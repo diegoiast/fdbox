@@ -3,6 +3,30 @@
 # set -x
 set -e
 
+function create_header() {
+    local NAME=$1
+    cat << EOF
+#ifndef __${NAME}_h__
+#define __${NAME}_h__
+
+int command_${NAME}(int arc, char* argv[]);
+
+#endif //__${NAME}_h__
+EOF
+}
+
+function create_file_content() {
+    local NAME=$1
+    cat << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include "${NAME}.h"
+
+int command_${NAME}(int arc, char* argv[]) {
+    return EXIT_FAILURE;
+}
+EOF
+}
 
 function create_main() {
     echo "#include <stdlib.h>"
@@ -85,19 +109,13 @@ for i in $SOURCES; do
     APPLETS="${APPLETS} ${NAME}"
     INCLUDES="${INCLUDES} $INC_FILE"
 
-    echo "#ifndef __${NAME}_h__" >> $INC_FILE
-    echo "#define __${NAME}_h__" >> $INC_FILE
-    echo "int command_${NAME}(int arc, char* argv[]);" >> $INC_FILE
-    echo "#endif //__${NAME}_h__" >> $INC_FILE
+    if [ ! -s $INC_FILE ]; then 
+        create_header $NAME > $INC_FILE
+    fi 
 
-    touch $INC_FILE
-    echo "#include <stdlib.h> " > $i
-    echo "#include <stdio.h> " >> $i
-    echo "#include \"${NAME}.h\" " >> $i
-    echo "" >> $i
-    echo "int command_${NAME}(int arc, char* argv[]) {" >> $i
-    echo "  return EXIT_FAILURE;" >> $i    
-    echo "}" >> $i
+    if [ ! -s $i ]; then 
+        create_file_content $NAME > $i
+    fi
 done;
 
 
@@ -109,11 +127,12 @@ echo "OBJECTS =${OBJECTS}"  >> $MAKEFILE
 echo "" >> $MAKEFILE
 
 echo 'fdbox: $(OBJECTS)' >> $MAKEFILE 
-echo '\t$(CC) $(OBJECTS) -o fbbox'   >> $MAKEFILE
+echo '\t$(CC) $(OBJECTS) -o fdbox'   >> $MAKEFILE
 echo "" >> $MAKEFILE
 echo "clean:" >>  $MAKEFILE
 echo '\trm -f $(OBJECTS) fdbox' >>  $MAKEFILE
 
-# create main
+echo "dist-clean: clean" >>  $MAKEFILE
+echo "\trm -f ${INCLUDES} main.c Makefile" >>  $MAKEFILE
 
 create_main $APPLETS  > main.c
