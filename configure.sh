@@ -3,7 +3,7 @@
 # set -x
 set -e
 
-function create_header() {
+create_header() {
     local NAME=$1
     cat << EOF
 #ifndef __${NAME}_h__
@@ -19,7 +19,7 @@ const char* help_${NAME}();
 EOF
 }
 
-function create_file_content() {
+create_file_content() {
     local NAME=$1
     cat << EOF
 #include <stdlib.h>
@@ -42,10 +42,10 @@ const char* help_${NAME}() {
 EOF
 }
 
-function create_main() {
+create_main() {
     echo "#include <stdlib.h>"
     echo "#include <stdio.h>"
-    echo "#include <strings.h>"
+    echo "#include <string.h>"
     echo "#include \"fdbox.h\""
     echo 
 
@@ -60,7 +60,7 @@ function create_main() {
     echo "   { NULL, NULL}"
     echo "};"
 
-    CAT << EOF
+    cat << EOF
 
 struct applet* find_applet(const char* applet_name);
 
@@ -141,7 +141,11 @@ echo "" >> $MAKEFILE
 echo "clean:" >>  $MAKEFILE
 echo '\trm -f $(OBJECTS) fdbox' >>  $MAKEFILE
 
-echo "dist-clean: clean" >>  $MAKEFILE
+echo "distclean: clean" >>  $MAKEFILE
 echo "\trm -f ${INCLUDES} main.c Makefile" >>  $MAKEFILE
+
+echo "gitclean: clean" >>  $MAKEFILE
+echo "\tgit checkout dos/*.c unix/*.c " >>  $MAKEFILE
+echo "\trm -f  dos/*.h unix/*.h main.c" >>  $MAKEFILE
 
 create_main $APPLETS  > main.c
