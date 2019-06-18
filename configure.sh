@@ -13,6 +13,7 @@ function create_header() {
 // For license - read license.txt
 
 int command_${NAME}(int arc, char* argv[]);
+const char* help_${NAME}();
 
 #endif //__${NAME}_h__
 EOF
@@ -23,6 +24,8 @@ function create_file_content() {
     cat << EOF
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "fdbox.h"
 #include "${NAME}.h"
 
 // This file is part of fdbox
@@ -32,6 +35,10 @@ int command_${NAME}(int arc, char* argv[]) {
     printf("${NAME} - TODO: Unimplemented yet\n");
     return EXIT_FAILURE;
 }
+
+const char* help_${NAME}() {
+    return "Here should be a basic help for ${NAME}";
+}
 EOF
 }
 
@@ -39,24 +46,16 @@ function create_main() {
     echo "#include <stdlib.h>"
     echo "#include <stdio.h>"
     echo "#include <strings.h>"
-    
+    echo "#include \"fdbox.h\""
     echo 
 
     for i in $INCLUDES; do
         echo "#include \"$i\""
     done
-
-    echo 
-    echo "typedef int (*functionHandler)(int, char*[]);"
-    echo 
-    echo "struct applet {"
-    echo "  const char* name;"
-    echo "  functionHandler handler;"
-    echo "};"
     echo
     echo 'struct applet commands[] = {'
     for i in $APPLETS; do
-        echo "    { \"$i\", &command_${i} },"
+        echo "    { &help_${i},  &command_${i}, \"$i\" },"
     done
     echo "   { NULL, NULL}"
     echo "};"
@@ -95,9 +94,10 @@ MAKEFILE="Makefile"
 OBJECTS=""
 INCLUDES=""
 APPLETS=""
-SOURCES=`echo ./help.c dos/*.c unix/*.c `
+SOURCES=`echo dos/*.c unix/*.c ./help.c `
 
 rm -f $MAKEFILE
+echo "CCFLAGS=-Os -g -Wall -I." >> $MAKEFILE
 echo ".PHONY: all clean"  >> $MAKEFILE
 echo "" >> $MAKEFILE
 echo "all: fdbox" >> $MAKEFILE
@@ -107,28 +107,28 @@ echo "" >> $MAKEFILE
 for i in $SOURCES; do 
     DIR=`echo $i | cut -f 1 -d/`
     NAME=`echo $i | cut -f 2 -d/ | cut -f 1 -d.`
-    echo "${NAME}.o: $i" >> $MAKEFILE
-    echo  "\t" '$(CC) $(CCFLAGS) -c $< -o $@' >> $MAKEFILE
 
-    echo >> $MAKEFILE
     INC_FILE="$DIR/${NAME}.h"
     OBJECTS="${OBJECTS} ${NAME}.o"
     APPLETS="${APPLETS} ${NAME}"
     INCLUDES="${INCLUDES} $INC_FILE"
 
-    if [ ! -s $INC_FILE ]; then
-        echo "Generating header for $i"
-        create_header $NAME > $INC_FILE
-    fi 
+    echo >> $MAKEFILE
+    echo "${NAME}.o: $i $INC_FILE fdbox.h " >> $MAKEFILE
+    echo  "\t" '$(CC) $(CCFLAGS) -c $< -o $@' >> $MAKEFILE
 
     if [ ! -s $i ]; then 
         echo "Generating content for $i"
         create_file_content $NAME > $i
     fi
+    if [ ! -s $INC_FILE ]; then
+        echo "Generating header $INC_FILE"
+        create_header $NAME > $INC_FILE
+    fi 
 done;
 
 
-echo "main.o: main.c" >> $MAKEFILE
+echo "main.o: main.c fdbox.h $INCLUDES" >> $MAKEFILE
 echo  "\t" '$(CC) $(CCFLAGS) -c $< -o $@' >> $MAKEFILE
 OBJECTS="${OBJECTS} main.o"
 
