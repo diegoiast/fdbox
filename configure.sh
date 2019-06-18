@@ -9,6 +9,9 @@ function create_header() {
 #ifndef __${NAME}_h__
 #define __${NAME}_h__
 
+// This file is part of fdbox
+// For license - read license.txt
+
 int command_${NAME}(int arc, char* argv[]);
 
 #endif //__${NAME}_h__
@@ -22,7 +25,11 @@ function create_file_content() {
 #include <stdio.h>
 #include "${NAME}.h"
 
+// This file is part of fdbox
+// For license - read license.txt
+
 int command_${NAME}(int arc, char* argv[]) {
+    printf("${NAME} - TODO: Unimplemented yet\n");
     return EXIT_FAILURE;
 }
 EOF
@@ -109,11 +116,13 @@ for i in $SOURCES; do
     APPLETS="${APPLETS} ${NAME}"
     INCLUDES="${INCLUDES} $INC_FILE"
 
-    if [ ! -s $INC_FILE ]; then 
+    if [ ! -s $INC_FILE ]; then
+        echo "Generating header for $i"
         create_header $NAME > $INC_FILE
     fi 
 
     if [ ! -s $i ]; then 
+        echo "Generating content for $i"
         create_file_content $NAME > $i
     fi
 done;
