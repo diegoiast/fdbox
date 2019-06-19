@@ -69,15 +69,13 @@ int command_beep(int argc, char* argv[]) {
     }
 
 // printf("f=%d, t=%d\n", frequency, lenght);
-#if defined(UNIX) || defined(__APPLE__)
+#if defined(__unix__) || defined(__APPLE__)
     printf ("\a");
     UNUSED(frequency);
     UNUSED(lenght);
-#endif
-#ifdef WIN32
+#elif defined(WIN32)
     Beep(frequency, lenght);
-#endif
-#ifdef DOS
+#elif deinfed(DOS)
     sound(frequency);
     delay(length);
     nosound();
@@ -86,13 +84,9 @@ int command_beep(int argc, char* argv[]) {
 }
 
 const char* help_beep() {
-#if defined(UNIX) || defined(__APPLE__)
+#if defined(__unix__) || defined(__APPLE__)
     return "Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with DOS)";
-#endif
-#ifdef WIN32
-    return "Makes sound for a specified length in milliseconds";
-#endif
-#ifdef DOS
+#elif defined(WIN32) || defined(DOS)
     return "Makes sound for a specified length in milliseconds";
 #endif
 }
