@@ -5,6 +5,8 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
+// https://stackoverflow.com/questions/1486904/how-do-i-best-silence-a-warning-about-unused-variables
+#define UNUSED(expr) do { (void)(expr); } while (0)
 
 typedef int (*function_handler)(int, char*[]);
 typedef const char* (*function_help)();
