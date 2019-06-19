@@ -31,7 +31,7 @@ create_file_content() {
 // This file is part of fdbox
 // For license - read license.txt
 
-int command_${NAME}(int arc, char* argv[]) {
+int command_${NAME}(int argc, char* argv[]) {
     printf("${NAME} - TODO: Unimplemented yet\n");
     return EXIT_FAILURE;
 }
@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
 {    
     struct applet *cmd = find_applet(argv[1]);
     if (cmd != NULL) {
-        return cmd->handler(argc, argv);
+        // shift argument list left, now applet name is argv[0]
+        return cmd->handler(argc - 1, ++argv);
     }
     command_help(argc, argv);
     return EXIT_FAILURE;
