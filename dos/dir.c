@@ -53,6 +53,12 @@ void dir_config_print(struct dir_config *config);
 
 void print_unimplemented(const char* arg);
 
+
+#define ARG_DONE         -1
+#define ARG_STRING       0
+#define ARG_NOT_EXISTING 1000
+#define ARG_EXTRA        1001
+
 int dos_parseargs(int *argc, char **argv[], const char* template, char **output );
 
 int command_dir(int argc, char* argv[]) {
@@ -65,11 +71,8 @@ int command_dir(int argc, char* argv[]) {
 
     argc = 1; // ???
     while ((r = dos_parseargs(&argc, &argv, "pwa[drhsa-]o[nsedgc-]sblc[h]", &c)) >= 0)  {
-        // printf(" dos_parseargs = %c (%d)\n", r, r);
+//         printf(" dos_parseargs = %c (%d)\n", r < 255? r: '?', r);
         switch (r) {
-        case 0:
-            config.files = c;
-            break;
         case 'a':
             print_unimplemented("/a");
             return EXIT_FAILURE;
@@ -157,8 +160,17 @@ int command_dir(int argc, char* argv[]) {
         case 'w':
             config.wide = true;
             break;
-        default:
-            printf("Unknown argument %c: %d\n", r,r);
+    
+        case ARG_STRING:
+            config.files = c;
+            break;
+        case ARG_EXTRA:
+            printf("Unknown argument suffix - %s\n",  c);
+            help_dir();
+            return EXIT_FAILURE;
+        case ARG_NOT_EXISTING:
+//         default:
+            printf("Unknown argument %s\n", c);
             help_dir();
             return EXIT_FAILURE;
         }
@@ -197,65 +209,63 @@ void dir_config_print(struct dir_config *config) {
 }
 
 int dos_parseargs(int *argc, char **argv[], const char* template, char **output) {
-    // is this a file name
-    // printf("Checking arg %d = %s\n", (*argc), (*argv)[*argc] );
-
-    if ((*argv)[*argc] == NULL) {
-        return -1;
+    
+//     printf("Checking for argc=%d\n", *argc);
+    char *c = ((*argv)[*argc]);
+    const char *t = template;
+    
+    if (c == NULL) {
+//         printf("No argument = -1\n");
+        return ARG_DONE;
     }
-    if ((*argv)[*argc][0] != '/') {
-        *output = (*argv)[*argc];
-        (*argc)++;
-        // printf("using file, argc=%d\n", *argc);
-        return 0;
-    };
-
-    // ok, we know it is a switch
-    char *arg = (*argv)[*argc] + 1;
-    while (*template != 0) {
-        // DEBUG_LINE;
-        if (*arg != *template) {
-            template ++;
-            if (*template == '[') {
-                while (*template != 0 && *template != ']') {
-                    template++;
+//     DEBUG_LINE;
+    while (*c  != '\0') {
+//         DEBUG_LINE;
+         // if this is not a command line argument, this is a filename
+        if (*c != '/') {
+            (*output) = c;
+            (*argv)++;
+//             printf("Found filename =%s\n", c);
+            return ARG_STRING;
+        }
+        
+        c++;
+        while (*t != '\0') {
+//             printf("t=%c, c=%c ?\n", *t, *c);
+            if (*t == '[') {
+                while (*t != '\0' && *t != ']') {
+                    t++;
+//                     printf(" - t=%c, c=%c ?\n", *t, *c);
                 }
             }
-            continue;
-        }
-
-        // DEBUG_LINE;
-        // we found the switch, does it have options?
-        template++;
-        // printf("next template = %c\n", *template);
-        if ( (*template) != '[') {
-            (*output) = NULL;
-            int result = *arg;
-            (*argc)++;
-            // DEBUG_LINE;
-            return result;
-        }
-
-// DEBUG_LINE;
-        char flag = 0;
-        while (*template != 0 && *template != ']') {
-            if (*template == *arg) {
-                flag = *arg;
+            
+            // not matching our template
+            if (*t != *c) {
+                t++;
+                continue;
             }
-            template ++;
+            
+            // is this a combo? does it need something to follow?
+            t++;
+            if (*t != '[' || *t == '\0') {
+                (*argv)++;
+                (*output) = NULL;
+                
+                if (*(c+1) != '\0') {
+                    // there is something else - not good                    
+//                     printf("Found simple argument %c->%c (BAD)\n", *c, *(c+1));
+//                     printf("argv=%s\n", (*argv)[(*argc-1)]);
+                    (*output) = (*argv)[(*argc-1)];
+                    return ARG_EXTRA;
+                }
+//                 printf("Found simple argument %c->%c (OK)\n", *c, *(c+1));
+                return *c;
+            }
         }
-        if (flag == 0) {
-            return -2;
-        }
-        // note that we do not validate yet
-        // printf("output = %d\n", *output);
-        *output = arg;
-        int result = *arg;
-        arg++;
-        return result;
+        c++;
     }
-
-        // DEBUG_LINE;
+//         printf("Arg not found\n");
     (*argc)++;
-    return -1;
+    (*output) = (*argv)[(*argc-1)];
+    return ARG_NOT_EXISTING;
 }
