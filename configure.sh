@@ -124,8 +124,8 @@ echo 'fdbox: $(OBJECTS)' >> $MAKEFILE
 echo '\t$(CC) $(OBJECTS) -o fdbox'   >> $MAKEFILE
 
 echo "" >> $MAKEFILE
-echo 'unittest: tests.o args.o' >> $MAKEFILE 
-echo '\t$(CC) tests.o args.o -o unittest'   >> $MAKEFILE
+echo 'unittest: tests.o args.o applet.o' >> $MAKEFILE 
+echo '\t$(CC) tests.o args.o applet.o -o unittest'   >> $MAKEFILE
 
 echo "" >> $MAKEFILE
 echo "test: unittest" >>  $MAKEFILE

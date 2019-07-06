@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "lib/applet.h"
 #include "fdbox.h"
 #include "help.h"
 
 // This file is part of fdbox
 // For license - read license.txt
+
+extern struct applet commands[];
 
 int command_help(int arc, char* argv[]) {
     printf("FDBox version %s (%d)\n", FDBOX_VERSION_STR, FDBOX_VERSION);

@@ -8,15 +8,6 @@
 // https://stackoverflow.com/questions/1486904/how-do-i-best-silence-a-warning-about-unused-variables
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
-typedef int (*function_handler)(int, char*[]);
-typedef const char* (*function_help)();
-
-struct applet { 
-  function_help help_text;
-  function_handler handler;
-  const char* name;
-};
-
 #define FDBOX_MAJOR 1
 #define FDBOX_MINOR 2 
 #define FDBOX_PATCH 1
@@ -26,8 +17,9 @@ struct applet {
 #define FDBOX_VERSION  FDBOX_MKVER( FDBOX_MAJOR, FDBOX_MINOR, FDBOX_PATCH, FDBOX_RELEASE ) 
 #define FDBOX_VERSION_STR STR(FDBOX_MAJOR)"."STR(FDBOX_MINOR)"."STR(FDBOX_PATCH)"-"STR(FDBOX_RELEASE)
 
-#ifndef __MAIN__
-extern struct applet commands[];
-#endif
+
+// debug
+#define DEBUG_LINE printf("%s:%d %s() - PING\n", __FILE__, __LINE__, __FUNCTION__)
+
 
 #endif // __fdbox_h__
