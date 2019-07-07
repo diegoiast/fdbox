@@ -31,14 +31,9 @@ bool test(const char* message, function_test unittest) {
     return true;
 }
 
-bool test_args() {
-    return false;
-}
-
-
 //////////////////////////
-
-bool verify_ptr_equals(void *arg1, void* arg2, const char * message) {
+// 
+bool verify_ptr_equals(void* arg1, void* arg2, const char* message) {
     printf(" * Checking %s: ", message);
     if (arg1 == arg2) {
         printf("OK\n");
@@ -47,6 +42,58 @@ bool verify_ptr_equals(void *arg1, void* arg2, const char * message) {
     printf("FAIL (expecting %p, got %p)\n", arg1, arg2);
     return false;
 }
+
+bool verify_int_equals(int arg1, int arg2, const char * message) {
+    printf(" * Checking %s: ", message);
+    if (arg1 == arg2) {
+        printf("OK\n");
+        return true;
+    }
+    printf("FAIL (expecting %d, got %d)\n", arg1, arg2);
+    return false;
+}
+
+
+///////////////////////////////////////////
+// Argumnents
+
+int split_strings(char* c2, char *argv[][100]) {
+    int argc = 0;
+    char *token;
+    while ((token = strsep(&c2, " "))) {
+        if (*token == '\0') {
+            continue;
+        }
+        (*argv)[argc] = token;
+        argc ++;
+    }
+    return argc;
+}
+
+void print_agrs(int argc, char *argv[]) {
+    for (int i=0; i<argc; i++) {
+        printf("%d: '%s', ", i, argv[i]);
+    }
+}
+
+bool test_args() {
+    bool ok = true;
+    char c2[256];
+    char *argv[100];
+    int argc = -1;
+
+    argc = split_strings(strcpy(c2, ""), &argv );
+    ok |= verify_int_equals(0, argc, "no arguments");
+
+    argc = split_strings(strcpy(c2, "asd asd"), &argv );
+    ok |= verify_int_equals(2, argc, "2 arguments");
+
+    argc = split_strings(strcpy(c2, "111 222 333 44             555 666"), &argv );
+    ok |= verify_int_equals(6, argc, "6 arguments");
+
+    return ok;
+}
+
 
 /////////// applets
 int applet1(int arc, char* argv[]) {
