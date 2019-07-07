@@ -1,7 +1,12 @@
 /* auto generated file */
+/* not modify manually*/
+
+/* general includes */
 #include <stddef.h>
+#include "lib/applet.h"
 #include "fdbox.h"
 
+/* applets includes */
 #include "dos/beep.h"
 #include "dos/call.h"
 #include "dos/cd.h"
@@ -29,8 +34,6 @@
 #include "unix/hexdump.h"
 #include "unix/tail.h"
 #include "./help.h"
-#include "lib/applet.h"
-#include "lib/args.h"
 
 struct applet commands[] = {
     { &help_beep,  &command_beep, "beep" },
@@ -60,5 +63,5 @@ struct applet commands[] = {
     { &help_hexdump,  &command_hexdump, "hexdump" },
     { &help_tail,  &command_tail, "tail" },
     { &help_help,  &command_help, "help" },
-    { NULL, NULL}
+    { NULL, NULL, NULL}
 };
