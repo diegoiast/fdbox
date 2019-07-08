@@ -16,8 +16,8 @@ bool test_applets();
 int main(int argc, char *argv[])
 {
     bool ok = true;
-    ok &= test("args", test_args);
     ok &= test("applets", test_applets);
+    ok &= test("args", test_args);
 //     test("args", test_args);
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -32,7 +32,9 @@ bool test(const char* message, function_test unittest) {
 }
 
 //////////////////////////
-// 
+// assert like functions. 
+// TODO : if we convert this to a macro, we will have line numbers
+
 bool verify_ptr_equals(void* arg1, void* arg2, const char* message) {
     printf(" * Checking %s: ", message);
     if (arg1 == arg2) {
@@ -54,6 +56,7 @@ bool verify_int_equals(int arg1, int arg2, const char * message) {
 }
 
 
+
 ///////////////////////////////////////////
 // Argumnents
 
@@ -70,26 +73,68 @@ int split_strings(char* c2, char *argv[][100]) {
     return argc;
 }
 
-void print_agrs(int argc, char *argv[]) {
-    for (int i=0; i<argc; i++) {
-        printf("%d: '%s', ", i, argv[i]);
-    }
-}
-
 bool test_args() {
     bool ok = true;
-    char c2[256];
+    char c2[256], *c3;
     char *argv[100];
-    int argc = -1;
+    int argc = -1, r;
 
+    // basic argument parsing - can we create argc/argv?
     argc = split_strings(strcpy(c2, ""), &argv );
     ok |= verify_int_equals(0, argc, "no arguments");
 
+    memset(c2, 'x', 256);
     argc = split_strings(strcpy(c2, "asd asd"), &argv );
     ok |= verify_int_equals(2, argc, "2 arguments");
-
+    
+    memset(c2, 'x', 256);
     argc = split_strings(strcpy(c2, "111 222 333 44             555 666"), &argv );
-    ok |= verify_int_equals(6, argc, "6 arguments");
+    ok |= verify_int_equals(6, argc, "6 arguments");    
+    
+    memset(c2, 'x', 256);
+    argc = split_strings(strcpy(c2, "dir /w"), &argv );
+    ok |= verify_int_equals(2, argc, "2 arguments");
+    
+    memset(c2, 'x', 256);
+    argc = split_strings(strcpy(c2, "dir /w /w"), &argv );
+    ok |= verify_int_equals(3, argc, "3 arguments");
+    
+    memset(c2, 'x', 256);
+    argc = split_strings(strcpy(c2, "dir /w /e"), &argv );
+    ok |= verify_int_equals(3, argc, "3 arguments");
+    
+    // let the fun begin
+    argc = split_strings(strcpy(c2, "dir /w"), &argv );
+//     print_agrs(argc, argv);
+    hexDump("argc - 1", c2, 50);
+
+//     DEBUG_LINE;
+//     print_agrs(argc, argv);
+    // TODO - I am unhappy about this typocast
+    while ((r = dos_parseargs(&argc, (char***)&argv, "w", &c3)) >= 0)  {
+        if (r != 'w') {
+            ok = false;
+            printf(" * Checking %c: FAIL\n", 'w');
+        }
+    }
+    if (ok) {
+        printf(" * Checking single arg: OK\n");
+    }
+
+    argc = split_strings(strcpy(c2, "dir /w /e"), &argv );
+    print_agrs(argc, argv);
+    hexDump("argc - 2", c2, 50);
+    return ok;
+//     print_agrs(argc, argv);
+    while ((r = dos_parseargs(&argc, (char***)&argv, "we", &c3)) >= 0)  {
+        if (r != 'w' || r != 'e') {
+            ok = false;
+            printf(" * Checking 2 args: FAIL\n");
+        }
+    }
+    if (ok) {
+        printf(" * Checking double arg: OK\n");
+    }
 
     return ok;
 }
