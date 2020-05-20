@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 
 #include "fdbox.h"
 #include "args.h"
@@ -14,9 +15,9 @@ void hexDump (char *desc, void *addr, int len) {
     unsigned char *pc = (unsigned char*)addr;
 
     // Output description if given.
-    if (desc != NULL)
+    if (desc != NULL) {
         printf ("%s: %p\n", desc, addr);
-
+    }
     if (len == 0) {
         printf("  ZERO LENGTH\n");
         return;
@@ -70,7 +71,7 @@ void print_agrs(int argc, char *argv[]) {
         printf("argv = NULL\n");
         return;
     }
-    printf("argv =%p\n");
+    printf("argv =%p\n", argv);
     for (int i=0; i<argc; i++) {
         printf("%d: '%s', ", i, argv[i]);
     }
@@ -79,16 +80,16 @@ void print_agrs(int argc, char *argv[]) {
 int dos_parseargs(int *argc, char **argv[], const char* template, char **output) {
     
     printf("Checking for argc=%d\n", *argc);
-    print_agrs(argc, argv);
+    print_agrs(*argc, *argv);
     char *c = ((*argv)[*argc]);
     const char *t = template;
     
-    DEBUG_LINE;
+//    DEBUG_LINE;
     if (c == NULL) {
 //         printf("No argument = -1\n");
         return ARG_DONE;
     }
-    DEBUG_LINE;
+//    DEBUG_LINE;
     while (*c  != '\0') {
         DEBUG_LINE;
          // if this is not a command line argument, this is a filename

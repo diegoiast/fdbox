@@ -17,9 +17,6 @@
 #define FDBOX_VERSION  FDBOX_MKVER( FDBOX_MAJOR, FDBOX_MINOR, FDBOX_PATCH, FDBOX_RELEASE ) 
 #define FDBOX_VERSION_STR STR(FDBOX_MAJOR)"."STR(FDBOX_MINOR)"."STR(FDBOX_PATCH)"-"STR(FDBOX_RELEASE)
 
-
-// debug
 #define DEBUG_LINE printf("%s:%d %s() - PING\n", __FILE__, __LINE__, __FUNCTION__)
-
 
 #endif // __fdbox_h__

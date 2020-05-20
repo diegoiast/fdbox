@@ -63,8 +63,6 @@ int command_dir(int argc, char* argv[]) {
 //         printf(" dos_parseargs = %c (%d)\n", r < 255? r: '?', r);
         switch (r) {
         case 'a':
-            print_unimplemented("/a");
-            return EXIT_FAILURE;
             while (c != NULL) {
                 char reverse = false;
                 if (*c == '-') {
@@ -107,8 +105,6 @@ int command_dir(int argc, char* argv[]) {
             config.lowercase = true;
             break;
         case 'o':
-            print_unimplemented("/a");
-            return EXIT_FAILURE;
             while (c != NULL) {
                 char reverse = false;
                 if (*c == '-') {
@@ -168,10 +164,6 @@ int command_dir(int argc, char* argv[]) {
     return EXIT_FAILURE;
 }
 
-const char* help_dir() {
-    return "Here should be a basic help for dir";
-}
-
 void print_unimplemented(const char* arg) {
     printf("Argument %s is still not implemented", arg);
 }
@@ -195,3 +187,8 @@ void dir_config_print(struct dir_config *config) {
     printf("subdirs=%d\n", config->subdirs);
     printf("files=%s\n", config->files);
 }
+
+const char* help_dir() {
+    return "Here should be a basic help for dir";
+}
+

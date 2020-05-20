@@ -18,4 +18,3 @@ int main(int argc, char *argv[])
     command_help(argc, argv);
     return EXIT_FAILURE;
 }
-
