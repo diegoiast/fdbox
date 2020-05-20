@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#if __LINUX__
+#if __linux__
 #include <unistd.h>
 #include <stdio.h>
 #include <limits.h>
@@ -21,18 +21,21 @@
 int command_cd(int argc, char* argv[]) {
     if (argc == 1)
     {
-#ifdef __LINUX__
-           char cwd[PATH_MAX];
-           char *getcwd(char *buf, size_t size);
+        char cwd[128];
+#ifdef __linux__
+           getcwd(cwd, 128);
 #endif
 
 #ifdef WIN32
-        char cwd[128];
         DWORD err = GetCurrentDirectory(128, cwd);
 #endif
 
-        printf("%s\n", cwd); } return EXIT_FAILURE;
+        printf("%s\n", cwd); 
+        return EXIT_FAILURE;
     }
+
+    return EXIT_FAILURE;
+}
 
 const char* help_cd() {
     return "Change working directory, pass none to display current directory";

@@ -8,7 +8,7 @@
 // For license - read license.txt
 
 int command_cls(int argc, char* argv[]) {
-#ifdef __LINUX__
+#ifdef __linux__
     printf("\e[1;1H\e[2J");
 #endif
 
