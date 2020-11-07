@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "lib/args.h"
 #include "fdbox.h"
@@ -38,172 +39,166 @@ preset switches by prefixing any switch with - (hyphen)--for example, /-W.
 
 struct dir_config
 {
-    char pause;
-    char wide;
-    char bare;
-    char compress_ratio; //  0 = no // 1 = yes, 2 = host allocation unit size
-    char lowercase;
-    char subdirs;
-    const char* files;
+    bool pause;                  // p
+    bool wide;                   // w
+//    int attr;                    // a D[dirs], H[hidden], S[system], R[readonly], A[Archive] -[not]
+//    int sort_order;              // o N[name], E[extention] G[dirs first] D[date] S[size] U[unsorted] - reverse
+    bool subdirs;                // s
+    bool bare;                   // b
+    bool lower_case;             // l
+    bool display_compress;       // c[h]
+    char files[128];
 };
-void dir_config_init(struct dir_config *config);
-void dir_config_print(struct dir_config *config);
-void print_unimplemented(const char* arg);
 
-char get_next_char(int argc, char*argv[], int *cargc, int *cargv)
+static void dir_config_init(struct dir_config *config);
+static void dir_config_print(struct dir_config *config);
+static bool dir_parse_config(int argc, char* argv[], struct dir_config *config);
+
+const char* pb(bool b)
 {
-    int c = argv[*cargc][*cargv];
+        return b ? "true" : "false";
+}
 
-    if (c == '\0') {
-        *cargc += 1;
-        *cargv = 0;
-        if (*cargc < argc) {
-            c = argv[*cargc][*cargv];
-        } else {
-            c = 0;
-        }
-    }
-
-    return c;
+void print_config(const struct dir_config *config)
+{
+        printf("\tpause=%s\n", pb(config->pause));
+        printf("\twide_format=%s\n", pb(config->wide));
+//        printf("\tattr=%d\n", config->attr);
+//        printf("\tsort_order=%d\n", config->sort_order);
+        printf("\tsubdirs=%s\n", pb(config->subdirs));
+        printf("\tlower_case=%s\n", pb(config->lower_case));
+        printf("\tdisplay_compress=%d\n", config->display_compress);
+        printf("%s\n", config->files);
 }
 
 int command_dir(int argc, char* argv[]) {
-    int cargc = 1, cargv=0;
-    char c;
-    struct dir_config config;
-    dir_config_init(&config);
-    // dir_config_print(&config);
-
-//    = dos_parseargs(&argc, &argv, "pwa[drhsa-]o[nsedgc-]sblc[h]", &c)) >= 0)  {
-    while ((c = get_next_char(argc, argv, &cargc, &cargv) != 0))  {
-        switch (c) {
-        case 'a':
-            do {
-                c = get_next_char(argc, argv, &cargc, &cargv);
-                char reverse = false;
-                switch (c) {
-                case '-':
-                    reverse = true;
-                    break;
-                case 'd':
-
-                    /* code */
-                    break;
-                case 'r':
-                    /* code */
-                    break;
-                case 'h':
-                    /* code */
-                    break;
-                case 's':
-                    /* code */
-                    break;
-                case 'a':
-                    /* code */
-                    break;
-                default:
-                    break;
-                }
-            } while (c != '\0' && c != ' ' && c != '\t');
-            break;
-        case 'b':
-            config.bare = true;
-            break;
-        case 'c':
-            // ???
-            if (c == 'h') {
-                config.compress_ratio = 2;
-            } else {
-                config.compress_ratio = 1;
-            }
-            break;
-        case 'l':
-            config.lowercase = true;
-            break;
-        case 'o':
-            while ((c = get_next_char(argc, argv, &cargc, &cargv) != 0))  {
-               char reverse = false;
-               switch (c) {
-               case '-':
-                   reverse = true;
-                   break;
-               case 'n':
-                   /* code */
-                   break;
-               case 's':
-                   /* code */
-                   break;
-               case 'e':
-                   /* code */
-                   break;
-               case 'd':
-                   /* code */
-                   break;
-               case 'g':
-                   /* code */
-                   break;
-               case 'c':
-                   /* code */
-                   break;
-               default:
-                   break;
-               }
-            }
-            break;
-        case 's':
-            config.subdirs = true;
-            break;
-        case 'p':
-            config.pause = true;
-            break;
-        case 'w':
-            config.wide = true;
-            break;
-/*
-        case ARG_STRING:
-            config.files = c;
-            break;
-        case ARG_EXTRA:
-            printf("Unknown argument suffix - %s\n",  c);
-            help_dir();
-            return EXIT_FAILURE;
-        case ARG_NOT_EXISTING:
-//         default:
-            printf("Unknown argument %s\n", c);
-            help_dir();
-            return EXIT_FAILURE;
-*/
+        struct dir_config config;
+        bool parsed = dir_parse_config(argc, argv, &config);
+        if (parsed) {
+                print_config(&config);
+        } else {
+                printf("Failed parsing command line args\n");
         }
-    }
-    dir_config_print(&config);
-    return EXIT_FAILURE;
-}
-
-void print_unimplemented(const char* arg) {
-    printf("Argument %s is still not implemented", arg);
-}
-
-void dir_config_init(struct dir_config *config) {
-    config->pause = false;
-    config->wide = false;
-    config->bare = false;
-    config->compress_ratio = 0; // 1 = yes, 2 = host allocation unit size
-    config->lowercase = false;
-    config->subdirs = false;
-    config->files = NULL;
-}
-
-void dir_config_print(struct dir_config *config) {
-    printf("pause=%d\n", config->pause);
-    printf("wide=%d\n", config->wide);
-    printf("base=%d\n", config->bare);
-    printf("compress_ratio=%d\n", config->compress_ratio);
-    printf("lowercase=%d\n", config->lowercase);
-    printf("subdirs=%d\n", config->subdirs);
-    printf("files=%s\n", config->files);
+        return EXIT_FAILURE;
 }
 
 const char* help_dir() {
     return "Here should be a basic help for dir";
 }
 
+static bool dir_parse_config(int argc, char* argv[], struct dir_config *config) {
+    for (int i=1; i < argc; i++) {
+            char c1, c2;
+
+            c1 = argv[i][0];
+            switch (c1) {
+            case '/':
+                    c2 = argv[i][1];
+                    switch (c2) {
+                    case 'p':
+                    case 'P':
+                            config->pause = true;
+                            if (argv[i][2] != 0) {
+                                    return false;
+                            }
+                            break;
+                    case 'w':
+                    case 'W':
+                            config->wide = true;
+                            if (argv[i][2] != 0) {
+                                    return false;
+                            }
+                            break;
+                    case 'a':
+                            switch (argv[i][2]) {
+                            case 'd':
+                            case 'D':
+                                    break;
+                            case 'h':
+                            case 'H':
+                                    break;
+                            case 's':
+                            case 'S':
+                                    break;
+                            case 'r':
+                            case 'R':
+                                    break;
+                            case 'a':
+                            case 'A':
+                                    break;
+                            default:
+                                    break;
+                            }
+                            break;
+                    case 'o':
+                            switch (argv[i][2]) {
+                            case 'n':
+                            case 'N':
+                                    break;
+                            case 'e':
+                            case 'E':
+                                    break;
+                            case 'g':
+                            case 'G':
+                                    break;
+                            case 'd':
+                            case 'D':
+                                    break;
+                            case 's':
+                            case 'S':
+                                    break;
+                            case 'u':
+                            case 'U':
+                                    break;
+                            default:
+                                    break;
+                            }
+                            break;
+                    case 's':
+                            config->subdirs = true;
+                            if (argv[i][2] != 0) {
+                                    return false;
+                            }
+                            break;
+                    case 'b':
+                            config->bare = true;
+                            if (argv[i][2] != 0) {
+                                    return false;
+                            }
+                            break;
+                    case 'l':
+                            config->lower_case = true;
+                            if (argv[i][2] != 0) {
+                                    return false;
+                            }
+                            break;
+                    default:
+                            printf("invalid command line switch at index %d/1\n", i);
+                    }
+                    break;
+            default:
+                    strncpy(config->files, argv[i], 128);
+                    break;
+            }
+    }
+
+}
+static void dir_config_init(struct dir_config *config) {
+    config->pause = false;
+    config->wide = false;
+    config->bare = false;
+//    config->compress_ratio = 0; // 1 = yes, 2 = host allocation unit size
+    config->lower_case = false;
+    config->subdirs = false;
+    config->files[0] = 0;
+}
+
+static void dir_config_print(struct dir_config *config) {
+    printf("pause=%d\n", config->pause);
+    printf("wide=%d\n", config->wide);
+    printf("base=%d\n", config->bare);
+//    printf("compress_ratio=%d\n", config->compress_ratio);
+    printf("lowercase=%d\n", config->lower_case);
+    printf("subdirs=%d\n", config->subdirs);
+    printf("files=%s\n", config->files);
+}
