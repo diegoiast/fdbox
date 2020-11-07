@@ -133,6 +133,8 @@ int dos_parseargs(int *argc, char **argv[], const char* template, char **output)
                 printf("Found simple argument %c->%c (OK)\n", *c, *(c+1));
                 return *c;
             }
+
+            // ok
         }
         c++;
     }

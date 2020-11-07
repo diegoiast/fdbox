@@ -50,27 +50,43 @@ void dir_config_init(struct dir_config *config);
 void dir_config_print(struct dir_config *config);
 void print_unimplemented(const char* arg);
 
-int command_dir(int argc, char* argv[]) {
-    char *c;
-    int r;
-    struct dir_config config;
+char get_next_char(int argc, char*argv[], int *cargc, int *cargv)
+{
+    int c = argv[*cargc][*cargv];
 
+    if (c == '\0') {
+        *cargc += 1;
+        *cargv = 0;
+        if (*cargc < argc) {
+            c = argv[*cargc][*cargv];
+        } else {
+            c = 0;
+        }
+    }
+
+    return c;
+}
+
+int command_dir(int argc, char* argv[]) {
+    int cargc = 1, cargv=0;
+    char c;
+    struct dir_config config;
     dir_config_init(&config);
     // dir_config_print(&config);
 
-    argc = 1; // ???
-    while ((r = dos_parseargs(&argc, &argv, "pwa[drhsa-]o[nsedgc-]sblc[h]", &c)) >= 0)  {
-//         printf(" dos_parseargs = %c (%d)\n", r < 255? r: '?', r);
-        switch (r) {
+//    = dos_parseargs(&argc, &argv, "pwa[drhsa-]o[nsedgc-]sblc[h]", &c)) >= 0)  {
+    while ((c = get_next_char(argc, argv, &cargc, &cargv) != 0))  {
+        switch (c) {
         case 'a':
-            while (c != NULL) {
+            do {
+                c = get_next_char(argc, argv, &cargc, &cargv);
                 char reverse = false;
-                if (*c == '-') {
+                switch (c) {
+                case '-':
                     reverse = true;
-                    c++;
-                }
-                switch (*c) {
+                    break;
                 case 'd':
+
                     /* code */
                     break;
                 case 'r':
@@ -84,18 +100,18 @@ int command_dir(int argc, char* argv[]) {
                     break;
                 case 'a':
                     /* code */
-                    break;                
+                    break;
                 default:
                     break;
                 }
-                c++;
-            }
+            } while (c != '\0' && c != ' ' && c != '\t');
             break;
         case 'b':
             config.bare = true;
             break;
         case 'c':
-            if (c != NULL && *c == 'h') {
+            // ???
+            if (c == 'h') {
                 config.compress_ratio = 2;
             } else {
                 config.compress_ratio = 1;
@@ -105,35 +121,33 @@ int command_dir(int argc, char* argv[]) {
             config.lowercase = true;
             break;
         case 'o':
-            while (c != NULL) {
-                char reverse = false;
-                if (*c == '-') {
-                    reverse = true;
-                    c++;
-                }
-                switch (*c) {
-                case 'n':
-                    /* code */
-                    break;
-                case 's':
-                    /* code */
-                    break;
-                case 'e':
-                    /* code */
-                    break;
-                case 'd':
-                    /* code */
-                    break;
-                case 'g':
-                    /* code */
-                    break;                
-                case 'c':
-                    /* code */
-                    break;                
-                default:
-                    break;
-                }
-                c++;
+            while ((c = get_next_char(argc, argv, &cargc, &cargv) != 0))  {
+               char reverse = false;
+               switch (c) {
+               case '-':
+                   reverse = true;
+                   break;
+               case 'n':
+                   /* code */
+                   break;
+               case 's':
+                   /* code */
+                   break;
+               case 'e':
+                   /* code */
+                   break;
+               case 'd':
+                   /* code */
+                   break;
+               case 'g':
+                   /* code */
+                   break;
+               case 'c':
+                   /* code */
+                   break;
+               default:
+                   break;
+               }
             }
             break;
         case 's':
@@ -145,7 +159,7 @@ int command_dir(int argc, char* argv[]) {
         case 'w':
             config.wide = true;
             break;
-    
+/*
         case ARG_STRING:
             config.files = c;
             break;
@@ -158,6 +172,7 @@ int command_dir(int argc, char* argv[]) {
             printf("Unknown argument %s\n", c);
             help_dir();
             return EXIT_FAILURE;
+*/
         }
     }
     dir_config_print(&config);
