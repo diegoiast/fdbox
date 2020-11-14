@@ -1,93 +1,253 @@
+// This file is part of fdbox
+// For license - read license.txt
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stddef.h>
+#include <malloc.h>
 
 #include "lib/args.h"
 #include "fdbox.h"
 #include "dir.h"
 
+// https://github.com/tronkko/dirent/tree/master/examples
+// https://github.com/tronkko/dirent/blob/master/include/dirent.h
+// https://gist.github.com/saghul/8013376
+// https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 
-// This file is part of fdbox
-// For license - read license.txt
+#ifdef _POSIX_C_SOURCE
+#include <dirent.h>
+#include <glob.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#endif
 
-/*
-Displays a list of files and subdirectories in a directory.                     
-                                                                                
-DIR [drive:][path][filename] [/P] [/W] [/A[[:]attribs]] [/O[[:]sortord]]        
-    [/S] [/B] [/L] [/C[H]]                                                      
-                                                                                
-  [drive:][path][filename]   Specifies drive, directory, and/or files to list.  
-  /P      Pauses after each screenful of information.                           
-  /W      Uses wide list format.                                                
-  /A      Displays files with specified attributes.                             
-  attribs   D  Directories   R  Read-only files         H  Hidden files         
-            S  System files  A  Files ready to archive  -  Prefix meaning "not" 
-  /O      List by files in sorted order.                                        
-  sortord   N  By name (alphabetic)       S  By size (smallest first)           
-            E  By extension (alphabetic)  D  By date & time (earliest first)    
-            G  Group directories first    -  Prefix to reverse order            
-            C  By compression ratio (smallest first)                            
-  /S      Displays files in specified directory and all subdirectories.         
-  /B      Uses bare format (no heading information or summary).                 
-  /L      Uses lowercase.                                                       
-  /C[H]   Displays file compression ratio; /CH uses host allocation unit size.  
-                                                                                
-Switches may be preset in the DIRCMD environment variable.  Override            
-preset switches by prefixing any switch with - (hyphen)--for example, /-W. 
- */
+#ifdef __WIN32__
+#include "lib/win32/dirent.h"
+#endif
+
+// this is to shut up QtCreator
+#ifndef bool
+#define bool int
+#define false 0
+#define true !false
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Types used internally
+
+#define SORT_NAME      0b00000001
+#define SORT_EXTENTION 0b00000010
+#define SORT_DIRS      0b00000100
+#define SORT_DATE      0b00001000
+#define SORT_SIZE      0b00010000
 
 struct dir_config
 {
+    bool show_help;              // ?
     bool pause;                  // p
     bool wide;                   // w
 //    int attr;                    // a D[dirs], H[hidden], S[system], R[readonly], A[Archive] -[not]
-//    int sort_order;              // o N[name], E[extention] G[dirs first] D[date] S[size] U[unsorted] - reverse
+    int sort_order;              //
     bool subdirs;                // s
     bool bare;                   // b
     bool lower_case;             // l
-    bool display_compress;       // c[h]
-    char files[128];
+//    bool display_compress;       // c[h]
+
+    // All other options are treated as files
+    char* files[128];
+    size_t files_count;
 };
 
+struct file_details {
+        char* file_name;
+        struct stat file_details;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Forward declarations
 static void dir_config_init(struct dir_config *config);
 static void dir_config_print(struct dir_config *config);
 static bool dir_parse_config(int argc, char* argv[], struct dir_config *config);
+static void dir_print_extended_help();
 
-const char* pb(bool b)
-{
-        return b ? "true" : "false";
-}
 
-void print_config(const struct dir_config *config)
-{
-        printf("\tpause=%s\n", pb(config->pause));
-        printf("\twide_format=%s\n", pb(config->wide));
-//        printf("\tattr=%d\n", config->attr);
-//        printf("\tsort_order=%d\n", config->sort_order);
-        printf("\tsubdirs=%s\n", pb(config->subdirs));
-        printf("\tlower_case=%s\n", pb(config->lower_case));
-        printf("\tdisplay_compress=%d\n", config->display_compress);
-        printf("%s\n", config->files);
-}
+static int dir_file_order;
+static int dir_file_comperator(const void *a, const void *b);
 
+static bool found(const char* file_name, const struct file_details files[], size_t file_count);
+static const char* pb(bool b);
+static char* string_to_lower(char* s);
+
+static bool flag_test(int value, int flag);
+static bool flag_set(int *value, int flag, bool on);
+
+///////////////////////////////////////////////////////////////////////////////
+// This is public API
 int command_dir(int argc, char* argv[]) {
         struct dir_config config;
-        bool parsed = dir_parse_config(argc, argv, &config);
-        if (parsed) {
-                print_config(&config);
-        } else {
+
+        // first read configuration from command line
+        dir_config_init(&config);
+        if (!dir_parse_config(argc, argv, &config)) {
                 printf("Failed parsing command line args\n");
+                return EXIT_FAILURE;
         }
-        return EXIT_FAILURE;
+        dir_config_print(&config);
+
+        if (config.show_help) {
+                dir_print_extended_help();
+                return EXIT_SUCCESS;
+        }
+
+        // then find all available files
+        struct file_details files[1000];
+        int file_count = 0;
+        if (config.files_count == 0) {
+                config.files[0] = "*";
+                config.files_count = 1;
+        }
+
+        for (size_t i=0; i<config.files_count; i++ ) {
+                glob_t globbuf = {0};
+                glob(config.files[i], GLOB_DOOFFS, NULL, &globbuf);
+                for (size_t j = 0; j != globbuf.gl_pathc; j++) {
+                        const char* file_name = globbuf.gl_pathv[j];
+                        if (!found(file_name, files, file_count)) {
+                                files[file_count].file_name = strdup(globbuf.gl_pathv[j]);
+                                file_count ++;
+                        }
+                }
+                globfree(&globbuf);
+        }
+
+        // then get info about each file
+        for (int i=0; i< file_count; i++) {
+                stat(files[i].file_name, &files[i].file_details);
+        }
+        // and sort if needed
+        if (config.sort_order != 0) {
+                dir_file_order = config.sort_order;
+                qsort(files, file_count, sizeof(struct file_details), dir_file_comperator);
+        }
+
+        long long int total_bytes = 0;
+        long long int free_bytes = 0;
+        int total_files = 0;
+        int total_dirs = 0;
+        int lines = 0;
+        int cols = 0;
+        if (!config.bare) {
+                printf("Directory of %s\n", "[TODO]");
+        }
+        for (int i=0; i< file_count; i++) {
+                char display[200];
+                total_bytes += files[i].file_details.st_size;
+                if (S_ISDIR(files[i].file_details.st_mode)) {
+                        total_dirs ++;
+                        if (config.wide) {
+                                snprintf(display, 200, "[%s]", files[i].file_name);
+                        }
+                        else {
+                                snprintf(display, 200, "%s/", files[i].file_name);
+                        }
+                } else {
+                        total_files ++;
+                        snprintf(display, 200, "%s", files[i].file_name);
+                }
+
+                if (config.lower_case) {
+                        string_to_lower(display);
+                }
+
+                if (config.wide) {
+                        printf("%-18s ", display);
+                        cols ++;
+                        if (cols == 4) {
+                                cols = 0;
+                                lines++;
+                                putchar('\n');
+                        }
+                } else {
+                        if (S_ISDIR(files[i].file_details.st_mode)) {
+                                printf("%-40s %20s %s %s\n", display, "<DIR>", "01-12-2020", "13:45");
+                        } else {
+                                printf("%-40s %20ld %s %s\n", display, files[i].file_details.st_size, "01-12-2020", "13:45");
+                        }
+                        lines ++;
+                }
+
+                // file name is no longer needed
+                free(files[i].file_name);
+        }
+
+        if (cols != 0) {
+                putchar('\n');
+        }
+        if (!config.bare) {
+                printf("%10d files(s)\t %lld bytes\n", total_files, total_bytes);
+                printf("%10d dirs(s) \t %lld free\n", total_dirs, free_bytes);
+        }
 }
 
 const char* help_dir() {
-    return "Here should be a basic help for dir";
+        return "Displays a list of files and subdirectories in a directory";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// internal functions
+static void dir_config_init(struct dir_config *config) {
+        config->pause = false;
+        config->wide = false;
+        config->bare = false;
+        config->sort_order = 0;
+        //    config->compress_ratio = 0; // 1 = yes, 2 = host allocation unit size
+        config->lower_case = false;
+        config->subdirs = false;
+        config->files_count = 0;
+        config->show_help = false;
+}
+
+static void dir_config_print(struct dir_config *config) {
+        printf("\tpause=%s\n", pb(config->pause));
+        printf("\twide_format=%s\n", pb(config->wide));
+//        printf("\tattr=%d\n", config->attr);
+        printf("\tsubdirs=%s\n", pb(config->subdirs));
+        printf("\tlower_case=%s\n", pb(config->lower_case));
+//        printf("\tdisplay_compress=%d\n", config->display_compress);
+
+        printf("\tsort=");
+        if (flag_test(config->sort_order, SORT_NAME)) {
+                printf("name ");
+        }
+        if (flag_test(config->sort_order, SORT_EXTENTION)) {
+                printf("extension ");
+        }
+        if (flag_test(config->sort_order, SORT_DIRS)) {
+                printf("directories ");
+        }
+        if (flag_test(config->sort_order, SORT_DATE)) {
+                printf("date ");
+        }
+        if (flag_test(config->sort_order, SORT_SIZE)) {
+                printf("size ");
+        }
+        if (config->sort_order == 0) {
+                printf("UNSORTED");
+        }
+        putchar('\n');
+
+        for (size_t i=0; i<config->files_count; i++ ) {
+                printf("%s ", config->files[i]);
+        }
+        printf("\n");
 }
 
 static bool dir_parse_config(int argc, char* argv[], struct dir_config *config) {
-    for (int i=1; i < argc; i++) {
+        for (int i=1; i < argc; i++) {
             char c1, c2;
 
             c1 = argv[i][0];
@@ -134,23 +294,27 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config) 
                             switch (argv[i][2]) {
                             case 'n':
                             case 'N':
+                                    flag_set( &config->sort_order, SORT_NAME, true);
                                     break;
                             case 'e':
                             case 'E':
+                                    flag_set( &config->sort_order, SORT_EXTENTION, true);
                                     break;
                             case 'g':
                             case 'G':
+                                    flag_set( &config->sort_order, SORT_DIRS, true);
                                     break;
                             case 'd':
                             case 'D':
+                                    flag_set( &config->sort_order, SORT_DATE, true);
                                     break;
                             case 's':
                             case 'S':
-                                    break;
-                            case 'u':
-                            case 'U':
+                                    flag_set( &config->sort_order, SORT_SIZE, true);
                                     break;
                             default:
+                                    printf("invalid sort argument %d/\n", i);
+                                    return false;
                                     break;
                             }
                             break;
@@ -172,33 +336,127 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config) 
                                     return false;
                             }
                             break;
+                    case '?':
+                            config->show_help = true;
+                            break;
                     default:
                             printf("invalid command line switch at index %d/1\n", i);
+                            return false;
                     }
                     break;
             default:
-                    strncpy(config->files, argv[i], 128);
+                    config->files[config->files_count] = argv[i];
+                    config->files_count ++;
                     break;
             }
-    }
-
-}
-static void dir_config_init(struct dir_config *config) {
-    config->pause = false;
-    config->wide = false;
-    config->bare = false;
-//    config->compress_ratio = 0; // 1 = yes, 2 = host allocation unit size
-    config->lower_case = false;
-    config->subdirs = false;
-    config->files[0] = 0;
+        }
+        return true;
 }
 
-static void dir_config_print(struct dir_config *config) {
-    printf("pause=%d\n", config->pause);
-    printf("wide=%d\n", config->wide);
-    printf("base=%d\n", config->bare);
-//    printf("compress_ratio=%d\n", config->compress_ratio);
-    printf("lowercase=%d\n", config->lower_case);
-    printf("subdirs=%d\n", config->subdirs);
-    printf("files=%s\n", config->files);
+static void dir_print_extended_help()
+{
+        printf("%s\n", help_dir());
+        printf("   dir [files] /p /w /s /b /l /O [files]\n");
+
+        printf("   /p pause after each screen\n");
+        printf("   /w use wide format, no details\n");
+        printf("   /s display contents of sub directories as well\n" );
+        printf("   /b bare format - print no headers of suffix\n" );
+        printf("   /l lower case - all names are dislpayed in lower case\n" );
+        printf("   /a[] filter files by attributes\n");
+        printf("       /ad - directoroies    /ar - readonly   /ah - hidden\n");
+        printf("       /as - system files\n");
+        printf("   /o[esdng] sort files\n" );
+        printf("       /oe - extension       /os - by name    /od - date\n" );
+        printf("       /on - by size         /og - directories first \n" );
+        printf("Examples:\n");
+        printf("> dir /w /os *.exe\n");
+        printf("> dir /p /b *.txt *.com\n");
+}
+
+static int dir_file_comperator(const void *a, const void *b)
+{
+        const struct file_details *file1 = (const struct file_details*) (a);
+        const struct file_details *file2 = (const struct file_details*) (b);
+
+        int order = 0;
+        if (flag_test(dir_file_order, SORT_DIRS)) {
+                if (S_ISDIR(file1->file_details.st_mode) && !S_ISDIR(file2->file_details.st_mode)) {
+                        order -= 10;
+                }
+                if (!S_ISDIR(file1->file_details.st_mode) && S_ISDIR(file2->file_details.st_mode)) {
+                        order += 10;
+                }
+        }
+        if (flag_test(dir_file_order, SORT_SIZE)) {
+                if (S_ISDIR(file1->file_details.st_mode) && !S_ISDIR(file2->file_details.st_mode)) {
+                        order --;
+                } else if (!S_ISDIR(file1->file_details.st_mode) && S_ISDIR(file2->file_details.st_mode)) {
+                        order ++;
+                } else if (!S_ISDIR(file1->file_details.st_mode) && !S_ISDIR(file2->file_details.st_mode)) {
+                        if (file1->file_details.st_size > file2->file_details.st_size) {
+                                order --;
+                        } else if (file1->file_details.st_size < file2->file_details.st_size) {
+                                order ++;
+                        }
+                }
+        }
+        if (flag_test(dir_file_order, SORT_DATE)) {
+                if (file1->file_details.st_mtim.tv_sec > file2->file_details.st_mtim.tv_sec) {
+                        order ++;
+                }
+                if (file1->file_details.st_mtim.tv_sec < file2->file_details.st_mtim.tv_sec) {
+                        order --;
+                }
+        }
+        if (flag_test(dir_file_order, SORT_NAME)) {
+                int v;
+                // TODO - config should be global, and we should use it here
+//                v = strcmp(file1->file_name, file2->file_name);
+                v = strcasecmp(file1->file_name, file2->file_name);
+                if (v > 0) {
+                        order += 2;
+                }
+                if (v < 0) {
+                        order -= 2;
+                }
+        }
+        // TODO - sort by ext
+        return order;
+}
+
+
+static bool found(const char* file_name, const struct file_details files[], size_t file_count) {
+        for (size_t i=0; i<file_count; i++) {
+                if (strcmp(file_name, files[i].file_name ) == 0) {
+                        return true;
+                }
+        }
+        return false;
+}
+
+static const char* pb(bool b)
+{
+        return b ? "true" : "false";
+}
+
+static char* string_to_lower(char* s)
+{
+        while (*s) {
+                *s = tolower(*s);
+                s++;
+        }
+}
+
+static bool flag_test(int value, int flag)
+{
+        return (value & flag) != 0;
+}
+static bool flag_set(int *value, int flag, bool on)
+{
+        if (on) {
+                *value |= flag;
+        } else {
+                *value ^= !flag;
+        }
 }
