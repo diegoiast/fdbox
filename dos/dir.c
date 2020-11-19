@@ -45,8 +45,7 @@
 #define SORT_DATE      0b00001000
 #define SORT_SIZE      0b00010000
 
-struct dir_config
-{
+struct dir_config {
     bool show_help;              // ?
     bool pause;                  // p
     bool wide;                   // w
@@ -56,8 +55,10 @@ struct dir_config
     bool bare;                   // b
     bool lower_case;             // l
 //    bool display_compress;       // c[h]
+// All other options are treated as files
+};
 
-    // All other options are treated as files
+struct dir_files {
     char* files[128];
     size_t files_count;
 };
@@ -69,9 +70,10 @@ struct file_details {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forward declarations
-static void dir_config_init(struct dir_config *config);
+static void dir_config_init(struct dir_config *config, struct dir_files *files);
 static void dir_config_print(struct dir_config *config);
-static bool dir_parse_config(int argc, char* argv[], struct dir_config *config);
+static void dir_display_dir(struct dir_config *config, const char* dir_name, struct dir_files *files2, int depth);
+static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, struct dir_files *files);
 static void dir_print_extended_help();
 
 
@@ -89,31 +91,38 @@ static bool flag_set(int *value, int flag, bool on);
 // This is public API
 int command_dir(int argc, char* argv[]) {
         struct dir_config config;
+        struct dir_files files;
 
         // first read configuration from command line
-        dir_config_init(&config);
-        if (!dir_parse_config(argc, argv, &config)) {
+        dir_config_init(&config, &files);
+        if (!dir_parse_config(argc, argv, &config, &files)) {
                 printf("Failed parsing command line args\n");
                 return EXIT_FAILURE;
         }
-        dir_config_print(&config);
+//        dir_config_print(&config);
 
         if (config.show_help) {
                 dir_print_extended_help();
                 return EXIT_SUCCESS;
         }
 
+        if (files.files_count == 0) {
+                files.files[0] = "*";
+                files.files_count = 1;
+        }
+
+        dir_display_dir(&config, ".", &files, 1);
+}
+
+static void dir_display_dir(struct dir_config *config, const char* dir_name, struct dir_files *files2, int depth)
+{
         // then find all available files
         struct file_details files[1000];
         int file_count = 0;
-        if (config.files_count == 0) {
-                config.files[0] = "*";
-                config.files_count = 1;
-        }
 
-        for (size_t i=0; i<config.files_count; i++ ) {
+        for (size_t i=0; i<files2->files_count; i++ ) {
                 glob_t globbuf = {0};
-                glob(config.files[i], GLOB_DOOFFS, NULL, &globbuf);
+                glob(files2->files[i], GLOB_DOOFFS, NULL, &globbuf);
                 for (size_t j = 0; j != globbuf.gl_pathc; j++) {
                         const char* file_name = globbuf.gl_pathv[j];
                         if (!found(file_name, files, file_count)) {
@@ -129,8 +138,8 @@ int command_dir(int argc, char* argv[]) {
                 stat(files[i].file_name, &files[i].file_details);
         }
         // and sort if needed
-        if (config.sort_order != 0) {
-                dir_file_order = config.sort_order;
+        if (config->sort_order != 0) {
+                dir_file_order = config->sort_order;
                 qsort(files, file_count, sizeof(struct file_details), dir_file_comperator);
         }
 
@@ -140,15 +149,15 @@ int command_dir(int argc, char* argv[]) {
         int total_dirs = 0;
         int lines = 0;
         int cols = 0;
-        if (!config.bare) {
-                printf("Directory of %s\n", "[TODO]");
+        if (!config->bare) {
+                printf("\nDirectory of %s (depth=%d)\n", dir_name, depth);
         }
         for (int i=0; i< file_count; i++) {
                 char display[200];
                 total_bytes += files[i].file_details.st_size;
                 if (S_ISDIR(files[i].file_details.st_mode)) {
                         total_dirs ++;
-                        if (config.wide) {
+                        if (config->wide) {
                                 snprintf(display, 200, "[%s]", files[i].file_name);
                         }
                         else {
@@ -159,11 +168,11 @@ int command_dir(int argc, char* argv[]) {
                         snprintf(display, 200, "%s", files[i].file_name);
                 }
 
-                if (config.lower_case) {
+                if (config->lower_case) {
                         string_to_lower(display);
                 }
 
-                if (config.wide) {
+                if (config->wide) {
                         printf("%-18s ", display);
                         cols ++;
                         if (cols == 4) {
@@ -180,16 +189,37 @@ int command_dir(int argc, char* argv[]) {
                         lines ++;
                 }
 
-                // file name is no longer needed
-                free(files[i].file_name);
+                if (config->subdirs && !S_ISDIR(files[i].file_details.st_mode)) {
+                        // file name is no longer needed
+                        free(files[i].file_name);
+                }
         }
-
         if (cols != 0) {
                 putchar('\n');
         }
-        if (!config.bare) {
+        if (!config->bare) {
                 printf("%10d files(s)\t %lld bytes\n", total_files, total_bytes);
                 printf("%10d dirs(s) \t %lld free\n", total_dirs, free_bytes);
+        }
+
+        if (config->subdirs) {
+                for (int i=0; i< file_count; i++) {
+                        if (!S_ISDIR(files[i].file_details.st_mode)) {
+                                continue;
+                        }
+                        if (files[i].file_name == 0 || files[i].file_name[0] == '\0') {
+                                continue;
+                        }
+                        struct dir_files f;
+                        char *s = malloc(strlen(files[i].file_name) + 5);
+                        strcpy(s, files[i].file_name);
+                        strcat(s, "/*.*");
+                        f.files[0] = s;
+                        f.files_count = 1;
+                        dir_display_dir(config, files[i].file_name, &f, depth +1 );
+                        free(s);
+                        free(files[i].file_name);
+                }
         }
 }
 
@@ -199,7 +229,7 @@ const char* help_dir() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // internal functions
-static void dir_config_init(struct dir_config *config) {
+static void dir_config_init(struct dir_config *config, struct dir_files *files) {
         config->pause = false;
         config->wide = false;
         config->bare = false;
@@ -207,8 +237,8 @@ static void dir_config_init(struct dir_config *config) {
         //    config->compress_ratio = 0; // 1 = yes, 2 = host allocation unit size
         config->lower_case = false;
         config->subdirs = false;
-        config->files_count = 0;
         config->show_help = false;
+        files->files_count = 0;
 }
 
 static void dir_config_print(struct dir_config *config) {
@@ -240,13 +270,13 @@ static void dir_config_print(struct dir_config *config) {
         }
         putchar('\n');
 
-        for (size_t i=0; i<config->files_count; i++ ) {
-                printf("%s ", config->files[i]);
-        }
+//        for (size_t i=0; i<config->files_count; i++ ) {
+//                printf("%s ", config->files[i]);
+//        }
         printf("\n");
 }
 
-static bool dir_parse_config(int argc, char* argv[], struct dir_config *config) {
+static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, struct dir_files *files) {
         for (int i=1; i < argc; i++) {
             char c1, c2;
 
@@ -345,8 +375,8 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config) 
                     }
                     break;
             default:
-                    config->files[config->files_count] = argv[i];
-                    config->files_count ++;
+                    files->files[files->files_count] = argv[i];
+                    files->files_count ++;
                     break;
             }
         }
