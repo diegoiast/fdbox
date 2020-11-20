@@ -83,6 +83,10 @@ static int dir_file_comperator(const void *a, const void *b);
 static bool found(const char* file_name, const struct file_details files[], size_t file_count);
 static const char* pb(bool b);
 static char* string_to_lower(char* s);
+bool prefix(const char *pre, const char *str)
+{
+    return strncmp(pre, str, strlen(pre)) == 0;
+}
 
 static bool flag_test(int value, int flag);
 static bool flag_set(int *value, int flag, bool on);
@@ -150,22 +154,29 @@ static void dir_display_dir(struct dir_config *config, const char* dir_name, str
         int lines = 0;
         int cols = 0;
         if (!config->bare) {
-                printf("\nDirectory of %s (depth=%d)\n", dir_name, depth);
+                printf("\nDirectory of %s\n", dir_name);
         }
         for (int i=0; i< file_count; i++) {
                 char display[200];
                 total_bytes += files[i].file_details.st_size;
+                char *fname =  files[i].file_name;
+
+                if (strcmp(dir_name, ".") != 0) {
+                        if (prefix(dir_name, fname)) {
+                                fname += strlen(dir_name)+1;
+                        }
+                }
                 if (S_ISDIR(files[i].file_details.st_mode)) {
                         total_dirs ++;
                         if (config->wide) {
-                                snprintf(display, 200, "[%s]", files[i].file_name);
+                                snprintf(display, 200, "[%s]", fname);
                         }
                         else {
-                                snprintf(display, 200, "%s/", files[i].file_name);
+                                snprintf(display, 200, "%s/", fname);
                         }
                 } else {
                         total_files ++;
-                        snprintf(display, 200, "%s", files[i].file_name);
+                        snprintf(display, 200, "%s", fname);
                 }
 
                 if (config->lower_case) {
