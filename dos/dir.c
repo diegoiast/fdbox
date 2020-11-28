@@ -24,7 +24,6 @@
 #include <glob.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
 #include <stdbool.h>
 #include <malloc.h>
 #endif
@@ -35,47 +34,9 @@
 
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
-/*#include "lib/tc202/dirent.h"*/
+#include "lib/tc202/stdextra.h"
 #include "lib/tc202/dos-glob.h"
 #include <sys/stat.h>
-
-typedef size_t uint;
-
-#define	__S_ISTYPE(mode, mask)	(((mode) & S_IFMT) == (mask))
-
-#define	S_ISDIR(mode)	 __S_ISTYPE((mode), S_IFDIR)
-
-
-#include <stdarg.h>
-int snprintf(char *str, size_t size, const char *format, ...)
-{
-        int i;
-        va_list argp;
-        va_start(argp, format);
-        i = vsprintf(str,format,argp);
-        va_end(argp);
-        return i;
-}
-
-int strcasecmp(const char *s1, const char *s2)
-{
-	while( ( *s1 != '\0' && *s2 != '\0' ) && toupper(*s1) == toupper(*s2) )
-        {
-                s1++;
-                s2++;
-        }
-
-        if(*s1 == *s2)
-        {
-                return 0;
-        }
-
-        else
-        {
-                return *s1 - *s2;
-        }
-        return 0;
-}
 #endif
 
 /* this is to shut up QtCreator */
@@ -177,7 +138,7 @@ static void dir_display_dir(struct dir_config *config, const char* dir_name, str
 {
         /* then find all available files */
         struct file_entry files[1000];
-        int file_count = 0;
+        size_t file_count = 0;
         size_t i, j;
 
         long long int total_bytes = 0;
@@ -210,7 +171,7 @@ static void dir_display_dir(struct dir_config *config, const char* dir_name, str
         if (!config->bare) {
                 printf("\nDirectory of %s\n", dir_name);
         }
-        for (i=0; i< file_count; i++) {
+        for (i=0; i<file_count; i++) {
                 char display[200];
                 char* fname;
 
@@ -348,7 +309,7 @@ static void dir_config_print(struct dir_config *config) {
 static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, struct dir_files *files) {
         size_t i;
 
-        for (i=1; i < argc; i++) {
+        for (i=1; i < (size_t)argc; i++) {
             char c1, c2;
 
             c1 = argv[i][0];
@@ -414,7 +375,7 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, 
                                     flag_set( &config->sort_order, SORT_SIZE, true);
                                     break;
                             default:
-                                    printf("invalid sort argument %d/\n", i);
+                                    printf("invalid sort argument %ld/\n", i);
                                     return false;
                             }
                             break;
@@ -440,7 +401,7 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, 
                             config->show_help = true;
                             break;
                     default:
-                            printf("invalid command line switch at index %d/1\n", i);
+                            printf("invalid command line switch at index %ld/1\n", i);
                             return false;
                     }
                     break;

@@ -46,6 +46,10 @@ typedef struct glob_t
 int glob(const char *pattern, int flags, int (*errfunc) (const char *epath, int eerrno), glob_t *pglob);
 void globfree(glob_t* pglob);
 
+/* these should not be here technically, they should be  in STAT.H */
+#define	__S_ISTYPE(mode, mask)	(((mode) & S_IFMT) == (mask))
+#define	S_ISDIR(mode)	 __S_ISTYPE((mode), S_IFDIR)
+
 #ifdef __cplusplus
 }
 #endif
