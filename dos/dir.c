@@ -19,6 +19,16 @@
 // https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 */
 
+/*
+ * TODO
+ *
+ * dir /s - display accumulative byte count
+ * dir /a - filter types
+ * dir /p - pause
+ * display fanicer byte sizes
+ * fix warnings in TC
+ */
+
 #ifdef _POSIX_C_SOURCE
 #include <dirent.h>
 #include <glob.h>
@@ -435,6 +445,23 @@ static void dir_print_extended_help()
         printf("> dir /p /b *.txt *.com\n");
 }
 
+/* lets assume extensions are 3 letters only for now */
+static char* get_extesnsion(const char* fname, char *ext)
+{
+        const char *p = fname;
+        while (*p) p ++;
+        while (p != fname && *p != '.') p--;
+        if (p != fname && *p == '.') {
+                ext[0] = *p;
+                ext[1] = *(p+1);
+                ext[2] = *(p+2);
+                ext[4] = 0;
+        } else {
+                ext[0] = 0;
+        }
+        return ext;
+}
+
 static int dir_file_comperator(const void *a, const void *b)
 {
         const struct file_entry *file1 = (const struct file_entry*) (a);
@@ -482,7 +509,19 @@ static int dir_file_comperator(const void *a, const void *b)
                         order -= 2;
                 }
         }
-        /* TODO - sort by ext */
+        if (flag_test(dir_file_order, SORT_EXTENTION)) {
+                char ext1[4], ext2[4];
+                int v;
+                get_extesnsion(file1->file_name, ext1);
+                get_extesnsion(file2->file_name, ext2);
+                v = strcasecmp(ext1, ext2);
+                if (v > 0) {
+                        order += 2;
+                }
+                if (v < 0) {
+                        order -= 2;
+                }
+        }
         return order;
 }
 
