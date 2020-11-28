@@ -12,6 +12,10 @@ DOWNLOAD_DIR=zip
 # https://web.archive.org/web/19980524231436/http://www1.htsoft.com/files/pacific/pacific.exe
 # https://web.archive.org/web/20000819032652/http://www1.htsoft.com:80/files/pacific/pacific.exe
 
+# also worth checking:
+# http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/devel/c/cc386/420/
+# http://www.desmet-c.com/
+# http://ladsoft.tripod.com/orange_c_compiler.html
 
 ONLINE_ZIPS='
 http://ndn.muxe.com/download/file/ndn_3_00_0005_d32.zip
@@ -19,6 +23,7 @@ https://github.com/downloads/AnimatorPro/Animator-Pro/AnimatorAKA.zip
 https://archive.org/download/msdos_borland_turbo_c_2.01/BorlandTurboC201-megapack.zip
 https://ia902905.us.archive.org/34/items/4dos8/4dos800.zip
 https://web.archive.org/web/19980524231436if_/http://www.htsoft.com:80/files/pacific/pacific.exe
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/devel/c/cc386/420/
 '
 
 # Choose the zip picker, been doing this since 1998. Crap.
