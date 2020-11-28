@@ -79,7 +79,7 @@ int command_beep(int argc, char* argv[]) {
     UNUSED(lenght);
 #endif
 
-#ifdef defined(WIN32)
+#if defined(WIN32)
     Beep(frequency, lenght);
 #endif
 

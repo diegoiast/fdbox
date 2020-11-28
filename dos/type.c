@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "dos/beep.h"type.h"
+#include "dos/type.h"
 
 /*
 This file is part of fdbox
