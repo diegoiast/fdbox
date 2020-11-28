@@ -13,10 +13,12 @@
 #endif
 
 #include "fdbox.h"
-#include "cd.h"
+#include "dos/cd.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_cd(int argc, char* argv[]) {
     if (argc == 1)

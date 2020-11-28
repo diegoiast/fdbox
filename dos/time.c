@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "time.h"
+#include "dos/time.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_time(int argc, char* argv[]) {
     printf("time - TODO: Unimplemented yet\n");

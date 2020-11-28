@@ -1,0 +1,27 @@
+main.c
+applets.c
+help.c (help.h)
+lib/applet.c
+lib/tc202/dos-glob.c (lib/tc202/dos-glob.h)
+dos/beep.c
+dos/call.c
+dos/cd.c
+dos/cls.c
+dos/copy.c
+dos/date.c
+dos/echo.c
+dos/exit.c
+dos/for.c
+dos/goto.c
+dos/if.c
+dos/mv.c
+dos/path.c
+dos/prompt.c
+dos/pwd.c
+dos/reboot.c
+dos/rem.c
+dos/set.c
+dos/shift.c
+dos/time.c
+dos/type.c
+dos/dir.c (dos/cmd_dir.h)

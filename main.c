@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     struct applet *cmd = find_applet(argv[1], commands);
     if (cmd != NULL) {
-        // shift argument list left, now applet name is argv[0]
+        /* shift argument list left, now applet name is argv[0] */
         return cmd->handler(argc - 1, ++argv);
     }
     command_help(argc, argv);

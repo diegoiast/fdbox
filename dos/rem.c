@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "rem.h"
+#include "dos/rem.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_rem(int argc, char* argv[]) {
     printf("rem - TODO: Unimplemented yet\n");

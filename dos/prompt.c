@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "prompt.h"
+#include "dos/prompt.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_prompt(int argc, char* argv[]) {
     printf("prompt - TODO: Unimplemented yet\n");

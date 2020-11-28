@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "tail.h"
+#include "unix/tail.h"
 
 // This file is part of fdbox
 // For license - read license.txt

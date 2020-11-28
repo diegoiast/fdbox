@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "shift.h"
+#include "dos/shift.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_shift(int argc, char* argv[]) {
     printf("shift - TODO: Unimplemented yet\n");

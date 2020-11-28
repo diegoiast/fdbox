@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "goto.h"
+#include "dos/goto.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_goto(int argc, char* argv[]) {
     printf("goto - TODO: Unimplemented yet\n");

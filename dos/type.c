@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "type.h"
+#include "dos/beep.h"type.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_type(int argc, char* argv[]) {
     printf("type - TODO: Unimplemented yet\n");

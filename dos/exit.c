@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "exit.h"
+#include "dos/exit.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_exit(int argc, char* argv[]) {
     printf("exit - TODO: Unimplemented yet\n");

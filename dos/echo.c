@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "echo.h"
+#include "dos/echo.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_echo(int argc, char* argv[]) {
     printf("echo - TODO: Unimplemented yet\n");

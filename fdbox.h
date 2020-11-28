@@ -1,11 +1,11 @@
 #ifndef __fdbox_h__
 #define __fdbox_h__
 
-// https://stackoverflow.com/a/5459929/78712
+/* https://stackoverflow.com/a/5459929/78712 */
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-// https://stackoverflow.com/questions/1486904/how-do-i-best-silence-a-warning-about-unused-variables
+/* https://stackoverflow.com/questions/1486904/how-do-i-best-silence-a-warning-about-unused-variables */
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 #define FDBOX_MAJOR 1

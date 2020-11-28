@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "for.h"
+#include "dos/for.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_for(int argc, char* argv[]) {
     printf("for - TODO: Unimplemented yet\n");

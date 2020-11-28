@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "pwd.h"
+#include "dos/pwd.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_pwd(int argc, char* argv[]) {
     printf("pwd - TODO: Unimplemented yet\n");

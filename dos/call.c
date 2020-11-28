@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "call.h"
+#include "dos/call.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+ This file is part of fdbox
+ For license - read license.txt
+*/
 
 int command_call(int argc, char* argv[]) {
     printf("call - TODO: Unimplemented yet\n");

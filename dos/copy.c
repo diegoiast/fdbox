@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "copy.h"
+#include "dos/copy.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_copy(int argc, char* argv[]) {
     printf("copy - TODO: Unimplemented yet\n");

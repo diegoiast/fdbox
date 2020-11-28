@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "set.h"
+#include "dos/set.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_set(int argc, char* argv[]) {
     printf("set - TODO: Unimplemented yet\n");

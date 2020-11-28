@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "path.h"
+#include "dos/path.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_path(int argc, char* argv[]) {
     printf("path - TODO: Unimplemented yet\n");

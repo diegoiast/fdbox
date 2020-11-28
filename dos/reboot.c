@@ -2,10 +2,13 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "reboot.h"
+#include "dos/reboot.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
+
 
 int command_reboot(int argc, char* argv[]) {
     printf("reboot - TODO: Unimplemented yet\n");

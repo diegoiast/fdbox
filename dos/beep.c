@@ -9,10 +9,12 @@
 #endif
 
 #include "fdbox.h"
-#include "beep.h"
+#include "dos/beep.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 void debug_args(int argc, char* argv[]);
 
@@ -22,20 +24,23 @@ int command_beep(int argc, char* argv[]) {
     const char *v;
     int frequency = 0;
     int lenght = 0;
+    int i;
 
-    // debug_args(argc, argv);
-    for (int i=1; i<argc; i++) {
-        // I have no idea why this could happen.
+    /* debug_args(argc, argv); */
+    for (i=1; i<argc; i++) {
+        int l;
+        /* I have no idea why this could happen. */
         if (argv[i] == NULL) {
             break;
         }
-        int l = strlen(argv[i]);
+        l = strlen(argv[i]);
         if (argv[i][0] == '/') {
+            char parameter;
             if (l != 2) {
                 printf("Missing argument /? \n");
                 return EXIT_FAILURE;
             }
-            char parameter = argv[i][1];
+            parameter = argv[i][1];
             switch (parameter) {
             case 't':
                 v = next(argc, argv, i);
@@ -68,14 +73,17 @@ int command_beep(int argc, char* argv[]) {
         }
     }
 
-// printf("f=%d, t=%d\n", frequency, lenght);
 #if defined(__unix__) || defined(__APPLE__)
     printf ("\a");
     UNUSED(frequency);
     UNUSED(lenght);
-#elif defined(WIN32)
+#endif
+
+#ifdef defined(WIN32)
     Beep(frequency, lenght);
-#elif deinfed(DOS)
+#endif
+
+#ifdef DOS
     sound(frequency);
     delay(length);
     nosound();
@@ -92,8 +100,9 @@ const char* help_beep() {
 }
 
 void debug_args(int argc, char* argv[]) {
+   int i;
     printf("argc = %d\n", argc);
-    for(int i=0; i<argc; i++) {
+    for (i=0; i<argc; i++) {
         printf("argv[%d] = %s\n", i, argv[i]);
     }
 }
@@ -104,3 +113,4 @@ const char* next(int argc, char* argv[], int current) {
     }
     return argv[current+1];
 }
+

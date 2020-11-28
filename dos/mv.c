@@ -2,10 +2,12 @@
 #include <stdio.h>
 
 #include "fdbox.h"
-#include "mv.h"
+#include "dos/mv.h"
 
-// This file is part of fdbox
-// For license - read license.txt
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
 
 int command_mv(int argc, char* argv[]) {
     printf("mv - TODO: Unimplemented yet\n");
