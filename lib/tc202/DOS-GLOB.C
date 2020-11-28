@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <errno.h>
 #include <dir.h>
+#include <dos.h>
 #include <string.h>
 
 #include "lib/tc202/dos-glob.h"
+#define ATTRIBUTES FA_RDONLY | FA_HIDDEN | FA_SYSTEM | FA_DIREC
 
 struct file_entry
 {
@@ -66,8 +68,8 @@ int glob(const char *pattern, int flags, int (*errfunc) (const char *epath, int 
         len--;
     path[len] = 0;
 
-    err = findfirst(pattern, &ff, WILDCARDS);
-    if (err >= 0)
+    err = findfirst(pattern, &ff, ATTRIBUTES);
+    if (err != 0)
     {
         if (flags & GLOB_NOCHECK)
         {
@@ -82,8 +84,8 @@ int glob(const char *pattern, int flags, int (*errfunc) (const char *epath, int 
 	    err2 = insert(path, ff.ff_name, &head);
 	    entries++;
 	    err = findnext(&ff);
-        } while (!err && !err2);
-        /* FindClose(hfindfile); */
+	} while (!err && !err2);
+	err = 0;
     }
 
     if (err == 0)

@@ -161,7 +161,11 @@ int command_dir(int argc, char* argv[]) {
         }
 
         if (files.files_count == 0) {
+#ifdef __MSDOS__
+                files.files[0] = strdup("*.*");
+#else
                 files.files[0] = strdup("*");
+#endif
                 files.files_count = 1;
         }
 
