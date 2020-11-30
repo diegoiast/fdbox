@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stddef.h>
+#include <time.h>
 
 #include "lib/args.h"
 #include "fdbox.h"
@@ -25,7 +26,6 @@
  * dir /s - display accumulative byte count
  * dir /a - filter types
  * dir /p - pause
- * display correct date
  * display fanicer byte sizes
  * fix display of subdirectories without any glob (dir /w ../)
  * fix warnings in TC
@@ -97,6 +97,7 @@ static void dir_config_init(struct dir_config *config, struct dir_files *files);
 static void dir_config_print(struct dir_config *config);
 static void dir_display_dir(struct dir_config *config, const char* dir_name, struct dir_files *files2, int depth);
 static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, struct dir_files *files);
+static void dir_format_date_time(long ff_date, long ff_time, char* time, char* date);
 static void dir_print_extended_help();
 
 static int dir_file_order;
@@ -222,10 +223,11 @@ static void dir_display_dir(struct dir_config *config, const char* dir_name, str
                                 putchar('\n');
                         }
                 } else {
+                        char* ttime = ctime(&files[i].file_details.st_mtime);
                         if (S_ISDIR(files[i].file_details.st_mode)) {
-                                printf("%-40s %20s %s %s\n", display, "<DIR>", "01-12-2020", "13:45");
+                                printf("%-40s %20s %s", display, "<DIR>", ttime);
                         } else {
-                                printf("%-40s %20ld %s %s\n", display, files[i].file_details.st_size, "01-12-2020", "13:45");
+                                printf("%-40s %20ld %s", display, files[i].file_details.st_size, ttime);
                         }
                         lines ++;
                 }
@@ -388,7 +390,7 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, 
                                     flag_set( &config->sort_order, SORT_SIZE, true);
                                     break;
                             default:
-                                    printf("invalid sort argument %ld/\n", i);
+                                    printf("invalid sort argument %d/\n", (int)i);
                                     return false;
                             }
                             break;
@@ -448,6 +450,26 @@ static void dir_print_extended_help()
         printf("> dir /p /b *.txt *.com\n");
 }
 
+static void dir_format_date_time(long ff_fdate, long ff_ftime, char* time, char* date)
+{
+    int year, month, day;
+    int hour, minute;
+    bool longyear = true;
+
+    year = (ff_fdate >> 9) + 80;
+    if (longyear)
+        year += 1900;
+    else
+        year %= 100;
+    day = ff_fdate & 0x001f;
+    month = (ff_fdate >> 5) & 0x000f;
+    hour = ff_ftime >> 5 >> 6;
+    minute = (ff_ftime >> 5) & 0x003f;
+
+    snprintf(date, 10, "%d/%d/%d", day, month, year);
+    snprintf(time, 10, "%02:%0d", hour, minute);
+}
+
 /* lets assume extensions are 3 letters only for now */
 static char* get_extesnsion(const char* fname, char *ext)
 {
@@ -493,10 +515,10 @@ static int dir_file_comperator(const void *a, const void *b)
                 }
         }
         if (flag_test(dir_file_order, SORT_DATE)) {
-                if (file1->file_details.st_atime > file2->file_details.st_atime) {
+                if (file1->file_details.st_mtime > file2->file_details.st_mtime) {
                         order ++;
                 }
-                if (file1->file_details.st_atime < file2->file_details.st_atime) {
+                if (file1->file_details.st_mtime < file2->file_details.st_mtime) {
                         order --;
                 }
         }
