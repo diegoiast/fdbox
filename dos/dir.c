@@ -25,7 +25,9 @@
  * dir /s - display accumulative byte count
  * dir /a - filter types
  * dir /p - pause
+ * display correct date
  * display fanicer byte sizes
+ * fix display of subdirectories without any glob (dir /w ../)
  * fix warnings in TC
  */
 
