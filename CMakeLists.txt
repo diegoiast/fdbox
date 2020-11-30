@@ -43,6 +43,14 @@ add_executable(fdbox
     unix/tail.c
 )
 
+
+if(WIN32)
+    target_sources(fdbox PRIVATE
+        lib/win32/win32-glob.c
+        lib/win32/win32-glob.h
+    )
+endif()
+
 target_include_directories(fdbox PUBLIC
     "${PROJECT_BINARY_DIR}"
     "${PROJECT_SOURCE_DIR}"

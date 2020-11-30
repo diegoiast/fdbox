@@ -40,6 +40,7 @@
 
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
+#include "lib/win32/win32-glob.h"
 #endif
 
 #ifdef __MSDOS__
