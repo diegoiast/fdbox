@@ -47,6 +47,16 @@ for ninja, but MinGW Makefiles should work as well. You might want to update
 the paths to Qt, CMake, Ninja and MinGW as its installed on your system. The `-B build`
 is the build directory and can be changed as you please.
 
+If you are using QtCrreator - build fill fail. Because QtCreator
+by default will pass QMake variables (which you may not have), and
+since again it will defaultto NMake. In the build tab, in the "Initial CMake parameters" type:
+
+    -DCMAKE_BUILD_TYPE:String=Debug
+    -DCMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
+    -DCMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}
+    -GNinja
+
+
 ## Why?
 Because.
 
