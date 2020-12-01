@@ -25,7 +25,7 @@
  *
  * dir /s - display accumulative byte count
  * dir /a - filter types
- * dir /p - pause
+ * dir /p - pause - WIP
  * display fanicer byte sizes
  * fix display of subdirectories without any glob (dir /w ../)
  * fix warnings in TC
@@ -225,11 +225,19 @@ static void dir_display_dir(struct dir_config *config, const char* dir_name, str
                 } else {
                         char* ttime = ctime(&files[i].file_details.st_mtime);
                         if (S_ISDIR(files[i].file_details.st_mode)) {
-                                printf("%-40s %20s %s", display, "<DIR>", ttime);
+                                printf("%-40s %10s %s", display, "<DIR>", ttime);
                         } else {
-                                printf("%-40s %20ld %s", display, files[i].file_details.st_size, ttime);
+                                printf("%-40s %10ld %s", display, files[i].file_details.st_size, ttime);
                         }
                         lines ++;
+                }
+
+                /* TODO read terminal height in runtime */
+                /* TODO convert to press any key */
+                /* https://stackoverflow.com/questions/18801483/press-any-key-to-continue-function-in-c/18801616 */
+                if (config->pause && lines == 24) {
+                        printf("Press enter to continue...\n");
+                        getchar();
                 }
 
                 if (config->subdirs && !S_ISDIR(files[i].file_details.st_mode)) {
@@ -467,7 +475,7 @@ static void dir_format_date_time(long ff_fdate, long ff_ftime, char* time, char*
     minute = (ff_ftime >> 5) & 0x003f;
 
     snprintf(date, 10, "%d/%d/%d", day, month, year);
-    snprintf(time, 10, "%02:%0d", hour, minute);
+    snprintf(time, 10, "%02d:%0d", hour, minute);
 }
 
 /* lets assume extensions are 3 letters only for now */
