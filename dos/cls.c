@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef __MSDOS__
+#include <conio.h>
+#endif
+
 #include "fdbox.h"
 #include "dos/cls.h"
 
@@ -16,6 +20,10 @@ int command_cls(int argc, char* argv[]) {
 
 #ifdef WIN32
     printf("\e[1;1H\e[2J");
+#endif
+
+#ifdef __MSDOS__
+        clrscr();
 #endif
 
     return EXIT_FAILURE;
