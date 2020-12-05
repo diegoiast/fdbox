@@ -9,4 +9,4 @@ echo.    4DOS
 echo.    NDN - Necromancer DOS Navigator
 
 SET DJGPP=c:\djgpp\djgpp.envd
-SET PATH=%PATH%;c:\ndn\;c:\tc;c:\pacific\bin;c:\djgpp\bin
+SET PATH=%PATH%;c:\freedos\bin;c:\ndn\;c:\tc;c:\pacific\bin;c:\djgpp\bin

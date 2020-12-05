@@ -2,7 +2,7 @@
 
 set -x
 set -e
-MAIN=dosbox
+MAIN=dosbox2
 DOWNLOAD_DIR=zip
 
 # TurboC can be downloaded from here, but from argive.org its easier
@@ -16,6 +16,7 @@ DOWNLOAD_DIR=zip
 # http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/devel/c/cc386/420/
 # http://www.desmet-c.com/
 # http://ladsoft.tripod.com/orange_c_compiler.html
+# http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/devel/c/cc386/420/
 
 ONLINE_ZIPS='
 http://ndn.muxe.com/download/file/ndn_3_00_0005_d32.zip
@@ -23,7 +24,7 @@ https://github.com/downloads/AnimatorPro/Animator-Pro/AnimatorAKA.zip
 https://archive.org/download/msdos_borland_turbo_c_2.01/BorlandTurboC201-megapack.zip
 https://ia902905.us.archive.org/34/items/4dos8/4dos800.zip
 https://web.archive.org/web/19980524231436if_/http://www.htsoft.com:80/files/pacific/pacific.exe
-http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/devel/c/cc386/420/
+https://github.com/open-watcom/open-watcom-v2/releases/download/Current-build/open-watcom-2_0-f77-dos.exe
 '
 
 # Choose the zip picker, been doing this since 1998. Crap.
@@ -62,6 +63,20 @@ TC1_FILE='http://julian.winworldpc.com/Abandonware Applications/PC/Borland Turbo
 # https://winworldpc.com/download/c28d2431-c28d-5737-11c3-a7c29d255254
 TC30_FILE='http://julian.winworldpc.com/Borland Turbo CPP 3.0 (5.25-1.2mb).7z'
 
+FREEDOS="
+https://github.com/FDOS/freecom/releases/download/com084pre7/com084b7-xmsswap.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/append/appe506x.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/xcopy/xwcpy081.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/attrib/attrib121.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/deltree/deltree102g.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/mem/mem1_11.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/more/more43.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/type/type20.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/tree/tree372x.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/edit/edit09ax.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/label/label122.zip
+"
+
 
 function download_files()
 {
@@ -87,14 +102,16 @@ function download_files()
 
 rm -fr $MAIN
 
-download_files "$ONLINE_ZIPS"    $DOWNLOAD_DIR       $MAIN
-download_files "$GCC_IA16_FILES" $DOWNLOAD_DIR/GCC   $MAIN/GCC
-download_files "$DJGPP_FILES"    $DOWNLOAD_DIR/DJGPP $MAIN/DJGPP
-#download_files "$TC1_FILE"       $DOWNLOAD_DIR/TC1   $MAIN/TC1
-#download_files "$TC30_FILE"      $DOWNLOAD_DIR/TC1   $MAIN/TC3
+download_files "$ONLINE_ZIPS"    $DOWNLOAD_DIR         $MAIN
+download_files "$GCC_IA16_FILES" $DOWNLOAD_DIR/GCC     $MAIN/GCC
+download_files "$DJGPP_FILES"    $DOWNLOAD_DIR/DJGPP   $MAIN/DJGPP
+download_files "$FREEDOS"        $DOWNLOAD_DIR/FREEDOS $MAIN/FREEDOS
+#download_files "$TC1_FILE"      $DOWNLOAD_DIR/TC1     $MAIN/TC1
+#download_files "$TC30_FILE"     $DOWNLOAD_DIR/TC1     $MAIN/TC3
 
 # special unzip - this is an EXE, not handled by the function
 7z x -y $DOWNLOAD_DIR/pacific.exe -o$MAIN/pacific/ > /dev/null
+7z x -y $DOWNLOAD_DIR/open-watcom-2_0-f77-dos.exe  -o$MAIN/ow/ > /dev/null
 
 # minor cleanups
 rm -fr $MAIN/__MACOSX
@@ -102,5 +119,19 @@ rm -f  $MAIN/autoexec.bat
 rm -f  $MAIN/RUNHACK.BAT   $MAIN/RUNHACK.EXE
 mv $MAIN/ndn_3_00_0005_d32 $MAIN/NDN
 mv $MAIN/SAMPLES/          $MAIN/TC/SAMPLES
-mv $MAIN/AnimatorAKA       $MAIN/ATA
+mv $MAIN/AnimatorAKA       $MAIN/AAT
+
+mv $MAIN/FREEDOS/bin/*     $MAIN/FREEDOS/BIN/
+rm -fr $MAIN/FREEDOS/bin/
+mv $MAIN/FREEDOS/doc/*     $MAIN/FREEDOS/DOC/
+rm -fr $MAIN/FREEDOS/doc/
+mv $MAIN/FREEDOS/help/*     $MAIN/FREEDOS/HELP/
+rm -fr $MAIN/FREEDOS/help/
+mv $MAIN/FREEDOS/nls/*     $MAIN/FREEDOS/NLS/
+rm -fr $MAIN/FREEDOS/nls/
+mv $MAIN/FREEDOS/*.exe     $MAIN/FREEDOS/BIN/
+mv $MAIN/FREEDOS/*.com     $MAIN/FREEDOS/BIN/
+mv $MAIN/FREEDOS/*.EXE     $MAIN/FREEDOS/BIN/
+mv $MAIN/FREEDOS/*.COM     $MAIN/FREEDOS/BIN/
+
 cp autoexec.bat            $MAIN/AUTOEXEC.BAT
