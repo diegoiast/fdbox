@@ -22,6 +22,10 @@ For license - read license.txt
 #include <stdbool.h>
 #endif
 
+#ifdef __WIN32__
+#include <stdbool.h>
+#endif
+
 struct copy_config {
 //        bool verify;
         bool ask_overwrite;

@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #if __linux__
@@ -32,8 +32,8 @@ int command_cd(int argc, char* argv[]) {
                 char cwd[128];
 #if defined(__linux__) || defined(__MSDOS__)
                 getcwd(cwd, 128);
-#elif define(WIN32)
-        DWORD err = GetCurrentDirectory(128, cwd);
+#elif defined(__WIN32__)
+                DWORD err = GetCurrentDirectory(128, cwd);
 #else
 #error platform not supported yet
 #endif
