@@ -33,6 +33,7 @@ For license - read license.txt
 #include "lib/win32/win32-glob.h"
 #include <stdbool.h>
 #define DIRECTORY_DELIMITER "/"
+#include <unistd.h>
 #endif
 
 struct copy_config {
@@ -61,7 +62,7 @@ int command_copy(int argc, char *argv[])
 
     copy_config_init(&config);
     copy_parse_config(argc, argv, &config);
-    copy_print_config(&config);
+    /* copy_print_config(&config); */
 
     file_name = config.dest_file;
     if (copy_is_dir(file_name)) {
@@ -85,7 +86,7 @@ static void copy_config_init(struct copy_config *config)
 {
         /*config->verify = false;*/
         config->ask_overwrite = false;
-        config->verbose = true;
+        config->verbose = false;
         config->copy_attributes = true;
         config->source_file = NULL;
         config->dest_file = NULL;
@@ -108,7 +109,7 @@ static bool copy_parse_config(int argc, char* argv[], struct copy_config *config
         size_t i;
 
         for (i=1; i < (size_t)argc; i++) {
-                char c1, c2, c3;
+                char c1, c2;
                 c1 = argv[i][0];
                 switch (c1) {
                 case '/':
@@ -119,6 +120,9 @@ static bool copy_parse_config(int argc, char* argv[], struct copy_config *config
                                 break;
                         case 'y':
                                 config->ask_overwrite = false;
+                                break;
+                        case 'v':
+                                config->verbose = true;
                                 break;
                         }
                         break;
@@ -176,7 +180,7 @@ static const char *copy_base_name(const char *file_name)
     int i = strlen(file_name);
     const char *c = file_name + i - 1;
     while (c != file_name && *c != '/' && *c != '\\') {
-        c++;
+        c--;
     }
     return file_name;
 }
@@ -186,7 +190,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         FILE *source;
         FILE *dest;
         char buffer[4096];
-        size_t total_read, total_written;
+        size_t total_read, total_written, total_size;
 
         source = fopen(from, "rb");
         if (source == NULL) {
@@ -199,12 +203,21 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 return errno;
         }
 
+        fseek(source, 0L, SEEK_END);
+        total_size = ftell(source);
+        fseek(source, 0L, SEEK_SET);
+/* TODO should I use:
+ *         rewind(source);
+ */
+
         total_read = 0;
         total_written = 0;
+        int last_displayed = 101;
         do {
                 size_t actually_read, actually_written;
+                int current;
 
-                actually_read = fread(buffer, 1, 4096, source);
+                actually_read = fread(buffer, 1, sizeof(buffer), source);
                 total_read += actually_read;
                 if (actually_read == 0) {
                         break;
@@ -214,7 +227,18 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 if (actually_written == 0) {
                         break;
                 }
+
+                current = ((total_written * 100) / total_size);
+                if (config->verbose && current != last_displayed) {
+                        printf("\r%02d%% - %s\r", current, to);
+                        fflush(stdout);
+                        last_displayed = current;
+                }
         } while (true);
+        /* TODO - clear all line */
+        if (config->verbose) {
+                printf("\r%02d%% - %s -> %s\n", (int) ((total_written * 100) / total_size), from, to);
+        }
 
         fclose(source);
         fclose(dest);
