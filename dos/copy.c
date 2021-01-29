@@ -121,7 +121,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         char buffer[4096];
         size_t total_read, total_written;
 
-        source = fopen(from, "r");
+        source = fopen(from, "rb");
         if (source == NULL) {
                 fprintf(stderr, "Failed reading from %s\n", from);
                 return errno;
