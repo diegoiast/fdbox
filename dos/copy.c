@@ -1,8 +1,11 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <string.h>
 #include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "fdbox.h"
 #include "dos/copy.h"
@@ -16,14 +19,20 @@ For license - read license.txt
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #include "lib/tc202/dos-glob.h"
+
+#define DIRECTORY_DELIMITER "\\"
 #endif
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
+#define DIRECTORY_DELIMITER "/"
 #endif
 
 #ifdef __WIN32__
+#include "lib/win32/dirent.h"
+#include "lib/win32/win32-glob.h"
 #include <stdbool.h>
+#define DIRECTORY_DELIMITER "/"
 #endif
 
 struct copy_config {
@@ -38,15 +47,34 @@ struct copy_config {
 static void copy_config_init(struct copy_config *config);
 static bool copy_parse_config(int argc, char* argv[], struct copy_config *config);
 static bool copy_print_config(struct copy_config *config);
+static bool copy_is_dir(const char *path);
+static char *copy_append_path(const char *directory, const char *file_name);
+static const char *copy_base_name(const char *file_name);
 static int copy_single_file(const char *from, const char *to, struct copy_config *config);
 
-int command_copy(int argc, char* argv[]) {
-        struct copy_config config;
-        copy_config_init(&config);
-        copy_parse_config(argc, argv, &config);
-        copy_print_config(&config);
+int command_copy(int argc, char *argv[])
+{
+    struct copy_config config;
+    const char *file_name;
+    bool free_memory = false;
+    int return_val;
 
-        return copy_single_file(config.source_file, config.dest_file, &config);
+    copy_config_init(&config);
+    copy_parse_config(argc, argv, &config);
+    copy_print_config(&config);
+
+    file_name = config.dest_file;
+    if (copy_is_dir(file_name)) {
+        const char *base_name = copy_base_name(config.source_file);
+        file_name = copy_append_path(file_name, base_name);
+        free_memory = true;
+    }
+
+    return_val = copy_single_file(config.source_file, file_name, &config);
+    if (free_memory) {
+        free((char *) file_name);
+    }
+    return return_val;
 }
 
 const char* help_copy() {
@@ -112,6 +140,45 @@ static bool copy_print_config(struct copy_config *config)
         printf("copy_attributes=%d\n", config->copy_attributes);
         printf("source_file=%s\n", config->source_file);
         printf("dest_file=%s\n", config->dest_file);
+}
+
+static bool copy_is_dir(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISDIR(path_stat.st_mode);
+}
+
+static char *copy_append_path(const char *directory, const char *file_name)
+{
+    int l1 = strlen(directory);
+    int l2 = strlen(file_name);
+    char *full_file_name;
+
+    /* does the directory end with / or  \\ ? */
+    if (directory[l1 - 1] == '/' || directory[l1 - 1] == '\\') {
+        full_file_name = malloc(l1 + l2);
+        strcpy(full_file_name, directory);
+        strcat(full_file_name, file_name);
+    } else {
+        /* it does not, we need to add it manually */
+        full_file_name = malloc(l1 + l2 + 1);
+        strcpy(full_file_name, directory);
+        strcat(full_file_name, DIRECTORY_DELIMITER);
+        strcat(full_file_name, file_name);
+    }
+
+    return full_file_name;
+}
+
+static const char *copy_base_name(const char *file_name)
+{
+    int i = strlen(file_name);
+    const char *c = file_name + i - 1;
+    while (c != file_name && *c != '/' && *c != '\\') {
+        c++;
+    }
+    return file_name;
 }
 
 static int copy_single_file(const char *from, const char *to, struct copy_config *config)
