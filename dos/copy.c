@@ -199,8 +199,8 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         }
         dest = fopen(to, "wb");
         if (dest == NULL) {
-                fprintf(stderr, "Failed openning  %s\n", to);
-                return errno;
+            fprintf(stderr, "Failed openning %s for writing\n", to);
+            return errno;
         }
 
         fseek(source, 0L, SEEK_END);
