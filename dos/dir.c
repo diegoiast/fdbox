@@ -337,7 +337,7 @@ static bool dir_parse_config(int argc, char* argv[], struct dir_config *config, 
 
             c1 = argv[i][0];
             switch (c1) {
-            case '/':
+            case ARGUMENT_DELIMIER:
                     c2 = argv[i][1];
                     switch (c2) {
                     case 'p':

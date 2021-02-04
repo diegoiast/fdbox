@@ -19,4 +19,14 @@
 
 #define DEBUG_LINE printf("%s:%d %s() - PING\n", __FILE__, __LINE__, __FUNCTION__)
 
+#ifdef _POSIX_C_SOURCE
+#define DIRECTORY_DELIMITER "/"
+#define ARGUMENT_DELIMIER '-'
+#endif
+
+#if defined(__WIN32__) || defined(__MSDOS__)
+#define DIRECTORY_DELIMITER "\\"
+#define ARGUMENT_DELIMIER '/'
+#endif
+
 #endif // __fdbox_h__

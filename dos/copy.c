@@ -19,20 +19,16 @@ For license - read license.txt
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #include "lib/tc202/dos-glob.h"
-
-#define DIRECTORY_DELIMITER "\\"
 #endif
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
-#define DIRECTORY_DELIMITER "/"
 #endif
 
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
 #include "lib/win32/win32-glob.h"
 #include <stdbool.h>
-#define DIRECTORY_DELIMITER "/"
 #include <unistd.h>
 #endif
 
@@ -112,7 +108,7 @@ static bool copy_parse_config(int argc, char* argv[], struct copy_config *config
                 char c1, c2;
                 c1 = argv[i][0];
                 switch (c1) {
-                case '/':
+                case ARGUMENT_DELIMIER:
                         c2 = argv[i][1];
                         switch (c2) {
                         case 'a':
