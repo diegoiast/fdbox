@@ -5,7 +5,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #include "fdbox.h"
 #include "dos/copy.h"
@@ -23,6 +22,7 @@ For license - read license.txt
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
+#include <unistd.h>
 #endif
 
 #ifdef __WIN32__
@@ -33,8 +33,7 @@ For license - read license.txt
 #endif
 
 struct copy_config {
-//        bool verify;
-        bool ask_overwrite;
+/*        bool verify; */ bool ask_overwrite;
         bool verbose;
         bool copy_attributes;
         const char* source_file;
@@ -123,7 +122,7 @@ static bool copy_parse_config(int argc, char* argv[], struct copy_config *config
                         }
                         break;
                 default:
-                        // ok its a file
+                        /* ok its a file */
                         if (config->source_file == NULL) {
                                 config->source_file = strdup(argv[i]);
                         } else {
@@ -187,6 +186,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         FILE *dest;
         char buffer[4096];
         size_t total_read, total_written, total_size;
+        int last_displayed = 101;
 
         source = fopen(from, "rb");
         if (source == NULL) {
@@ -208,7 +208,6 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 
         total_read = 0;
         total_written = 0;
-        int last_displayed = 101;
         do {
                 size_t actually_read, actually_written;
                 int current;

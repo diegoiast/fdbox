@@ -52,13 +52,6 @@
 #include <sys/stat.h>
 #endif
 
-/* this is to shut up QtCreator */
-#ifndef bool
-#define bool int
-#define false 0
-#define true !false
-#endif
-
 /***************************************************************************
  * Types used internally
  ***************************************************************************/
