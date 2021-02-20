@@ -33,7 +33,8 @@ For license - read license.txt
 #endif
 
 struct copy_config {
-/*        bool verify; */ bool ask_overwrite;
+/*        bool verify; */
+        bool ask_overwrite;
         bool verbose;
         bool copy_attributes;
         const char* source_file;
@@ -50,31 +51,31 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 
 int command_copy(int argc, char *argv[])
 {
-    struct copy_config config;
-    const char *file_name;
-    bool free_memory = false;
-    int return_val;
+        struct copy_config config;
+        const char *file_name;
+        bool free_memory = false;
+        int return_val;
 
-    copy_config_init(&config);
-    copy_parse_config(argc, argv, &config);
-    /* copy_print_config(&config); */
+        copy_config_init(&config);
+        copy_parse_config(argc, argv, &config);
+        /* copy_print_config(&config); */
 
-    file_name = config.dest_file;
-    if (copy_is_dir(file_name)) {
-        const char *base_name = copy_base_name(config.source_file);
-        file_name = copy_append_path(file_name, base_name);
-        free_memory = true;
-    }
+        file_name = config.dest_file;
+        if (copy_is_dir(file_name)) {
+                const char *base_name = copy_base_name(config.source_file);
+                file_name = copy_append_path(file_name, base_name);
+                free_memory = true;
+        }
 
-    return_val = copy_single_file(config.source_file, file_name, &config);
-    if (free_memory) {
-        free((char *) file_name);
-    }
-    return return_val;
+        return_val = copy_single_file(config.source_file, file_name, &config);
+        if (free_memory) {
+                free((char *) file_name);
+        }
+        return return_val;
 }
 
 const char* help_copy() {
-    return "Here should be a basic help for copy";
+        return "Here should be a basic help for copy";
 }
 
 static void copy_config_init(struct copy_config *config)
@@ -143,41 +144,41 @@ static bool copy_print_config(struct copy_config *config)
 
 static bool copy_is_dir(const char *path)
 {
-    struct stat path_stat;
-    stat(path, &path_stat);
-    return S_ISDIR(path_stat.st_mode);
+        struct stat path_stat;
+        stat(path, &path_stat);
+        return S_ISDIR(path_stat.st_mode);
 }
 
 static char *copy_append_path(const char *directory, const char *file_name)
 {
-    int l1 = strlen(directory);
-    int l2 = strlen(file_name);
-    char *full_file_name;
+        int l1 = strlen(directory);
+        int l2 = strlen(file_name);
+        char *full_file_name;
 
-    /* does the directory end with / or  \\ ? */
-    if (directory[l1 - 1] == '/' || directory[l1 - 1] == '\\') {
-        full_file_name = malloc(l1 + l2);
-        strcpy(full_file_name, directory);
-        strcat(full_file_name, file_name);
-    } else {
-        /* it does not, we need to add it manually */
-        full_file_name = malloc(l1 + l2 + 1);
-        strcpy(full_file_name, directory);
-        strcat(full_file_name, DIRECTORY_DELIMITER);
-        strcat(full_file_name, file_name);
-    }
+        /* does the directory end with / or  \\ ? */
+        if (directory[l1 - 1] == '/' || directory[l1 - 1] == '\\') {
+                full_file_name = malloc(l1 + l2);
+                strcpy(full_file_name, directory);
+                strcat(full_file_name, file_name);
+        } else {
+                /* it does not, we need to add it manually */
+                full_file_name = malloc(l1 + l2 + 1);
+                strcpy(full_file_name, directory);
+                strcat(full_file_name, DIRECTORY_DELIMITER);
+                strcat(full_file_name, file_name);
+        }
 
-    return full_file_name;
+        return full_file_name;
 }
 
 static const char *copy_base_name(const char *file_name)
 {
-    int i = strlen(file_name);
-    const char *c = file_name + i - 1;
-    while (c != file_name && *c != '/' && *c != '\\') {
-        c--;
-    }
-    return file_name;
+        int i = strlen(file_name);
+        const char *c = file_name + i - 1;
+        while (c != file_name && *c != '/' && *c != '\\') {
+                c--;
+        }
+        return file_name;
 }
 
 static int copy_single_file(const char *from, const char *to, struct copy_config *config)
