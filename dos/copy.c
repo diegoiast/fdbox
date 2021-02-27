@@ -23,6 +23,7 @@ For license - read license.txt
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
 #include <unistd.h>
+#include <glob.h>
 #endif
 
 #ifdef __WIN32__
@@ -52,25 +53,39 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 int command_copy(int argc, char *argv[])
 {
         struct copy_config config;
-        const char *file_name;
+        const char *target_name;
         bool free_memory = false;
-        int return_val;
+        int return_val, j;
 
         copy_config_init(&config);
         copy_parse_config(argc, argv, &config);
         /* copy_print_config(&config); */
 
-        file_name = config.dest_file;
-        if (copy_is_dir(file_name)) {
-                const char *base_name = copy_base_name(config.source_file);
-                file_name = copy_append_path(file_name, base_name);
-                free_memory = true;
-        }
+        glob_t globbuf = {0};
+        glob(config.source_file, GLOB_DOOFFS, NULL, &globbuf);
+        for (j = 0; j != globbuf.gl_pathc; j++) {
+                const char* from_file = globbuf.gl_pathv[j];
+                free_memory = false;
 
-        return_val = copy_single_file(config.source_file, file_name, &config);
-        if (free_memory) {
-                free((char *) file_name);
+                target_name = config.dest_file;
+                if (copy_is_dir(target_name)) {
+                        const char *base_name = copy_base_name(from_file);
+                        target_name = copy_append_path(target_name, base_name);
+                        free_memory = true;
+                }
+
+                return_val = copy_single_file(from_file, target_name, &config);
+                if (free_memory) {
+                        free((char *) target_name);
+                }
+                if (return_val != EXIT_SUCCESS) {
+                        break;
+                }
         }
+        globfree(&globbuf);
+
+
+
         return return_val;
 }
 
@@ -125,9 +140,9 @@ static bool copy_parse_config(int argc, char* argv[], struct copy_config *config
                 default:
                         /* ok its a file */
                         if (config->source_file == NULL) {
-                                config->source_file = strdup(argv[i]);
+                                config->source_file = argv[i];
                         } else {
-                                config->dest_file = strdup(argv[i]);
+                                config->dest_file = argv[i];
                         }
                 }
         }
