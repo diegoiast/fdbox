@@ -83,9 +83,6 @@ int command_copy(int argc, char *argv[])
                 }
         }
         globfree(&globbuf);
-
-
-
         return return_val;
 }
 
