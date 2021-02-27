@@ -171,14 +171,12 @@ static char *copy_append_path(const char *directory, const char *file_name)
         char *full_file_name;
 
         /* does the directory end with / or  \\ ? */
+        full_file_name = malloc(l1 + l2 + 1);
+        strcpy(full_file_name, directory);
         if (directory[l1 - 1] == '/' || directory[l1 - 1] == '\\') {
-                full_file_name = malloc(l1 + l2);
-                strcpy(full_file_name, directory);
                 strcat(full_file_name, file_name);
         } else {
                 /* it does not, we need to add it manually */
-                full_file_name = malloc(l1 + l2 + 1);
-                strcpy(full_file_name, directory);
                 strcat(full_file_name, DIRECTORY_DELIMITER);
                 strcat(full_file_name, file_name);
         }
