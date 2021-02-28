@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <utime.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -95,7 +97,7 @@ static void copy_config_init(struct copy_config *config)
         /*config->verify = false;*/
         config->ask_overwrite = false;
         config->verbose = false;
-        config->copy_attributes = true;
+        config->copy_attributes = false;
         config->source_file = NULL;
         config->dest_file = NULL;
 }
@@ -241,16 +243,38 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                         last_displayed = current;
                 }
         } while (true);
-        /* TODO - clear all line */
-        if (config->verbose) {
-                printf("\r%02d%% - %s -> %s\n", (int) ((total_written * 100) / total_size), from, to);
-        }
 
         fclose(source);
         fclose(dest);
         if (total_read != total_written) {
                 fprintf(stderr, "Failed writing to %s (wrote %ld/%ld bytes)\n", to, total_written, total_read);
                 return errno;
+        }
+
+        if (config->copy_attributes) {
+                struct stat source_attr;
+                struct utimbuf new_times;
+                int err;
+
+                stat(from, &source_attr);
+                new_times.actime = source_attr.st_atime;
+                new_times.modtime = source_attr.st_mode;
+                err = utime(to, &new_times);
+                if (err) {
+                        fprintf(stderr, "Failed setting time on %s", to);
+                        return errno;
+                }
+                err = chmod(to, source_attr.st_mode);
+                if (err) {
+                        fprintf(stderr, "Failed setting ownership on %s", to);
+                        return errno;
+                }
+        }
+
+        /* TODO - clear all line */
+        if (config->verbose) {
+                printf("\r%02d%% - %s -> %s %s\n", (int) ((total_written * 100) / total_size), from, to,
+                       config->copy_attributes ? "*": "");
         }
         return EXIT_SUCCESS;
 }
