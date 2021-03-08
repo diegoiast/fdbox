@@ -55,19 +55,18 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 int command_copy(int argc, char *argv[])
 {
         struct copy_config config;
-        const char *target_name;
-        bool free_memory = false;
         int return_val, j;
+        glob_t globbuf = {0};
 
         copy_config_init(&config);
         copy_parse_config(argc, argv, &config);
         /* copy_print_config(&config); */
 
-        glob_t globbuf = {0};
         glob(config.source_file, GLOB_DOOFFS, NULL, &globbuf);
         for (j = 0; j != globbuf.gl_pathc; j++) {
                 const char* from_file = globbuf.gl_pathv[j];
-                free_memory = false;
+                const char *target_name;
+                bool free_memory = false;
 
                 target_name = config.dest_file;
                 if (copy_is_dir(target_name)) {
@@ -209,6 +208,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         dest = fopen(to, "wb");
         if (dest == NULL) {
             fprintf(stderr, "Failed openning %s for writing\n", to);
+            fclose(source);
             return errno;
         }
 
