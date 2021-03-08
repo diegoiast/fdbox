@@ -36,6 +36,7 @@ For license - read license.txt
 #endif
 
 struct copy_config {
+        bool show_help;
 /*        bool verify; */
         bool ask_overwrite;
         bool verbose;
@@ -47,6 +48,7 @@ struct copy_config {
 static void copy_config_init(struct copy_config *config);
 static bool copy_parse_config(int argc, char* argv[], struct copy_config *config);
 static bool copy_print_config(struct copy_config *config);
+static void copy_print_extended_help();
 static bool copy_is_dir(const char *path);
 static char *copy_append_path(const char *directory, const char *file_name);
 static const char *copy_base_name(const char *file_name);
@@ -61,6 +63,11 @@ int command_copy(int argc, char *argv[])
         copy_config_init(&config);
         copy_parse_config(argc, argv, &config);
         /* copy_print_config(&config); */
+
+        if (config.show_help) {
+                copy_print_extended_help();
+                return EXIT_SUCCESS;
+        }
 
         if (config.source_file == NULL || config.source_file[0] == '\0') {
                 fprintf(stderr, "Error: no source file provided\n");
@@ -104,6 +111,7 @@ const char* help_copy() {
 static void copy_config_init(struct copy_config *config)
 {
         /*config->verify = false;*/
+        config->show_help = false;
         config->ask_overwrite = false;
         config->verbose = false;
         config->copy_attributes = false;
@@ -137,6 +145,10 @@ static bool copy_parse_config(int argc, char* argv[], struct copy_config *config
                         case 'a':
                                 config->copy_attributes = true;
                                 break;
+                        case '?':
+                        case 'h':
+                                config->show_help = true;
+                                break;
                         case 'y':
                                 config->ask_overwrite = false;
                                 break;
@@ -163,6 +175,19 @@ static bool copy_print_config(struct copy_config *config)
         printf("copy_attributes=%d\n", config->copy_attributes);
         printf("source_file=%s\n", config->source_file);
         printf("dest_file=%s\n", config->dest_file);
+}
+
+static void copy_print_extended_help()
+{
+        printf("%s\n", help_copy());
+        printf("   copy [from] [to] /a /y /v\n");
+
+        printf("   /a Copy attributes\n");
+        printf("   /y Ask for confirmation on overrite (WIP)\n");
+        printf("   /v Verbose copy\n" );
+        printf("Examples:\n");
+        printf("> copy c:\\autoexec.bat c:\\autoexec.old \n");
+        printf("> copy *.exe backup\\ \n");
 }
 
 static bool copy_is_dir(const char *path)
