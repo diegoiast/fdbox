@@ -62,6 +62,16 @@ int command_copy(int argc, char *argv[])
         copy_parse_config(argc, argv, &config);
         /* copy_print_config(&config); */
 
+        if (config.source_file == NULL || config.source_file[0] == '\0') {
+                fprintf(stderr, "Error: no source file provided\n");
+                return EXIT_FAILURE;
+        }
+
+        if (config.dest_file == NULL || config.dest_file[0] == '\0') {
+                fprintf(stderr, "Error: no destination file provided\n");
+                return EXIT_FAILURE;
+        }
+
         glob(config.source_file, GLOB_DOOFFS, NULL, &globbuf);
         for (j = 0; j != globbuf.gl_pathc; j++) {
                 const char* from_file = globbuf.gl_pathv[j];
@@ -88,7 +98,7 @@ int command_copy(int argc, char *argv[])
 }
 
 const char* help_copy() {
-        return "Here should be a basic help for copy";
+        return "Copies one or more files to another location";
 }
 
 static void copy_config_init(struct copy_config *config)
@@ -261,12 +271,12 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 new_times.modtime = source_attr.st_mtim.tv_sec;
                 err = utime(to, &new_times);
                 if (err) {
-                        fprintf(stderr, "Failed setting time on %s", to);
+                        fprintf(stderr, "Error: failed setting time on %s", to);
                         return errno;
                 }
                 err = chmod(to, source_attr.st_mode);
                 if (err) {
-                        fprintf(stderr, "Failed setting ownership on %s", to);
+                        fprintf(stderr, "Error: failed setting ownership on %s", to);
                         return errno;
                 }
         }
