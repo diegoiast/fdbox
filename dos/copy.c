@@ -120,15 +120,16 @@ static void copy_config_init(struct copy_config *config)
 }
 
 /*
- * MSDOS
+ * MSDOS + freecom
  * /a ascii
  * /b binary
  * /v verify
  * /y - no confirmation, always overrites
  * /-y prompts to confirm every overwrite
  *
- * FreeCOM
- *
+ * /a - We do not support ascii (we always copy in binary mode)
+ * /v - we do not verify - let the OS do this for us.
+ * /-y WIP - parser is not supporting this yet.
  */
 
 static bool copy_parse_config(int argc, char* argv[], struct copy_config *config)
