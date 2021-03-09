@@ -225,7 +225,7 @@ static const char *copy_base_name(const char *file_name)
         while (c != file_name && *c != '/' && *c != '\\') {
                 c--;
         }
-        return file_name;
+        return c;
 }
 
 static int copy_single_file(const char *from, const char *to, struct copy_config *config)
