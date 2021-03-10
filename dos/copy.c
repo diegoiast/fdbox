@@ -225,6 +225,10 @@ static const char *copy_base_name(const char *file_name)
         while (c != file_name && *c != '/' && *c != '\\') {
                 c--;
         }
+
+        if (*c == '/' || *c =='\\') {
+                c++;
+        }
         return c;
 }
 
