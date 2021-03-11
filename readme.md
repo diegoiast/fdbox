@@ -1,14 +1,32 @@
 # fdshell
 
-A new shell for FreeDOS. Code will contain usable utilities 
+A new shell for FreeDOS. Code will contain usable utilities
 borrowed from Unix and maintain compatibility with MSDOS 6.22
 `command.com`.
+
+## Status
+
+ * Only DOS commands are supported. Unix commands might follow.
+ * Code compiles only under GCC (Windows+Linux). TCC (DOS).
+ * Currently I am using LibC's functions - so I am limited to
+   stadnard C code support for localization.
+ * `TurboC` does need a proper makefile.
+ * `beep` - works.
+ * `cd` - works
+ * `cls` - works
+ * `copy`
+   * All copies are binaries. By design.
+   * Recursive copy not implemented yet
+ * `dir`
+   * `/o?` Order is funky. I admit it's not traditional but it works.
+   * `/p` Pausing is not coded yet
+ * All other stuff in not implemented.
 
 ## Building
 
 The assumption is that this project will be developed on
 Linux (or any Posix compliant OS), and we maintain compatibilty
-with DOS at all times. The reason, is for better tooling (git, 
+with DOS at all times. The reason, is for better tooling (git,
 valgrind, strace, text-editors).
 
 Code is strictly C (asm where needed). Supported environments
@@ -28,7 +46,7 @@ Code is strictly C (asm where needed). Supported environments
  * BSD ? (should work)
  * OSX ? (should work)
  * SerenityOS (WIP)
-    
+
 
 Check out this git repository:
 
@@ -37,9 +55,9 @@ Check out this git repository:
     cmake --build build
 
 On Windows, the best build environment I found is QtCreator. No need for Qt-dev
-but you will need Ninja and CMake to be installed from the installer. Before the 
+but you will need Ninja and CMake to be installed from the installer. Before the
 cmake commmand type on your cmd:
-    
+
     set PATH=%PATH%;c:\Qt\Tools\CMake_64\bin;c:\Qt\Tools\Ninja;c:\Qt\Tools\mingw810_64\bin
 
 By default CMake on windows tries to generate NMake (VC) files. I opted
@@ -56,13 +74,15 @@ since again it will default to NMake. In the build tab, in the "Initial CMake pa
     -DCMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}
     -GNinja
 
+If you plan on building this on DOS - there is a TurboC 2.02 project. Code
+does compile under TC - its tested all the time.
 
 ## Why?
 Because.
 
 I started this project at 2001, and only recently re-started it from scratch. The idea came
 after I saw Minibox, and though (as every programmer does...) "this is wrong, this is not the
-way to do this, I will do it better". I am unsure if I am doing it better, but this is the 
+way to do this, I will do it better". I am unsure if I am doing it better, but this is the
 best way to thank Ercan Ersoy - you give me a push to restart this project: thank you.
 
 My old project:
@@ -74,7 +94,7 @@ https://github.com/ercanersoy/Minibox
 Ideas and inspiration do come from busybox (the applet concept for
 example). However - this project does not share any code, and cannot
 be considered a derived work (please don't copy code from Busybox here,
-as I might re-license code, and want new implementations for those old ideas).  
+as I might re-license code, and want new implementations for those old ideas).
 
 ## DosBox setup
 
@@ -88,9 +108,9 @@ Then in DosBox config, edited the start up files (usually at the end) to this:
     mount d /home/diego/fdbox/
     C:\AUTOEXEC.BAT
     d:
-   
-Then, each time I start dosbox, I have in the path all the compilers I need and 
-I am redirected to the full code of the program in drive D:. The project contains 
+
+Then, each time I start dosbox, I have in the path all the compilers I need and
+I am redirected to the full code of the program in drive D:. The project contains
 a TurboC project file - so typing `tc` will bring up the IDE with the project ready
 to hack.
 
