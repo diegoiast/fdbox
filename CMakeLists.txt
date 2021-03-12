@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.10)
 project(fdbox VERSION 0.1)
 
 add_executable(fdbox 
+        readme.md
     main.c
     applets.c
     help.c
