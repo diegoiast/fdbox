@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <utime.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -26,6 +25,7 @@ For license - read license.txt
 #include <stdbool.h>
 #include <unistd.h>
 #include <glob.h>
+#include <utime.h>
 #endif
 
 #ifdef __WIN32__
@@ -33,6 +33,7 @@ For license - read license.txt
 #include "lib/win32/win32-glob.h"
 #include <stdbool.h>
 #include <unistd.h>
+#include <utime.h>
 #endif
 
 struct copy_config {
@@ -292,6 +293,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         }
 
         if (config->copy_attributes) {
+#ifndef __MSDOS__
                 struct stat source_attr;
                 struct utimbuf new_times;
                 int err;
@@ -301,14 +303,17 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 new_times.modtime = source_attr.st_mtim.tv_sec;
                 err = utime(to, &new_times);
                 if (err) {
-                        fprintf(stderr, "Error: failed setting time on %s", to);
+                        fprintf(stderr, "Error: failed setting time on %s\n", to);
                         return errno;
                 }
                 err = chmod(to, source_attr.st_mode);
                 if (err) {
-                        fprintf(stderr, "Error: failed setting ownership on %s", to);
+                        fprintf(stderr, "Error: failed setting ownership on %s\n", to);
                         return errno;
                 }
+#else
+                fprintf(stderr, "Warning: copying attributes on MSDOS is not supported yet\n");
+#endif
         }
 
         /* TODO - clear all line */
