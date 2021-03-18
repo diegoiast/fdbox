@@ -18,6 +18,9 @@ DOWNLOAD_DIR=zip
 # http://ladsoft.tripod.com/orange_c_compiler.html
 # http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/devel/c/cc386/420/
 
+# nice docs:
+# http://bitsavers.informatik.uni-stuttgart.de/pdf/borland/turbo_c/Turbo_C_Users_Guide_1987.pdf
+
 ONLINE_ZIPS='
 http://ndn.muxe.com/download/file/ndn_3_00_0005_d32.zip
 https://github.com/downloads/AnimatorPro/Animator-Pro/AnimatorAKA.zip
