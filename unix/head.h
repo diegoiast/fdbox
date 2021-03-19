@@ -4,7 +4,7 @@
 // This file is part of fdbox
 // For license - read license.txt
 
-int command_head(int arc, char* argv[]);
-const char* help_head();
+int command_head(int arc, char *argv[]);
+const char *help_head();
 
 #endif //__head_h__

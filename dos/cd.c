@@ -3,10 +3,10 @@
 #include <string.h>
 
 #if __linux__
-#include <unistd.h>
-#include <stdio.h>
 #include <limits.h>
 #include <pwd.h>
+#include <stdio.h>
+#include <unistd.h>
 #endif
 
 #ifdef __MSDOS__
@@ -14,20 +14,20 @@
 #endif
 
 #ifdef WIN32
-#include <windows.h>
 #include <winbase.h>
+#include <windows.h>
 #endif
 
-#include "fdbox.h"
 #include "dos/cd.h"
+#include "fdbox.h"
 
 /*
 This file is part of fdbox
 For license - read license.txt
 */
 
-int command_cd(int argc, char* argv[]) {
-        const char* path = argv[1];
+int command_cd(int argc, char *argv[]) {
+        const char *path = argv[1];
         if (argc == 1) {
                 char cwd[128];
 #if defined(__linux__) || defined(__MSDOS__)
@@ -51,7 +51,7 @@ int command_cd(int argc, char* argv[]) {
         // a lot
         struct passwd *p = NULL;
         if (argv[1][0] == '~') {
-                char * username = argv[1] + 1;
+                char *username = argv[1] + 1;
                 if (*username == '\0') {
                         path = getenv("HOME");
                         if (path == NULL || path[0] == '\0') {
@@ -64,12 +64,10 @@ int command_cd(int argc, char* argv[]) {
                         return EXIT_FAILURE;
                 }
                 if (p != NULL)
-                path = p->pw_dir;
+                        path = p->pw_dir;
         }
 #endif
         return chdir(path);
 }
 
-const char* help_cd() {
-    return "Change working directory, pass none to display current directory";
-}
+const char *help_cd() { return "Change working directory, pass none to display current directory"; }

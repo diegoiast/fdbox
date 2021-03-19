@@ -6,7 +6,7 @@
  For license - read license.txt
 */
 
-int command_beep(int arc, char* argv[]);
-const char* help_beep();
+int command_beep(int arc, char *argv[]);
+const char *help_beep();
 
 #endif //__beep_h__

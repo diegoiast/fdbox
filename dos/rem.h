@@ -6,7 +6,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-int command_rem(int arc, char* argv[]);
-const char* help_rem();
+int command_rem(int arc, char *argv[]);
+const char *help_rem();
 
 #endif //__rem_h__

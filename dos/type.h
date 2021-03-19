@@ -6,7 +6,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-int command_type(int arc, char* argv[]);
-const char* help_type();
+int command_type(int arc, char *argv[]);
+const char *help_type();
 
 #endif //__type_h__

@@ -6,8 +6,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-
-int command_call(int arc, char* argv[]);
-const char* help_call();
+int command_call(int arc, char *argv[]);
+const char *help_call();
 
 #endif //__call_h__

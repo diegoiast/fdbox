@@ -6,7 +6,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-int command_date(int arc, char* argv[]);
-const char* help_date();
+int command_date(int arc, char *argv[]);
+const char *help_date();
 
 #endif //__date_h__
