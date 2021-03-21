@@ -48,7 +48,6 @@ add_executable(
   dos/rem.c
   dos/set.c
   dos/shift.c
-  dos/time.c
   dos/type.c
   unix/cal.c
   unix/head.c

@@ -27,7 +27,6 @@
 #include "dos/rem.h"
 #include "dos/set.h"
 #include "dos/shift.h"
-#include "dos/time.h"
 #include "dos/type.h"
 #if 0
 #include "unix/cal.h"

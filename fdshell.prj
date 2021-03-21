@@ -23,6 +23,5 @@ dos/reboot.c
 dos/rem.c
 dos/set.c
 dos/shift.c
-dos/time.c
 dos/type.c
 dos/dir.c (dos/cmd_dir.h)
