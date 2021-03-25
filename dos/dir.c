@@ -63,6 +63,8 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #define SORT_DATE 0x08
 #define SORT_SIZE 0x10
 
+#define MAX_DIR_FILES 128
+
 struct dir_config {
         bool show_help;
         bool pause;
@@ -75,7 +77,7 @@ struct dir_config {
 };
 
 struct dir_files {
-        char *files[128];
+        char *files[MAX_DIR_FILES];
         size_t files_count;
 };
 
@@ -322,7 +324,7 @@ static void dir_config_print(struct dir_config *config) {
 
 static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
                              struct dir_files *files) {
-        size_t i;
+        size_t i, files_requested = 0;
 
         for (i = 1; i < (size_t)argc; i++) {
                 char c1, c2;
@@ -416,15 +418,21 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
                                 config->show_help = true;
                                 break;
                         default:
-                                printf("invalid command line switch at index %ld/1\n", i);
+                                fprintf(stderr, "invalid command line switch at index %ld\n", i);
                                 return false;
                         }
                         break;
                 default:
-                        files->files[files->files_count] = argv[i];
-                        files->files_count++;
+                        files_requested ++;
+                        if (files->files_count < MAX_DIR_FILES) {
+                                files->files[files->files_count] = argv[i];
+                                files->files_count++;
+                        }
                         break;
                 }
+        }
+        if (files_requested != files->files_count) {
+                fprintf(stderr, "Warning: %d/%d files not be displayed\n", (int) files_requested-MAX_DIR_FILES, (int) files_requested);
         }
         return true;
 }
