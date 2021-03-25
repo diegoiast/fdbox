@@ -161,11 +161,11 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 glob_t globbuf = {0};
                 glob(files2->files[i], GLOB_DOOFFS, NULL, &globbuf);
                 for (j = 0; j != globbuf.gl_pathc; j++) {
+                        const char *file_name = globbuf.gl_pathv[j];
                         requested_count++;
                         if (requested_count > MAX_DIR_ENTRY_FILES) {
                                 continue;
                         }
-                        const char *file_name = globbuf.gl_pathv[j];
                         if (!found(file_name, files, file_count)) {
                                 files[file_count].file_name = strdup(globbuf.gl_pathv[j]);
                                 stat(files[file_count].file_name, &files[file_count].file_details);

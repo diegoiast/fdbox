@@ -23,7 +23,7 @@ const char *next(int argc, char *argv[], int current);
 int command_beep(int argc, char *argv[]) {
         const char *v;
         int frequency = 0;
-        int lenght = 0;
+        int length = 0;
         int i;
 
         /* debug_args(argc, argv); */
@@ -48,7 +48,7 @@ int command_beep(int argc, char *argv[]) {
                                         printf("Missing argument /t - time\n");
                                         return EXIT_FAILURE;
                                 }
-                                lenght = strtol(v, NULL, 0);
+                                length = strtol(v, NULL, 0);
                                 if (errno != 0) {
                                         printf("Invalid time argument: %s\n", v);
                                         return EXIT_FAILURE;
@@ -76,14 +76,13 @@ int command_beep(int argc, char *argv[]) {
 #if defined(__unix__) || defined(__APPLE__)
         printf("\a");
         UNUSED(frequency);
-        UNUSED(lenght);
+        UNUSED(length);
 #endif
 
 #if defined(WIN32)
-        Beep(frequency, lenght);
-#endif
+        Beep(frequency, length);
+#elif defined(__MSDOS__)
 
-#ifdef DOS
         sound(frequency);
         delay(length);
         nosound();
@@ -94,7 +93,7 @@ int command_beep(int argc, char *argv[]) {
 const char *help_beep() {
 #if defined(__unix__) || defined(__APPLE__)
         return "Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with DOS)";
-#elif defined(WIN32) || defined(DOS)
+#elif defined(WIN32) || defined(__MSDOS__)
         return "Makes sound for a specified length in milliseconds";
 #endif
 }
