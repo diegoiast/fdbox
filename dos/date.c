@@ -143,11 +143,11 @@ static int date_set_new_date(char *new_date) {
         char *token;
 
         token = strtok(new_date, "-");
-        month = token != NULL ? atoi(token) : -1;
+        month = token != NULL ? strtol(token, NULL, 10) : -1;
         token = strtok(NULL, "-");
-        day = token != NULL ? atoi(token) : -1;
+        day = token != NULL ? strtol(token, NULL, 10) : -1;
         token = strtok(NULL, "-");
-        year = token != NULL ? atoi(token) : -1;
+        year = token != NULL ? strtol(token, NULL, 10) : -1;
 
         if (year <= 0 || month <= 0 || day <= 0) {
                 return EXIT_FAILURE;
@@ -195,11 +195,11 @@ int date_set_new_time(char *new_time) {
 
         /* TODO - port to strtol - https://www.cplusplus.com/reference/cstdlib/strtol/ */
         token = strtok(new_time, ":");
-        hour = token != NULL ? atoi(token) : -1;
+        hour = token != NULL ? strtol(token, NULL, 10) : -1;
         token = strtok(NULL, ":");
-        minute = token != NULL ? atoi(token) : -1;
+        minute = token != NULL ? strtol(token, NULL, 10) : -1;
         token = strtok(NULL, ":");
-        second = token != NULL ? atoi(token) : 0;
+        second = token != NULL ? strtol(token, NULL, 10) : 0;
         token = strtok(NULL, ":");
 
 /*
