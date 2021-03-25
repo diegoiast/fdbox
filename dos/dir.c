@@ -2,6 +2,24 @@
  For license - read license.txt
 */
 
+/*
+ * TODO
+ * - dir /s - display accumulative byte count
+ * - dir /a - filter types
+ * - dir /p - pause - WIP
+ * - display fanicer byte sizes
+ * - fix display of subdirectories without any glob (dir /w ../)
+ * - on msdos "dir c:*" (when in d:) displays garbage ("dir c:\*" works).
+ */
+
+/*
+Places I look for inspiration:
+https://github.com/tronkko/dirent/tree/master/examples
+https://github.com/tronkko/dirent/blob/master/include/dirent.h
+https://gist.github.com/saghul/8013376
+https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
+*/
+
 #include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -12,25 +30,6 @@
 #include "dos/cmd_dir.h"
 #include "fdbox.h"
 #include "lib/args.h"
-
-/*
-Places I look for inspiration:
-https://github.com/tronkko/dirent/tree/master/examples
-https://github.com/tronkko/dirent/blob/master/include/dirent.h
-https://gist.github.com/saghul/8013376
-https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
-*/
-
-/*
- * TODO
- *
- * dir /s - display accumulative byte count
- * dir /a - filter types
- * dir /p - pause - WIP
- * display fanicer byte sizes
- * fix display of subdirectories without any glob (dir /w ../)
- * fix warnings in TC
- */
 
 #ifdef _POSIX_C_SOURCE
 #include <dirent.h>
@@ -64,6 +63,7 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #define SORT_SIZE 0x10
 
 #define MAX_DIR_FILES 128
+#define MAX_DIR_ENTRY_FILES 1024
 
 struct dir_config {
         bool show_help;
@@ -146,8 +146,8 @@ int command_dir(int argc, char *argv[]) {
 static void dir_display_dir(struct dir_config *config, const char *dir_name,
                             struct dir_files *files2, int depth) {
         /* then find all available files */
-        struct file_entry files[1000];
-        size_t file_count = 0;
+        struct file_entry files[MAX_DIR_ENTRY_FILES];
+        size_t file_count = 0, requested_count = 0;
         size_t i, j;
 
         long long int total_bytes = 0;
@@ -161,6 +161,10 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 glob_t globbuf = {0};
                 glob(files2->files[i], GLOB_DOOFFS, NULL, &globbuf);
                 for (j = 0; j != globbuf.gl_pathc; j++) {
+                        requested_count++;
+                        if (requested_count > MAX_DIR_ENTRY_FILES) {
+                                continue;
+                        }
                         const char *file_name = globbuf.gl_pathv[j];
                         if (!found(file_name, files, file_count)) {
                                 files[file_count].file_name = strdup(globbuf.gl_pathv[j]);
@@ -177,6 +181,10 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 qsort(files, file_count, sizeof(struct file_entry), dir_file_comperator);
         }
 
+        if (requested_count != file_count) {
+                fprintf(stderr, "Warning: %d/%d files will not be showed\n",
+                        (int)requested_count - MAX_DIR_ENTRY_FILES, (int)requested_count);
+        }
         if (!config->bare) {
                 printf("\nDirectory of %s\n", dir_name);
         }
@@ -197,7 +205,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                         if (config->wide) {
                                 snprintf(display, 200, "[%s]", fname);
                         } else {
-                                snprintf(display, 200, "%s/", fname);
+                                snprintf(display, 200, "%s%s", fname, DIRECTORY_DELIMITER);
                         }
                 } else {
                         total_files++;
@@ -423,7 +431,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
                         }
                         break;
                 default:
-                        files_requested ++;
+                        files_requested++;
                         if (files->files_count < MAX_DIR_FILES) {
                                 files->files[files->files_count] = argv[i];
                                 files->files_count++;
@@ -432,7 +440,8 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
                 }
         }
         if (files_requested != files->files_count) {
-                fprintf(stderr, "Warning: %d/%d files not be displayed\n", (int) files_requested-MAX_DIR_FILES, (int) files_requested);
+                fprintf(stderr, "Warning: %d/%d files not be displayed\n",
+                        (int)files_requested - MAX_DIR_FILES, (int)files_requested);
         }
         return true;
 }
