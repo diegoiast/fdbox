@@ -33,7 +33,7 @@ add_executable(
   dos/cd.c
   dos/cls.c
   dos/copy.c
-  dos/date.c
+  dos/datetime.c
   dos/dir.c
   dos/echo.c
   dos/exit.c

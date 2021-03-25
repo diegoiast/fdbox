@@ -13,7 +13,7 @@
 #include "dos/cls.h"
 #include "dos/cmd_dir.h"
 #include "dos/copy.h"
-#include "dos/date.h"
+#include "dos/datetime.h"
 #include "dos/echo.h"
 #include "dos/exit.h"
 #include "dos/for.h"

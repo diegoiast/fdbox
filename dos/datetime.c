@@ -1,16 +1,22 @@
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
+
+/*
+ * TODO
+ * - support for reading AM/PM time format
+ * - support for different date separators (depending on locale)
+ * - support for different date locale (MM/DD/YY vs DD/MM/YY etc).
+ */
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include "dos/date.h"
+#include "dos/datetime.h"
 #include "fdbox.h"
-
-/*
-This file is part of fdbox
-For license - read license.txt
-*/
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
@@ -35,7 +41,7 @@ struct date_time_config {
 
 static void date_time_config_init(struct date_time_config *config);
 static bool date_time_config_parse(int argc, char *argv[], struct date_time_config *config,
-                              char interactive_char);
+                                   char interactive_char);
 static void date_time_config_print(struct date_time_config *config);
 static int date_set_new_date(char *new_date);
 static void date_print_date();
@@ -106,7 +112,7 @@ static void date_time_config_init(struct date_time_config *config) {
 }
 
 static bool date_time_config_parse(int argc, char *argv[], struct date_time_config *config,
-                              char interactive_char) {
+                                   char interactive_char) {
         size_t i;
 
         interactive_char = toupper(interactive_char);
@@ -169,9 +175,7 @@ static int date_set_new_date(char *new_date) {
                 tv.tv_usec = 0;
                 return settimeofday(&tv, NULL);
         }
-#endif
-
-#if defined(__MSDOS__)
+#elif defined(__MSDOS__)
         {
                 struct date the_date;
                 the_date.da_year = year;
@@ -193,7 +197,6 @@ int date_set_new_time(char *new_time) {
         int hour = -1, minute = -1, second = -1;
         char *token;
 
-        /* TODO - port to strtol - https://www.cplusplus.com/reference/cstdlib/strtol/ */
         token = strtok(new_time, ":");
         hour = token != NULL ? strtol(token, NULL, 10) : -1;
         token = strtok(NULL, ":");
@@ -202,7 +205,7 @@ int date_set_new_time(char *new_time) {
         second = token != NULL ? strtol(token, NULL, 10) : 0;
         token = strtok(NULL, ":");
 
-/*
+#if 0
         TODO: we cannot support PM/AM yet
         if (token != NULL && token[0] != '\0') {
                 if (token[2] != '\0') {
@@ -223,13 +226,38 @@ int date_set_new_time(char *new_time) {
                         hour += 12;
                 }
         }
-*/
-
+#endif
         if (hour < 0 || minute < 0 || second < 0) {
                 return EXIT_FAILURE;
         }
 
-        printf("TODO: set time to %02d:%02d:%02d\n", hour, minute, second);
+#if defined(_POSIX_C_SOURCE) || defined(__WIN32__)
+        {
+                time_t new_time;
+                struct tm tm;
+                struct timeval tv;
+                new_time = time(NULL);
+                tm = *localtime(&new_time);
+                tm.tm_hour = hour;
+                tm.tm_min = minute;
+                tm.tm_sec = second;
+                new_time = mktime(&tm);
+                tv.tv_sec = new_time;
+                tv.tv_usec = 0;
+                return settimeofday(&tv, NULL);
+        }
+#elif defined(__MSDOS__)
+        {
+                struct time the_time;
+                printf("TODO: set time to %02d:%02d:%02d\n", hour, minute, second);
+
+                the_time.ti_hour = hour;
+                the_time.ti_min = minute;
+                the_time.ti_sec = second;
+                the_time.ti_hund = 0;
+                settime(&the_time);
+        }
+#endif
         return EXIT_FAILURE;
 }
 
@@ -238,7 +266,6 @@ void date_print_time() {
         struct tm tm = *localtime(&t);
         printf("Current time is %02d:%02d:%02d\n", tm.tm_hour, tm.tm_min, tm.tm_sec);
 }
-
 
 static void date_print_extended_help() {
         printf("%s\n", help_date());
@@ -257,6 +284,5 @@ static void time_print_extended_help() {
         printf("and not be interactive. If you don't - the command will\n");
         printf("prompt you for a new time\n");
 }
-
 
 static const char *pb(bool b) { return b ? "true" : "false"; }
