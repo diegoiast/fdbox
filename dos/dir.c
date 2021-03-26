@@ -140,7 +140,7 @@ int command_dir(int argc, char *argv[]) {
         }
 
         dir_display_dir(&config, ".", &files, 1);
-        return 0;
+        return EXIT_SUCCESS;
 }
 
 static void dir_display_dir(struct dir_config *config, const char *dir_name,
@@ -256,8 +256,8 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 printf("%10d files(s)\t %lld bytes\n", total_files, total_bytes);
                 printf("%10d dirs(s) \t %lld free\n", total_dirs, free_bytes);
         }
-        if (config->subdirs) {
-                for (i = 0; i < file_count; i++) {
+        for (i = 0; i < file_count; i++) {
+                if (config->subdirs) {
                         struct dir_files f;
                         char *s;
 
@@ -274,8 +274,8 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                         f.files_count = 1;
                         dir_display_dir(config, files[i].file_name, &f, depth + 1);
                         free(s);
-                        free(files[i].file_name);
                 }
+                free(files[i].file_name);
         }
 }
 
