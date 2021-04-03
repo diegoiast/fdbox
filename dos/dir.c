@@ -30,6 +30,7 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "dos/cmd_dir.h"
 #include "fdbox.h"
 #include "lib/args.h"
+#include "lib/strextra.h"
 
 #ifdef _POSIX_C_SOURCE
 #include <dirent.h>
@@ -102,8 +103,6 @@ static int dir_file_order;
 static int dir_file_comperator(const void *a, const void *b);
 
 static bool found(const char *file_name, const struct file_entry files[], size_t file_count);
-static const char *pb(bool b);
-static char *string_to_lower(char *s);
 
 /* TODO - should this be moved to a library? */
 static bool prefix(const char *pre, const char *str) { return strncmp(pre, str, strlen(pre)) == 0; }
@@ -213,7 +212,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 }
 
                 if (config->lower_case) {
-                        string_to_lower(display);
+                        str_to_lower(display);
                 }
 
                 if (config->wide) {
@@ -296,10 +295,10 @@ static void dir_config_init(struct dir_config *config, struct dir_files *files) 
 }
 
 static void dir_config_print(struct dir_config *config) {
-        printf("\tpause=%s\n", pb(config->pause));
-        printf("\twide_format=%s\n", pb(config->wide));
-        printf("\tsubdirs=%s\n", pb(config->subdirs));
-        printf("\tlower_case=%s\n", pb(config->lower_case));
+        printf("\tpause=%s\n", str_bool(config->pause));
+        printf("\twide_format=%s\n", str_bool(config->wide));
+        printf("\tsubdirs=%s\n", str_bool(config->subdirs));
+        printf("\tlower_case=%s\n", str_bool(config->lower_case));
 
         printf("\tsort=");
         if (flag_test(config->sort_order, SORT_NAME)) {
@@ -485,24 +484,6 @@ static void dir_format_date_time(long ff_fdate, long ff_ftime, char *time, char 
         snprintf(time, 10, "%02d:%0d", hour, minute);
 }
 
-/* lets assume extensions are 3 letters only for now */
-static char *get_extesnsion(const char *fname, char *ext) {
-        const char *p = fname;
-        while (*p)
-                p++;
-        while (p != fname && *p != '.')
-                p--;
-        if (p != fname && *p == '.') {
-                ext[0] = *p;
-                ext[1] = *(p + 1);
-                ext[2] = *(p + 2);
-                ext[4] = 0;
-        } else {
-                ext[0] = 0;
-        }
-        return ext;
-}
-
 static int dir_file_comperator(const void *a, const void *b) {
         const struct file_entry *file1 = (const struct file_entry *)(a);
         const struct file_entry *file2 = (const struct file_entry *)(b);
@@ -554,8 +535,9 @@ static int dir_file_comperator(const void *a, const void *b) {
         if (flag_test(dir_file_order, SORT_EXTENTION)) {
                 char ext1[4], ext2[4];
                 int v;
-                get_extesnsion(file1->file_name, ext1);
-                get_extesnsion(file2->file_name, ext2);
+                file_get_extesnsion(file1->file_name, ext1);
+                file_get_extesnsion(file2->file_name, ext2);
+                printf("testing %s:%s\n", ext1, ext2);
                 v = strcasecmp(ext1, ext2);
                 if (v > 0) {
                         order += 2;
@@ -575,16 +557,6 @@ static bool found(const char *file_name, const struct file_entry files[], size_t
                 }
         }
         return false;
-}
-
-static const char *pb(bool b) { return b ? "true" : "false"; }
-
-static char *string_to_lower(char *s) {
-        while (*s) {
-                *s = tolower(*s);
-                s++;
-        }
-        return s;
 }
 
 static bool flag_test(int value, int flag) { return (value & flag) != 0; }

@@ -28,6 +28,7 @@ add_executable(
   help.c
   lib/applet.c
   lib/args.c
+  lib/strextra.c
   dos/beep.c
   dos/call.c
   dos/cd.c

@@ -8,6 +8,7 @@
 #include <time.h>
 
 #include "dos/copy.h"
+#include "lib/strextra.h"
 #include "fdbox.h"
 
 /*
@@ -87,7 +88,7 @@ int command_copy(int argc, char *argv[]) {
 
                 target_name = config.dest_file;
                 if (copy_is_dir(target_name)) {
-                        const char *base_name = copy_base_name(from_file);
+                        const char *base_name = file_base_name(from_file);
                         target_name = copy_append_path(target_name, base_name);
                         free_memory = true;
                 }
@@ -208,19 +209,6 @@ static char *copy_append_path(const char *directory, const char *file_name) {
         }
 
         return full_file_name;
-}
-
-static const char *copy_base_name(const char *file_name) {
-        int i = strlen(file_name);
-        const char *c = file_name + i - 1;
-        while (c != file_name && *c != '/' && *c != '\\') {
-                c--;
-        }
-
-        if (*c == '/' || *c == '\\') {
-                c++;
-        }
-        return c;
 }
 
 static int copy_single_file(const char *from, const char *to, struct copy_config *config) {

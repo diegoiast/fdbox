@@ -1,5 +1,4 @@
-/*
-This file is part of fdbox
+/* This file is part of fdbox
 For license - read license.txt
 */
 
@@ -16,6 +15,7 @@ For license - read license.txt
 #include <time.h>
 
 #include "dos/datetime.h"
+#include "lib/strextra.h"
 #include "fdbox.h"
 
 #ifdef _POSIX_C_SOURCE
@@ -49,8 +49,6 @@ static void date_print_extended_help();
 static int date_set_new_time(char *new_time);
 static void date_print_time();
 static void time_print_extended_help();
-
-static const char *pb(bool b);
 
 int command_time(int argc, char *argv[]) {
         struct date_time_config config;
@@ -139,8 +137,8 @@ static bool date_time_config_parse(int argc, char *argv[], struct date_time_conf
 }
 
 static void date_config_print(struct date_time_config *config) {
-        printf("\tShow help = %s\n", pb(config->show_help));
-        printf("\tInteractive = %s\n", pb(config->interactive));
+        printf("\tShow help = %s\n", str_bool(config->show_help));
+        printf("\tInteractive = %s\n", str_bool(config->interactive));
         printf("\tnew date = %s\n", config->new_date_time ? config->new_date_time : "NULL");
 }
 
@@ -284,5 +282,3 @@ static void time_print_extended_help() {
         printf("and not be interactive. If you don't - the command will\n");
         printf("prompt you for a new time\n");
 }
-
-static const char *pb(bool b) { return b ? "true" : "false"; }
