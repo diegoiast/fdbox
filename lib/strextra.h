@@ -27,7 +27,7 @@ const char *str_bool(bool b);
 char *str_to_lower(char *s);
 
 /* java - string.startsWith() */
-bool str_is_prefix(const char *pre, const char *str);
+bool str_is_prefix(const char *str, const char *pre);
 
 /* fnsplit, more or less, returing only the filename+ext, without path */
 const char *file_base_name(const char *file_name);

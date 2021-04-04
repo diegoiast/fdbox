@@ -21,6 +21,17 @@ cpmaddpackage(
   "CMAKE_FORMAT_EXCLUDE cmake/CPM.cmake")
 
 add_executable(
+  tests
+  tests.c
+  lib/applet.c
+  lib/args.c
+  lib/strextra.c
+  )
+target_include_directories(tests PUBLIC "${PROJECT_BINARY_DIR}"
+                                        "${PROJECT_SOURCE_DIR}")
+
+
+add_executable(
   fdbox
   readme.md
   main.c

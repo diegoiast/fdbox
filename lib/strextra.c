@@ -5,14 +5,15 @@
 const char *str_bool(bool b) { return b ? "true" : "false"; }
 
 char *str_to_lower(char *s) {
+        char *s1 = s;
         while (*s) {
                 *s = tolower(*s);
                 s++;
         }
-        return s;
+        return s1;
 }
 
-bool str_is_prefix(const char *pre, const char *str) { return strncmp(pre, str, strlen(pre)) == 0; }
+bool str_is_prefix(const char *str, const char *pre) { return strncmp(pre, str, strlen(pre)) == 0; }
 
 const char *file_base_name(const char *file_name) {
         int i = strlen(file_name);

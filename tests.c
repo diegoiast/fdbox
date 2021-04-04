@@ -2,6 +2,7 @@
 #include "fdbox.h"
 #include "lib/applet.h"
 #include "lib/args.h"
+#include "lib/strextra.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,12 +13,13 @@ typedef bool (*function_test)();
 bool test(const char *message, function_test unittest);
 bool test_args();
 bool test_applets();
+bool test_strings();
 
 int main(int argc, char *argv[]) {
         bool ok = true;
         ok &= test("applets", test_applets);
-        ok &= test("args", test_args);
-        //     test("args", test_args);
+//        ok &= test("args", test_args);
+        ok &= test("strings", test_strings);
         return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
@@ -54,6 +56,16 @@ bool verify_int_equals(int arg1, int arg2, const char *message) {
         return false;
 }
 
+bool verify_string_equals(const char *arg1, const char *arg2, const char *message) {
+        printf(" * Checking %s: ", message);
+        if (strcmp(arg1, arg2) == 0) {
+                printf("OK\n");
+                return true;
+        }
+        printf("FAIL (expecting %s, got %s)\n", arg1, arg2);
+        return false;
+}
+
 ///////////////////////////////////////////
 // Argumnents
 
@@ -70,6 +82,7 @@ int split_strings(char *c2, char *argv[][100]) {
         return argc;
 }
 
+// UNused yes
 bool test_args() {
         bool ok = true;
         char c2[256], *c3;
@@ -155,5 +168,45 @@ bool test_applets() {
         ok &= verify_ptr_equals(c->handler, applet2, "applet 2 available");
         c = find_applet("applet3", commands);
         ok &= verify_ptr_equals(c, NULL, "applet 3 un-available");
+        return ok;
+}
+
+
+bool test_string_lower() {
+        const char *c;
+        char str[100];
+        bool ok = true;
+
+        c = str_to_lower(strcpy(str, "NULL"));
+        ok &= verify_string_equals(c, "null", "Testing normal lower");
+        c = str_to_lower(strcpy(str,"qwertyuiopQWERTYUIOP"));
+        ok &= verify_string_equals(c, "qwertyuiopqwertyuiop", "Testing normal lower");
+        c = str_to_lower(strcpy(str, ""));
+        ok &= verify_string_equals(c, strcpy(str, ""), "Testing lower to empty string");
+        c = str_to_lower(strcpy(str, "123456"));
+        ok &= verify_string_equals(c, "123456", "Testing numbers");
+
+        return ok;
+}
+
+bool test_str_prefix() {
+        const char *c;
+        char str[100];
+        bool ok = true;
+
+        c = strcpy(str, "Lorem Ipsum");
+        ok &= verify_int_equals(str_is_prefix(c, "L"), 1, "Testing string starts with string (1)");
+        ok &= verify_int_equals(str_is_prefix(c, "Lorem"), 1, "Testing string starts with string (5)");
+        ok &= verify_int_equals(str_is_prefix(c, "XXX"), 0, "Testing string does not start with string");
+        ok &= verify_int_equals(str_is_prefix(c, "Lorem Ipsum"), 1, "Testing string starts with itself");
+        ok &= verify_int_equals(str_is_prefix(c, ""), 1, "Testing string starts with itself");
+
+        return ok;
+}
+
+bool test_strings() {
+        bool ok = true;
+        ok &= test_string_lower();
+        ok &= test_str_prefix();
         return ok;
 }
