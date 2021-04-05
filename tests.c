@@ -178,13 +178,13 @@ bool test_string_lower() {
         bool ok = true;
 
         c = str_to_lower(strcpy(str, "NULL"));
-        ok &= verify_string_equals(c, "null", "Testing normal lower");
+        ok &= verify_string_equals(c, "null", "normal lower");
         c = str_to_lower(strcpy(str,"qwertyuiopQWERTYUIOP"));
-        ok &= verify_string_equals(c, "qwertyuiopqwertyuiop", "Testing normal lower");
+        ok &= verify_string_equals(c, "qwertyuiopqwertyuiop", "normal lower");
         c = str_to_lower(strcpy(str, ""));
-        ok &= verify_string_equals(c, strcpy(str, ""), "Testing lower to empty string");
+        ok &= verify_string_equals(c, strcpy(str, ""), "lower to empty string");
         c = str_to_lower(strcpy(str, "123456"));
-        ok &= verify_string_equals(c, "123456", "Testing numbers");
+        ok &= verify_string_equals(c, "123456", "numbers");
 
         return ok;
 }
@@ -195,11 +195,55 @@ bool test_str_prefix() {
         bool ok = true;
 
         c = strcpy(str, "Lorem Ipsum");
-        ok &= verify_int_equals(str_is_prefix(c, "L"), 1, "Testing string starts with string (1)");
-        ok &= verify_int_equals(str_is_prefix(c, "Lorem"), 1, "Testing string starts with string (5)");
-        ok &= verify_int_equals(str_is_prefix(c, "XXX"), 0, "Testing string does not start with string");
-        ok &= verify_int_equals(str_is_prefix(c, "Lorem Ipsum"), 1, "Testing string starts with itself");
-        ok &= verify_int_equals(str_is_prefix(c, ""), 1, "Testing string starts with itself");
+        ok &= verify_int_equals(str_is_prefix(c, "L"), 1, "string starts with string (1)");
+        ok &= verify_int_equals(str_is_prefix(c, "Lorem"), 1, "string starts with string (5)");
+        ok &= verify_int_equals(str_is_prefix(c, "XXX"), 0, "string does not start with string");
+        ok &= verify_int_equals(str_is_prefix(c, "Lorem Ipsum"), 1, "string starts with itself");
+        ok &= verify_int_equals(str_is_prefix(c, ""), 1, "string starts with itself");
+
+        return ok;
+}
+
+bool test_file_basename() {
+        char str[100];
+        const char *c;
+        bool ok = true;
+
+        strcpy(str, "file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "full file name");
+
+        strcpy(str, "c:\\windows\\drivers\\file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "windows path");
+
+        strcpy(str, "\\windows\\drivers\\file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "windows path (no drive)");
+
+        strcpy(str, "windows\\drivers\\file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "windows path (relative)");
+
+        strcpy(str, "..\\..\\windows\\file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "windows path (relative, parent)");
+
+        strcpy(str, "/tmp/file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "unix path");
+
+        strcpy(str, "tmp/file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "unix path (relative)");
+
+        strcpy(str, "../../../tmp/file.txt");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "file.txt", "unix path (relative, parent)");
+
+        strcpy(str, "c:/test/messedup/..\\windows.exe.manifest");
+        c = file_base_name(str);
+        ok &= verify_string_equals(c, "windows.exe.manifest", "Testing mixed path (unix/windows, parent)");
 
         return ok;
 }
@@ -208,5 +252,6 @@ bool test_strings() {
         bool ok = true;
         ok &= test_string_lower();
         ok &= test_str_prefix();
+        ok &= test_file_basename();
         return ok;
 }
