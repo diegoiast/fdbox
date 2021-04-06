@@ -29,19 +29,16 @@ const char *file_base_name(const char *file_name) {
 }
 
 /* lets assume extensions are 3 letters only for now */
-const char *file_get_extesnsion(const char *fname, char *ext) {
+const char *file_get_extesnsion(const char *fname) {
         const char *p = fname;
-        while (*p)
+        while (*p) {
                 p++;
-        while (p != fname && *p != '.')
-                p--;
-        if (p != fname && *p == '.') {
-                ext[0] = *p;
-               ext[1] = *(p + 1);
-                ext[2] = *(p + 2);
-                ext[4] = 0;
-        } else {
-                ext[0] = 0;
         }
-        return ext;
+        while (p != fname && *p != '.') {
+                p--;
+        }
+        if (*p == '.') {
+                p++;
+        }
+        return p;
 }

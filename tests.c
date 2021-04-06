@@ -82,7 +82,7 @@ int split_strings(char *c2, char *argv[][100]) {
         return argc;
 }
 
-// UNused yes
+// Unused test, the API is not used
 bool test_args() {
         bool ok = true;
         char c2[256], *c3;
@@ -243,7 +243,31 @@ bool test_file_basename() {
 
         strcpy(str, "c:/test/messedup/..\\windows.exe.manifest");
         c = file_base_name(str);
-        ok &= verify_string_equals(c, "windows.exe.manifest", "Testing mixed path (unix/windows, parent)");
+        ok &= verify_string_equals(c, "windows.exe.manifest", "mixed path (unix/windows, parent)");
+
+        return ok;
+}
+
+bool test_file_extensions() {
+        char str[100];
+        const char *c;
+        bool ok = true;
+
+        strcpy(str, "file.txt");
+        c = file_get_extesnsion(str);
+        ok &= verify_string_equals(c, "txt", "getting normal 8.3 extention");
+
+        strcpy(str, "/var/lib/file.txt");
+        c = file_get_extesnsion(str);
+        ok &= verify_string_equals(c, "txt", "getting normal 8.3 extention + path");
+
+        strcpy(str, "/var/lib/file.text");
+        c = file_get_extesnsion(str);
+        ok &= verify_string_equals(c, "text", "getting normal long extention + path");
+
+        strcpy(str, "/var/lib/file.txt.text.file.blabla");
+        c = file_get_extesnsion(str);
+        ok &= verify_string_equals(c, "blabla", "getting very long extention + path");
 
         return ok;
 }
@@ -253,5 +277,6 @@ bool test_strings() {
         ok &= test_string_lower();
         ok &= test_str_prefix();
         ok &= test_file_basename();
+        ok &= test_file_extensions();
         return ok;
 }

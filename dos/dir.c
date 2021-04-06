@@ -533,10 +533,10 @@ static int dir_file_comperator(const void *a, const void *b) {
                 }
         }
         if (flag_test(dir_file_order, SORT_EXTENTION)) {
-                char ext1[4], ext2[4];
+                const char *ext1, *ext2;
                 int v;
-                file_get_extesnsion(file1->file_name, ext1);
-                file_get_extesnsion(file2->file_name, ext2);
+                ext1 = file_get_extesnsion(file1->file_name);
+                ext2 = file_get_extesnsion(file2->file_name);
                 printf("testing %s:%s\n", ext1, ext2);
                 v = strcasecmp(ext1, ext2);
                 if (v > 0) {

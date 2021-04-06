@@ -33,6 +33,6 @@ bool str_is_prefix(const char *str, const char *pre);
 const char *file_base_name(const char *file_name);
 
 /* returns the last tip of the file name */
-const char *file_get_extesnsion(const char *fname, char *ext);
+const char *file_get_extesnsion(const char *fname);
 
 #endif /* __STR_EXTRA__ */
