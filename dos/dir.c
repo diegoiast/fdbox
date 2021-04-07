@@ -537,7 +537,6 @@ static int dir_file_comperator(const void *a, const void *b) {
                 int v;
                 ext1 = file_get_extesnsion(file1->file_name);
                 ext2 = file_get_extesnsion(file2->file_name);
-                printf("testing %s:%s\n", ext1, ext2);
                 v = strcasecmp(ext1, ext2);
                 if (v > 0) {
                         order += 2;
