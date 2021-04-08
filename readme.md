@@ -17,15 +17,20 @@ borrowed from Unix and maintain compatibility with MSDOS 6.22
  * `copy`
    * All copies are binaries. By design.
    * Recursive copy not implemented yet
+   * Copy globs, and several files - not implemented yet
+   * Append files (copy file1+file2 file3) not implemented yet
  * `dir`
    * `/o?` Order is funky. I admit it's not traditional but it works.
    * `/p` Pausing is not coded yet
+ * date/time
+   * Missing AM/PM input
+   * Test localization (for example date, MM/DD)
  * All other stuff in not implemented.
 
 ## Building
 
 The assumption is that this project will be developed on
-Linux (or any Posix compliant OS), and we maintain compatibilty
+Linux (or any Posix compliant OS), and will maintain compatibilty
 with DOS at all times. The reason, is for better tooling (git,
 valgrind, strace, text-editors).
 
