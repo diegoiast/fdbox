@@ -156,6 +156,12 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         int lines = 0;
         int cols = 0;
 
+        /* I don't fully understand - but without initializing the array to 0,
+         * valgrind is not happy. It complains about S_ISDIR() and st_mtime
+         * Which is wierd - as those fields are used for display... and IMHO
+         * the values I see are OK.
+         */
+        memset(files, 0, sizeof(files));
         for (i = 0; i < files2->files_count; i++) {
                 glob_t globbuf = {0};
                 glob(files2->files[i], GLOB_DOOFFS, NULL, &globbuf);
