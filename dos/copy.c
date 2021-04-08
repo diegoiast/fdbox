@@ -296,8 +296,14 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 
         /* TODO - clear all line */
         if (config->verbose) {
-                printf("\r%02d%% - %s -> %s %s\n", (int)((total_written * 100) / total_size), from,
-                       to, config->copy_attributes ? "*" : "");
+                if (total_size != 0) {
+                        int per = (int)((total_written * 100) / total_size);
+                        printf("\r%02d%% - %s -> %s %s\n", per, from,
+                               to, config->copy_attributes ? "*" : "");
+                } else {
+                        printf("\r%s -> %s %s\n", from,
+                               to, config->copy_attributes ? "*" : "");
+                }
         }
         return EXIT_SUCCESS;
 }
