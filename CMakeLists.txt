@@ -46,6 +46,7 @@ add_executable(
   dos/cls.c
   dos/copy.c
   dos/datetime.c
+  dos/del.c
   dos/dir.c
   dos/echo.c
   dos/exit.c

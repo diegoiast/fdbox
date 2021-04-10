@@ -28,11 +28,13 @@
 #ifdef _POSIX_C_SOURCE
 #define DIRECTORY_DELIMITER "/"
 #define ARGUMENT_DELIMIER '-'
+#define ALL_FILES_GLOB "*"
 #endif
 
 #if defined(__WIN32__) || defined(__MSDOS__)
 #define DIRECTORY_DELIMITER "\\"
 #define ARGUMENT_DELIMIER '/'
+#define ALL_FILES_GLOB "*.*"
 #endif
 
 #endif // __fdbox_h__

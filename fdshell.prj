@@ -11,6 +11,7 @@ dos/cd.c
 dos/cls.c
 dos/copy.c
 dos/datetime.c (dos/datetime.h)
+dos/del.c (dos/del.h)
 dos/echo.c
 dos/exit.c
 dos/for.c
