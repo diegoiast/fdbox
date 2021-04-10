@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -138,7 +139,7 @@ static bool copy_parse_config(int argc, char *argv[], struct copy_config *config
                 c1 = argv[i][0];
                 switch (c1) {
                 case ARGUMENT_DELIMIER:
-                        c2 = argv[i][1];
+                        c2 = tolower(argv[i][1]);
                         switch (c2) {
                         case 'a':
                                 config->copy_attributes = true;

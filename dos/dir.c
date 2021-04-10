@@ -130,11 +130,7 @@ int command_dir(int argc, char *argv[]) {
         }
 
         if (files.files_count == 0) {
-#ifdef __MSDOS__
-                files.files[0] = strdup("*.*");
-#else
-                files.files[0] = strdup("*");
-#endif
+                files.files[0] = ALL_FILES_GLOB;
                 files.files_count = 1;
         }
 
@@ -274,7 +270,8 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                         }
                         s = (char *)malloc(strlen(files[i].file_name) + 5);
                         strcpy(s, files[i].file_name);
-                        strcat(s, "/*.*");
+                        strcat(s, DIRECTORY_DELIMITER);
+                        strcat(s, ALL_FILES_GLOB);
                         f.files[0] = s;
                         f.files_count = 1;
                         dir_display_dir(config, files[i].file_name, &f, depth + 1);
@@ -345,7 +342,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
                 c1 = argv[i][0];
                 switch (c1) {
                 case ARGUMENT_DELIMIER:
-                        c2 = argv[i][1];
+                        c2 = tolower(argv[i][1]);
                         switch (c2) {
                         case 'p':
                         case 'P':
