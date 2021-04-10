@@ -206,8 +206,9 @@ deletion_result del_single_file(struct del_config *config, const char* file_name
 
         if (config->prompt) {
                 int c;
-                printf("%s :Delete this file?  (Yes/No/All/Cancel)", file_base_name(file_name));
+                printf("%s :Delete this file? (Yes/No/All/Cancel) ", file_base_name(file_name));
                 c = fgetc(stdin);
+                fgetc(stdin);
                 switch (tolower(c)) {
                 case 'y':
                         break;
@@ -228,7 +229,7 @@ deletion_result del_single_file(struct del_config *config, const char* file_name
         if (!delete_file) {
              return no;
         }
-        if (config->verbose) {
+        if (config->verbose && !config->prompt) {
                 printf(" <x> %s\n", file_name);
         }
         r = remove(file_name);
