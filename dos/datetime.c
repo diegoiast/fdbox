@@ -15,8 +15,8 @@ For license - read license.txt
 #include <time.h>
 
 #include "dos/datetime.h"
-#include "lib/strextra.h"
 #include "fdbox.h"
+#include "lib/strextra.h"
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>

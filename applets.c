@@ -37,6 +37,7 @@
 #endif
 #include "./help.h"
 
+/* clang-format off */
 struct applet commands[] = {{help_beep, command_beep, "beep"},
                             {help_call, command_call, "call"},
                             {help_cd, command_cd, "cd"},

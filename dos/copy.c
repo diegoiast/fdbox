@@ -1,5 +1,5 @@
-#include <errno.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,8 +9,8 @@
 #include <time.h>
 
 #include "dos/copy.h"
-#include "lib/strextra.h"
 #include "fdbox.h"
+#include "lib/strextra.h"
 
 /*
 This file is part of fdbox
@@ -299,11 +299,10 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         if (config->verbose) {
                 if (total_size != 0) {
                         int per = (int)((total_written * 100) / total_size);
-                        printf("\r%02d%% - %s -> %s %s\n", per, from,
-                               to, config->copy_attributes ? "*" : "");
+                        printf("\r%02d%% - %s -> %s %s\n", per, from, to,
+                               config->copy_attributes ? "*" : "");
                 } else {
-                        printf("\r%s -> %s %s\n", from,
-                               to, config->copy_attributes ? "*" : "");
+                        printf("\r%s -> %s %s\n", from, to, config->copy_attributes ? "*" : "");
                 }
         }
         return EXIT_SUCCESS;

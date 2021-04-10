@@ -18,7 +18,7 @@ bool test_strings();
 int main(int argc, char *argv[]) {
         bool ok = true;
         ok &= test("applets", test_applets);
-//        ok &= test("args", test_args);
+        //        ok &= test("args", test_args);
         ok &= test("strings", test_strings);
         return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
@@ -171,7 +171,6 @@ bool test_applets() {
         return ok;
 }
 
-
 bool test_string_lower() {
         const char *c;
         char str[100];
@@ -179,7 +178,7 @@ bool test_string_lower() {
 
         c = str_to_lower(strcpy(str, "NULL"));
         ok &= verify_string_equals(c, "null", "normal lower");
-        c = str_to_lower(strcpy(str,"qwertyuiopQWERTYUIOP"));
+        c = str_to_lower(strcpy(str, "qwertyuiopQWERTYUIOP"));
         ok &= verify_string_equals(c, "qwertyuiopqwertyuiop", "normal lower");
         c = str_to_lower(strcpy(str, ""));
         ok &= verify_string_equals(c, strcpy(str, ""), "lower to empty string");
