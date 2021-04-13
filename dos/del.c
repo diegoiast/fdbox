@@ -55,13 +55,17 @@ static bool del_config_parse(int argc, char *argv[], struct del_config *config);
 static bool del_config_print(const struct del_config *config);
 static void del_print_extended_help();
 static deletion_result del_single_file(struct del_config *config, const char *file_name);
-static deletion_result del_single_dir(struct del_config *config, const char *file_name,
-                                      int *deleted_file_count, int *found_file_count);
+static deletion_result del_dir(struct del_config *config, const char *file_name,
+                                      int *deleted_file_count, int *found_file_count,
+                                      int *deleted_dirs_count, int *found_dirs_count
+                                      );
 
 int command_del(int argc, char *argv[]) {
         int i;
         int total_deleted_files = 0;
         int total_files = 0;
+        int total_deleted_dirs = 0;
+        int total_dirs = 0;
         struct del_config config;
 
         del_config_init(&config);
@@ -78,31 +82,15 @@ int command_del(int argc, char *argv[]) {
         for (i = 0; i < config.file_glob_count; i++) {
                 glob_t globbuf = {0};
                 deletion_result result;
-                int j;
+                int tested_files = 0;
+                int tested_dirs = 0;
+                int deleted_files = 0;
+                int deleted_dirs = 0;
 
-                glob(config.file_glob[i], GLOB_DOOFFS, NULL, &globbuf);
-                for (j = 0; j != globbuf.gl_pathc; j++) {
-                        const char *file_name = globbuf.gl_pathv[j];
-                        struct stat st;
-                        int deleted_files = 0;
-                        int tested_files = 0;
-
-                        stat(file_name, &st);
-                        if (S_ISDIR(st.st_mode)) {
-                                result = del_single_dir(&config, file_name, &deleted_files,
-                                                        &tested_files);
-                        } else {
-                                result = del_single_file(&config, file_name);
-                                deleted_files = 1;
-                                tested_files = 1;
-                        }
-                        if (result == yes) {
-                                total_deleted_files += deleted_files;
-                        } else if (result == cancel) {
-                                break;
-                        }
-                        total_files += tested_files;
-                }
+                del_dir(&config, config.file_glob[i],
+                     &tested_files, &deleted_files,
+                     &tested_dirs, &deleted_dirs
+                );
                 globfree(&globbuf);
 
                 if (result == cancel) {
@@ -188,7 +176,7 @@ void del_print_extended_help() {
         printf("   /p Prompt for deletion of each file\n");
         printf("   /v Verbose delete\n");
         printf("   /r Recursive delete (delete subdirs)\n");
-        printf("   /r Force deletion of subdirs, or RO files\n");
+        printf("   /f Force deletion of subdirs, or RO files\n");
 }
 
 deletion_result del_single_file(struct del_config *config, const char *file_name) {
@@ -226,31 +214,54 @@ deletion_result del_single_file(struct del_config *config, const char *file_name
         return r == 0 ? yes : no;
 }
 
-static deletion_result del_single_dir(struct del_config *config, const char *file_name,
-                                      int *deleted_file_count, int *found_file_count) {
+static deletion_result del_dir(struct del_config *config, const char *file_name,
+                                      int *deleted_file_count, int *found_file_count,
+                                      int *deleted_dirs_count, int *found_dirs_count) {
         glob_t globbuf = {0};
         deletion_result result;
         char fname[256];
         int j;
+        int deleted_files = 0;
+        int deleted_dirs = 0;
+        int tested_files = 0;
+        int tested_dirs = 0;
+        struct stat st;
 
-        *deleted_file_count = 0;
-        if (!config->force) {
-                return no;
-        }
 
         fname[0] = 0;
         strcat(fname, file_name);
-        strcat(fname, DIRECTORY_DELIMITER);
-        strcat(fname, ALL_FILES_GLOB);
+
+        stat(file_name, &st);
+        if (S_ISDIR(st.st_mode)) {
+                strcat(fname, DIRECTORY_DELIMITER);
+                strcat(fname, ALL_FILES_GLOB);
+        }
 
         glob(fname, GLOB_DOOFFS, NULL, &globbuf);
-
         for (j = 0; j != globbuf.gl_pathc; j++) {
-                (*found_file_count)++;
-                result = del_single_file(config, globbuf.gl_pathv[j]);
-                if (result == yes) {
-                        (*deleted_file_count)++;
-                } else if (result == cancel) {
+                struct stat st;
+                const char *name = globbuf.gl_pathv[j];
+                stat(name, &st);
+                if (S_ISDIR(st.st_mode)) {
+                        (*found_dirs_count)++;
+                        result = del_dir(config, name,
+                                                &deleted_files, &tested_files,
+                                                &deleted_dirs, &tested_dirs);
+
+                        if (result == yes) {
+                                // todo prompt for deleting dir?
+                                remove(name);
+                        }
+                } else {
+                        (*found_file_count)++;
+                        result = del_single_file(config, globbuf.gl_pathv[j]);
+                        tested_files = 1;
+                        if (result == yes) {
+                                deleted_files ++;
+                        }
+                }
+
+                if (result == cancel) {
                         break;
                 }
         }
