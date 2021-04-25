@@ -56,9 +56,8 @@ static bool del_config_print(const struct del_config *config);
 static void del_print_extended_help();
 static deletion_result del_single_file(struct del_config *config, const char *file_name);
 static deletion_result del_dir(struct del_config *config, const char *file_name,
-                                      int *deleted_file_count, int *found_file_count,
-                                      int *deleted_dirs_count, int *found_dirs_count
-                                      );
+                               int *deleted_file_count, int *found_file_count,
+                               int *deleted_dirs_count, int *found_dirs_count);
 
 int command_del(int argc, char *argv[]) {
         int i;
@@ -86,10 +85,8 @@ int command_del(int argc, char *argv[]) {
                 int deleted_files = 0;
                 int deleted_dirs = 0;
 
-                result = del_dir(&config, config.file_glob[i],
-                     &deleted_files, &tested_files,
-                     &deleted_dirs, &tested_dirs
-                );
+                result = del_dir(&config, config.file_glob[i], &deleted_files, &tested_files,
+                                 &deleted_dirs, &tested_dirs);
                 total_deleted_dirs += deleted_dirs;
                 total_deleted_files += deleted_files;
                 total_dirs += tested_dirs;
@@ -112,7 +109,8 @@ int command_del(int argc, char *argv[]) {
                         if (total_dirs == total_deleted_dirs) {
                                 printf("Deleted %d directories\n", total_dirs);
                         } else {
-                                printf("Deleted %d/%d directories\n", total_deleted_dirs, total_dirs);
+                                printf("Deleted %d/%d directories\n", total_deleted_dirs,
+                                       total_dirs);
                         }
                 }
         }
@@ -226,8 +224,8 @@ deletion_result del_single_file(struct del_config *config, const char *file_name
 }
 
 static deletion_result del_dir(struct del_config *config, const char *file_name,
-                                      int *deleted_file_count, int *found_file_count,
-                                      int *deleted_dirs_count, int *found_dirs_count) {
+                               int *deleted_file_count, int *found_file_count,
+                               int *deleted_dirs_count, int *found_dirs_count) {
         glob_t globbuf = {0};
         deletion_result result = yes;
         bool delete_dir_on_exit = false;
@@ -251,14 +249,13 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                 const char *name = globbuf.gl_pathv[j];
                 stat(name, &st);
                 if (S_ISDIR(st.st_mode)) {
-                        result = del_dir(config, name,
-                                                deleted_file_count, found_file_count,
-                                                deleted_dirs_count, found_dirs_count);
+                        result = del_dir(config, name, deleted_file_count, found_file_count,
+                                         deleted_dirs_count, found_dirs_count);
                 } else {
                         (*found_file_count)++;
                         result = del_single_file(config, globbuf.gl_pathv[j]);
                         if (result == yes) {
-                                (*deleted_file_count) ++;
+                                (*deleted_file_count)++;
                         }
                 }
 
@@ -270,7 +267,7 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
         if (result == yes && delete_dir_on_exit) {
                 /* this is actualy a directory */
                 remove(file_name);
-                (*deleted_dirs_count) ++;
+                (*deleted_dirs_count)++;
                 if (config->verbose) {
                         printf(" <d> %s\n", file_name);
                 }
