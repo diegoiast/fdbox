@@ -219,7 +219,7 @@ deletion_result del_single_file(struct del_config *config, const char *file_name
                 return no;
         }
         if (config->verbose && !config->prompt) {
-                printf(" <x> %s\n", file_name);
+                printf(" <f> %s\n", file_name);
         }
         r = remove(file_name);
         return r == 0 ? yes : no;
@@ -239,7 +239,9 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
         strcat(fname, file_name);
         stat(file_name, &st);
         if (S_ISDIR(st.st_mode)) {
-                strcat(fname, DIRECTORY_DELIMITER);
+                if (!str_ends_with(file_name, '/') && !str_ends_with(file_name, '\\')) {
+                        strcat(fname, DIRECTORY_DELIMITER);
+                }
                 strcat(fname, ALL_FILES_GLOB);
                 delete_dir_on_exit = true;
                 (*found_dirs_count)++;
@@ -249,17 +251,9 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                 const char *name = globbuf.gl_pathv[j];
                 stat(name, &st);
                 if (S_ISDIR(st.st_mode)) {
-//                        (*found_dirs_count)++;
                         result = del_dir(config, name,
                                                 deleted_file_count, found_file_count,
                                                 deleted_dirs_count, found_dirs_count);
-
-                        if (result == yes) {
-                                // todo prompt for deleting dir?
-                                remove(name);
-                                (*deleted_dirs_count) ++;
-                                printf(" <x> %s (%d dirs)\n", name, *deleted_dirs_count);
-                        }
                 } else {
                         (*found_file_count)++;
                         result = del_single_file(config, globbuf.gl_pathv[j]);
@@ -277,7 +271,9 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                 /* this is actualy a directory */
                 remove(file_name);
                 (*deleted_dirs_count) ++;
-                printf(" <x> %s (%d dirs) - end\n", file_name, *deleted_dirs_count);
+                if (config->verbose) {
+                        printf(" <d> %s\n", file_name);
+                }
         }
         return result;
 }
