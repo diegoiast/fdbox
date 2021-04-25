@@ -80,18 +80,20 @@ int command_del(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
         for (i = 0; i < config.file_glob_count; i++) {
-                glob_t globbuf = {0};
                 deletion_result result;
                 int tested_files = 0;
                 int tested_dirs = 0;
                 int deleted_files = 0;
                 int deleted_dirs = 0;
 
-                del_dir(&config, config.file_glob[i],
-                     &tested_files, &deleted_files,
-                     &tested_dirs, &deleted_dirs
+                result = del_dir(&config, config.file_glob[i],
+                     &deleted_files, &tested_files,
+                     &deleted_dirs, &tested_dirs
                 );
-                globfree(&globbuf);
+                total_deleted_dirs += deleted_dirs;
+                total_deleted_files += deleted_files;
+                total_dirs += tested_dirs;
+                total_files += tested_files;
 
                 if (result == cancel) {
                         break;
@@ -99,10 +101,19 @@ int command_del(int argc, char *argv[]) {
         }
 
         if (config.verbose) {
-                if (total_files == total_deleted_files) {
-                        printf("Deleted %d files\n", total_files);
-                } else {
-                        printf("Deleted %d/%d files\n", total_deleted_files, total_files);
+                if (total_files != 0) {
+                        if (total_files == total_deleted_files) {
+                                printf("Deleted %d files\n", total_files);
+                        } else {
+                                printf("Deleted %d/%d files\n", total_deleted_files, total_files);
+                        }
+                }
+                if (total_dirs != 0) {
+                        if (total_dirs == total_deleted_dirs) {
+                                printf("Deleted %d directories\n", total_dirs);
+                        } else {
+                                printf("Deleted %d/%d directories\n", total_deleted_dirs, total_dirs);
+                        }
                 }
         }
         return EXIT_FAILURE;
@@ -218,46 +229,42 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                                       int *deleted_file_count, int *found_file_count,
                                       int *deleted_dirs_count, int *found_dirs_count) {
         glob_t globbuf = {0};
-        deletion_result result;
+        deletion_result result = yes;
+        bool delete_dir_on_exit = false;
         char fname[256];
         int j;
-        int deleted_files = 0;
-        int deleted_dirs = 0;
-        int tested_files = 0;
-        int tested_dirs = 0;
         struct stat st;
-
 
         fname[0] = 0;
         strcat(fname, file_name);
-
         stat(file_name, &st);
         if (S_ISDIR(st.st_mode)) {
                 strcat(fname, DIRECTORY_DELIMITER);
                 strcat(fname, ALL_FILES_GLOB);
+                delete_dir_on_exit = true;
+                (*found_dirs_count)++;
         }
-
         glob(fname, GLOB_DOOFFS, NULL, &globbuf);
         for (j = 0; j != globbuf.gl_pathc; j++) {
-                struct stat st;
                 const char *name = globbuf.gl_pathv[j];
                 stat(name, &st);
                 if (S_ISDIR(st.st_mode)) {
-                        (*found_dirs_count)++;
+//                        (*found_dirs_count)++;
                         result = del_dir(config, name,
-                                                &deleted_files, &tested_files,
-                                                &deleted_dirs, &tested_dirs);
+                                                deleted_file_count, found_file_count,
+                                                deleted_dirs_count, found_dirs_count);
 
                         if (result == yes) {
                                 // todo prompt for deleting dir?
                                 remove(name);
+                                (*deleted_dirs_count) ++;
+                                printf(" <x> %s (%d dirs)\n", name, *deleted_dirs_count);
                         }
                 } else {
                         (*found_file_count)++;
                         result = del_single_file(config, globbuf.gl_pathv[j]);
-                        tested_files = 1;
                         if (result == yes) {
-                                deleted_files ++;
+                                (*deleted_file_count) ++;
                         }
                 }
 
@@ -266,5 +273,11 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                 }
         }
         globfree(&globbuf);
+        if (result == yes && delete_dir_on_exit) {
+                /* this is actualy a directory */
+                remove(file_name);
+                (*deleted_dirs_count) ++;
+                printf(" <x> %s (%d dirs) - end\n", file_name, *deleted_dirs_count);
+        }
         return result;
 }
