@@ -15,6 +15,18 @@ char *str_to_lower(char *s) {
 
 bool str_is_prefix(const char *str, const char *pre) { return strncmp(pre, str, strlen(pre)) == 0; }
 
+bool str_ends_with(const char *str, char c)
+{
+        char *cc = strrchr(str, c);
+        if (cc == NULL) {
+                return false;
+        }
+        if (*(cc+1) != '\0') {
+                return false;
+        }
+        return true;
+}
+
 const char *file_base_name(const char *file_name) {
         int i = strlen(file_name);
         const char *c = file_name + i - 1;

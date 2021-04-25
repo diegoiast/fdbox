@@ -203,6 +203,21 @@ bool test_str_prefix() {
         return ok;
 }
 
+bool test_str_char_suffix() {
+        bool ok = true;
+
+        ok &= verify_int_equals(str_ends_with("123", '3'), 1, "String ends (digit)");
+        ok &= verify_int_equals(str_ends_with("3", '3'), 1, "String ends (digit)");
+        ok &= verify_int_equals(str_ends_with("333", '3'), 1, "String ends (digit)");
+        ok &= verify_int_equals(str_ends_with("aaa", 'a'), 1, "String ends (alpha)");
+        ok &= verify_int_equals(str_ends_with("cba", 'a'), 1, "String ends (alpha)");
+        ok &= verify_int_equals(str_ends_with("a", 'a'), 1, "String ends (alpha)");
+        ok &= verify_int_equals(str_ends_with("A", 'a'), 0, "String not ends (alpha)");
+        ok &= verify_int_equals(str_ends_with("Aa-", 'a'), 0, "String not ends (alpha)");
+        ok &= verify_int_equals(str_ends_with("", 'a'), 0, "String not ends (alpha)");
+        return ok;
+}
+
 bool test_file_basename() {
         char str[100];
         const char *c;
@@ -275,6 +290,7 @@ bool test_strings() {
         bool ok = true;
         ok &= test_string_lower();
         ok &= test_str_prefix();
+        ok &= test_str_char_suffix();
         ok &= test_file_basename();
         ok &= test_file_extensions();
         return ok;
