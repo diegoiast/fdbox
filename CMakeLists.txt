@@ -53,6 +53,7 @@ add_executable(
   dos/for.c
   dos/goto.c
   dos/if.c
+  dos/md.c
   dos/mv.c
   dos/path.c
   dos/prompt.c

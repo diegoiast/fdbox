@@ -20,6 +20,7 @@
 #include "dos/for.h"
 #include "dos/goto.h"
 #include "dos/if.h"
+#include "dos/md.h"
 #include "dos/mv.h"
 #include "dos/path.h"
 #include "dos/prompt.h"
@@ -51,6 +52,8 @@ struct applet commands[] = {{help_beep, command_beep, "beep"},
                             {help_for, command_for, "for"},
                             {help_goto, command_goto, "goto"},
                             {help_if, command_if, "if"},
+                            {help_md, command_md, "md"},
+                            {help_md, command_md, "mkdir"},
                             {help_mv, command_mv, "mv"},
                             {help_path, command_path, "path"},
                             {help_prompt, command_prompt, "prompt"},
