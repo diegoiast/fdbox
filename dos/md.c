@@ -156,7 +156,7 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
         bool failed_once = false;
 
         do {
-#if defined(__MSDOS__)
+#if defined(__MSDOS__) || defined(__WIN32__)
                 r = mkdir(dir_name);
 #else
                 r = mkdir(dir_name, 0755);
@@ -172,7 +172,7 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
         } while (r = !0);
 
         if (failed_once) {
-#if defined(__MSDOS__)
+#if defined(__MSDOS__) || defined(__WIN32__)
                 r = mkdir(dir_name);
 #else
                 r = mkdir(dir_name, 0755);

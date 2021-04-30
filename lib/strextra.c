@@ -53,3 +53,22 @@ const char *file_get_extesnsion(const char *fname) {
         }
         return p;
 }
+
+#if defined(__WIN32__)
+/* happily borrowed from https://stackoverflow.com/a/8514474 */
+char *strsep(char **stringp, const char *delim) {
+        char *start = *stringp;
+        char *p;
+
+        p = (start != NULL) ? strpbrk(start, delim) : NULL;
+
+        if (p == NULL) {
+                *stringp = NULL;
+        } else {
+                *p = '\0';
+                *stringp = p + 1;
+        }
+
+        return start;
+}
+#endif

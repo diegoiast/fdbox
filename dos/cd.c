@@ -14,8 +14,13 @@
 #endif
 
 #ifdef WIN32
+// Windows needs this specific include order, and clang-format will
+// try to re-order by ABC. Lets not.
+// clang-format off
+#include <direct.h>
+#include <windef.h>
 #include <winbase.h>
-#include <windows.h>
+// clang-format on
 #endif
 
 #include "dos/cd.h"

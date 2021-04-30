@@ -279,7 +279,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 
                 stat(from, &source_attr);
                 new_times.actime = source_attr.st_atime;
-                new_times.modtime = source_attr.st_mtim.tv_sec;
+                new_times.modtime = source_attr.st_mtime;
                 err = utime(to, &new_times);
                 if (err) {
                         fprintf(stderr, "Error: failed setting time on %s\n", to);

@@ -158,7 +158,7 @@ static int date_set_new_date(char *new_date) {
         }
         /*        printf("TODO: set the date to %02d-%02d-%4d\n", day, month, year); */
 
-#if defined(_POSIX_C_SOURCE) || defined(__WIN32__)
+#if defined(_POSIX_C_SOURCE)
         {
                 time_t new_time;
                 struct tm tm;
@@ -181,6 +181,9 @@ static int date_set_new_date(char *new_date) {
                 the_date.da_day = day;
                 setdate(&the_date);
         }
+#elif defined(__WIN32__)
+        // TODO: We do not support this on windows yet
+        return EXIT_FAILURE;
 #endif
         return EXIT_SUCCESS;
 }
@@ -229,7 +232,7 @@ int date_set_new_time(char *new_time) {
                 return EXIT_FAILURE;
         }
 
-#if defined(_POSIX_C_SOURCE) || defined(__WIN32__)
+#if defined(_POSIX_C_SOURCE)
         {
                 time_t new_time;
                 struct tm tm;
@@ -255,8 +258,11 @@ int date_set_new_time(char *new_time) {
                 the_time.ti_hund = 0;
                 settime(&the_time);
         }
-#endif
+#elif defined(__WIN32__)
         return EXIT_FAILURE;
+#endif
+
+        return EXIT_SUCCESS;
 }
 
 void date_print_time() {
