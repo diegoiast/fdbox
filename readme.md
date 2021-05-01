@@ -9,7 +9,7 @@ borrowed from Unix and maintain compatibility with MSDOS 6.22
  * Only DOS commands are supported. Unix commands might follow.
  * Code compiles only under GCC (Windows+Linux). TCC (DOS).
  * Currently I am using LibC's functions - so I am limited to
-   stadnard C code support for localization.
+   standard C code support for localization.
  * `TurboC` does need a proper makefile.
  * `beep` - works.
  * `cd` - works
@@ -19,12 +19,15 @@ borrowed from Unix and maintain compatibility with MSDOS 6.22
    * Recursive copy not implemented yet
    * Copy globs, and several files - not implemented yet
    * Append files (copy file1+file2 file3) not implemented yet
+ * `date`, `time`
+   * Missing AM/PM input
+   * Test localization (for example date, MM/DD)
+   * Not supported on Windows (only DOS/Linux)
+ * `del` 
  * `dir`
    * `/o?` Order is funky. I admit it's not traditional but it works.
    * `/p` Pausing is not coded yet
- * date/time
-   * Missing AM/PM input
-   * Test localization (for example date, MM/DD)
+ * `md`/`mkdir` - works
  * All other stuff in not implemented.
 
 ## Building
@@ -34,7 +37,7 @@ Linux (or any Posix compliant OS), and will maintain compatibilty
 with DOS at all times. The reason, is for better tooling (git,
 valgrind, strace, text-editors).
 
-Code is strictly C (asm where needed). Supported environments
+Code is strictly C (asm where needed). Supported environments:
 
  * MS-DOS/FreeDOS/dosbox
     * TurboC 2.01 -  http://edn.embarcadero.com/article/20841
@@ -45,7 +48,7 @@ Code is strictly C (asm where needed). Supported environments
  * Linux
     * GCC / CLang + CMake.
  * Windows
-    * GCC / Clang + CMake
+    * GCC / CLang + CMake
     * https://github.com/LADSoft/OrangeC (WIP)
     * VisualStudio (?)
  * BSD ? (should work)
@@ -129,3 +132,5 @@ GPL V3. See file license.txt
 ## TODO - future development
  - There are commands that are available on Unix and DOS, but differ in syntax
    unsure how to handle.
+ - MSDOS: Using XMS swapping wold be good, using SPWNO would be epic (http://www.cs.cmu.edu/%7Eralf/files.html)
+ 
