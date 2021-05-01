@@ -37,4 +37,9 @@ const char *file_base_name(const char *file_name);
 /* returns the last tip of the file name */
 const char *file_get_extesnsion(const char *fname);
 
+#if defined(__WIN32__)
+/* This function is available on Linux, but now on Windows */
+char *strsep(char **stringp, const char *delim);
+#endif
+
 #endif /* __STR_EXTRA__ */
