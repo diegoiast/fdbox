@@ -17,6 +17,7 @@ dos/exit.c
 dos/for.c
 dos/goto.c
 dos/if.c
+dos/md.c (dos/md.h)
 dos/mv.c
 dos/path.c
 dos/prompt.c
