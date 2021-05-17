@@ -28,6 +28,9 @@ borrowed from Unix and maintain compatibility with MSDOS 6.22
    * `/o?` Order is funky. I admit it's not traditional but it works.
    * `/p` Pausing is not coded yet
  * `md`/`mkdir` - works
+ * `move`/`rename`/`ren` - works
+   * The commands use the same syntax as copy and rename/move similar aliases.
+   * Currently only `move` works, default alias will be added "soon".
  * All other stuff in not implemented.
 
 ## Building
