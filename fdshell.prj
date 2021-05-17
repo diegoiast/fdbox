@@ -9,7 +9,7 @@ dos/beep.c
 dos/call.c
 dos/cd.c
 dos/cls.c
-dos/copy.c
+dos/copymove.c (dos/copymove.h)
 dos/datetime.c (dos/datetime.h)
 dos/del.c (dos/del.h)
 dos/echo.c

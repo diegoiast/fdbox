@@ -12,7 +12,7 @@
 #include "dos/cd.h"
 #include "dos/cls.h"
 #include "dos/cmd_dir.h"
-#include "dos/copy.h"
+#include "dos/copymove.h"
 #include "dos/datetime.h"
 #include "dos/del.h"
 #include "dos/echo.h"
@@ -54,7 +54,7 @@ struct applet commands[] = {{help_beep, command_beep, "beep"},
                             {help_if, command_if, "if"},
                             {help_md, command_md, "md"},
                             {help_md, command_md, "mkdir"},
-                            {help_mv, command_mv, "mv"},
+                            {help_move, command_move, "move"},
                             {help_path, command_path, "path"},
                             {help_prompt, command_prompt, "prompt"},
                             {help_pwd, command_pwd, "pwd"},

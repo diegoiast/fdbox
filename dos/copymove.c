@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#include "dos/copy.h"
+#include "dos/copymove.h"
 #include "fdbox.h"
 #include "lib/strextra.h"
 
@@ -44,57 +44,67 @@ struct copy_config {
         bool ask_overwrite;
         bool verbose;
         bool copy_attributes;
+
+        bool move_files;
         const char *source_file;
         const char *dest_file;
 };
 
-static void copy_config_init(struct copy_config *config);
-static bool copy_parse_config(int argc, char *argv[], struct copy_config *config);
-static bool copy_print_config(struct copy_config *config);
+static void copy_move_config_init(struct copy_config *config);
+static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *config);
+static bool copy_move_print_config(struct copy_config *config);
 static void copy_print_extended_help();
-static bool copy_is_dir(const char *path);
-static char *copy_append_path(const char *directory, const char *file_name);
-static const char *copy_base_name(const char *file_name);
+static void move_print_extended_help();
+static bool copy_move_is_dir(const char *path);
+static char *copy_move_append_path(const char *directory, const char *file_name);
 static int copy_single_file(const char *from, const char *to, struct copy_config *config);
+static int move_single_file(const char *from, const char *to, struct copy_config *config);
 
-int command_copy(int argc, char *argv[]) {
-        struct copy_config config;
+static int command_move_copy(int argc, char *argv[], struct copy_config *config) {
         int return_val, j;
         glob_t globbuf = {0};
 
-        copy_config_init(&config);
-        copy_parse_config(argc, argv, &config);
+        copy_move_config_init(config);
+        copy_move_parse_config(argc, argv, config);
         /* copy_print_config(&config); */
 
-        if (config.show_help) {
-                copy_print_extended_help();
+        if (config->show_help) {
+                if (config->move_files) {
+                        copy_print_extended_help();
+                } else {
+                        move_print_extended_help();
+                }
                 return EXIT_SUCCESS;
         }
 
-        if (config.source_file == NULL || config.source_file[0] == '\0') {
+        if (config->source_file == NULL || config->source_file[0] == '\0') {
                 fprintf(stderr, "Error: no source file provided\n");
                 return EXIT_FAILURE;
         }
 
-        if (config.dest_file == NULL || config.dest_file[0] == '\0') {
+        if (config->dest_file == NULL || config->dest_file[0] == '\0') {
                 fprintf(stderr, "Error: no destination file provided\n");
                 return EXIT_FAILURE;
         }
 
-        glob(config.source_file, GLOB_DOOFFS, NULL, &globbuf);
+        glob(config->source_file, GLOB_DOOFFS, NULL, &globbuf);
         for (j = 0; j != globbuf.gl_pathc; j++) {
                 const char *from_file = globbuf.gl_pathv[j];
                 const char *target_name;
                 bool free_memory = false;
 
-                target_name = config.dest_file;
-                if (copy_is_dir(target_name)) {
+                target_name = config->dest_file;
+                if (copy_move_is_dir(target_name)) {
                         const char *base_name = file_base_name(from_file);
-                        target_name = copy_append_path(target_name, base_name);
+                        target_name = copy_move_append_path(target_name, base_name);
                         free_memory = true;
                 }
 
-                return_val = copy_single_file(from_file, target_name, &config);
+                if (config->move_files) {
+                        return_val = move_single_file(from_file, target_name, config);
+                } else {
+                        return_val = copy_single_file(from_file, target_name, config);
+                }
                 if (free_memory) {
                         free((char *)target_name);
                 }
@@ -106,9 +116,23 @@ int command_copy(int argc, char *argv[]) {
         return return_val;
 }
 
+int command_copy(int argc, char *argv[]) {
+        struct copy_config config;
+        config.move_files = false;
+        return command_move_copy(argc, argv, &config);
+}
+
+int command_move(int argc, char *argv[]) {
+        struct copy_config config;
+        config.move_files = true;
+        return command_move_copy(argc, argv, &config);
+}
+
 const char *help_copy() { return "Copies one or more files to another location"; }
 
-static void copy_config_init(struct copy_config *config) {
+const char *help_move() { return "Moves one or more files to another location"; }
+
+static void copy_move_config_init(struct copy_config *config) {
         /*config->verify = false;*/
         config->show_help = false;
         config->ask_overwrite = false;
@@ -116,10 +140,13 @@ static void copy_config_init(struct copy_config *config) {
         config->copy_attributes = false;
         config->source_file = NULL;
         config->dest_file = NULL;
+        config->move_files = false;
 }
 
 /*
- * MSDOS + freecom
+ * MSDOS + freecom -
+ * This is the "copy" command, but we use it also for move/rename
+ *
  * /a ascii
  * /b binary
  * /v verify
@@ -131,7 +158,7 @@ static void copy_config_init(struct copy_config *config) {
  * /-y WIP - parser is not supporting this yet.
  */
 
-static bool copy_parse_config(int argc, char *argv[], struct copy_config *config) {
+static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *config) {
         size_t i;
 
         for (i = 1; i < (size_t)argc; i++) {
@@ -167,7 +194,7 @@ static bool copy_parse_config(int argc, char *argv[], struct copy_config *config
         }
 }
 
-static bool copy_print_config(struct copy_config *config) {
+static bool copy_move_print_config(struct copy_config *config) {
         printf("ask_overwrite=%d\n", config->ask_overwrite);
         printf("verbose=%d\n", config->verbose);
         printf("copy_attributes=%d\n", config->copy_attributes);
@@ -187,13 +214,24 @@ static void copy_print_extended_help() {
         printf("> copy *.exe backup\\ \n");
 }
 
-static bool copy_is_dir(const char *path) {
+static void move_print_extended_help() {
+        printf("%s\n", help_copy());
+        printf("   move [from] [to] /a /y /v\n");
+
+        printf("   /y Ask for confirmation on overrite (WIP)\n");
+        printf("   /v Verbose copy\n");
+        printf("Examples:\n");
+        printf("> move c:\\autoexec.bat c:\\autoexec.old \n");
+        printf("> move *.exe backup\\ \n");
+}
+
+static bool copy_move_is_dir(const char *path) {
         struct stat path_stat;
         stat(path, &path_stat);
         return S_ISDIR(path_stat.st_mode);
 }
 
-static char *copy_append_path(const char *directory, const char *file_name) {
+static char *copy_move_append_path(const char *directory, const char *file_name) {
         int l1 = strlen(directory);
         int l2 = strlen(file_name);
         char *full_file_name;
@@ -306,4 +344,26 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 }
         }
         return EXIT_SUCCESS;
+}
+
+static int move_single_file(const char *from, const char *to, struct copy_config *config) {
+        int r = rename(from, to);
+
+        if (r == 0) {
+                if (config->verbose) {
+                        printf("\r %s -> %s\n", from, to);
+                }
+                return EXIT_SUCCESS;
+        }
+
+        /* OK, we cannot move - lets copy+delete */
+        config->copy_attributes = true;
+        r = copy_single_file(from, to, config);
+        if (r != 0) {
+                fprintf(stderr, "Error: failed moving %s->%s\n", from, to);
+        }
+        r = remove(from);
+        if (r != 0) {
+                fprintf(stderr, "Error: failed deleting original file: %s\n", from);
+        }
 }
