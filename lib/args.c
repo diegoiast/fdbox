@@ -80,6 +80,7 @@ void print_agrs(int argc, char *argv[]) {
         }
 }
 
+#if 0
 int dos_parseargs(int *argc, char **argv[], const char *template, char **output) {
         printf("Checking for argc=%d\n", *argc);
         print_agrs(*argc, *argv);
@@ -142,6 +143,7 @@ int dos_parseargs(int *argc, char **argv[], const char *template, char **output)
         (*output) = (*argv)[(*argc - 1)];
         return ARG_NOT_EXISTING;
 }
+#endif
 
 int command_config_init(struct command_config *config)
 {
