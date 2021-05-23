@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "fdbox.h"
 #include "lib/args.h"
@@ -140,4 +141,48 @@ int dos_parseargs(int *argc, char **argv[], const char *template, char **output)
         (*argc)++;
         (*output) = (*argv)[(*argc - 1)];
         return ARG_NOT_EXISTING;
+}
+
+int command_config_init(struct command_config *config)
+{
+        config->verbose = false;
+        config->show_help = false;
+        config->file_glob_count = 0;
+        memset(config->file_glob, 0, sizeof(config->file_glob));
+
+        config->state.current_argument = 1;
+}
+
+int command_config_parse(int argc, char *argv[], struct command_config *config) {
+        char c1, c2;
+        char *arg = argv[config->state.current_argument];
+
+        if (config->state.current_argument >= argc) {
+                return ARG_DONE;
+        }
+
+        config->state.current_argument ++;
+
+        switch (arg[0]) {
+        case ARGUMENT_DELIMIER:
+                c2 = arg[1];
+                switch (tolower(c2)) {
+                case '?':
+                case 'h':
+                        config->show_help = true;
+                        return ARG_PROCESSED;
+                case 'v':
+                        config->verbose = true;
+                        return ARG_PROCESSED;
+                default:
+                        return c2;
+                }
+                break;
+
+        default:
+                /* ok its a file */
+                config->file_glob[config->file_glob_count] = arg;
+                config->file_glob_count++;
+                return ARG_PROCESSED;
+        }
 }

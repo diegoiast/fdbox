@@ -6,6 +6,7 @@
 #include "dos/del.h"
 #include "fdbox.h"
 #include "lib/strextra.h"
+#include "lib/args.h"
 
 /*
 This file is part of fdbox
@@ -14,14 +15,12 @@ For license - read license.txt
 
 #ifdef __MSDOS__
 #include "lib/tc202/dos-glob.h"
-#include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #include <sys/stat.h>
 #endif
 
 #ifdef _POSIX_C_SOURCE
 #include <glob.h>
-#include <stdbool.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
@@ -30,19 +29,15 @@ For license - read license.txt
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
 #include "lib/win32/win32-glob.h"
-#include <stdbool.h>
 #include <unistd.h>
 #include <utime.h>
 #endif
 
 struct del_config {
-        bool show_help;
         bool prompt;
-        bool verbose;
         bool recursive;
         bool force;
-        const char *file_glob[128];
-        size_t file_glob_count;
+        struct command_config global;
 };
 
 /* homage to a classic
@@ -74,18 +69,18 @@ int command_del(int argc, char *argv[]) {
         }
         /* del_config_print(&config); */
 
-        if (config.show_help) {
+        if (config.global.show_help) {
                 del_print_extended_help();
                 return EXIT_SUCCESS;
         }
-        for (i = 0; i < config.file_glob_count; i++) {
+        for (i = 0; i < config.global.file_glob_count; i++) {
                 deletion_result result;
                 int tested_files = 0;
                 int tested_dirs = 0;
                 int deleted_files = 0;
                 int deleted_dirs = 0;
 
-                result = del_dir(&config, config.file_glob[i], &deleted_files, &tested_files,
+                result = del_dir(&config, config.global.file_glob[i], &deleted_files, &tested_files,
                                  &deleted_dirs, &tested_dirs);
                 total_deleted_dirs += deleted_dirs;
                 total_deleted_files += deleted_files;
@@ -97,7 +92,7 @@ int command_del(int argc, char *argv[]) {
                 }
         }
 
-        if (config.verbose) {
+        if (config.global.verbose) {
                 if (total_files != 0) {
                         if (total_files == total_deleted_files) {
                                 printf("Deleted %d files\n", total_files);
@@ -120,61 +115,45 @@ int command_del(int argc, char *argv[]) {
 const char *help_del() { return "Delete one or more files"; }
 
 void del_config_init(struct del_config *config) {
-        config->show_help = false;
         config->prompt = false;
-        config->verbose = false;
         config->recursive = false;
-        config->file_glob_count = 0;
-        memset(config->file_glob, 0, sizeof(config->file_glob));
+        command_config_init(&config->global);
 }
 
 bool del_config_parse(int argc, char *argv[], struct del_config *config) {
         size_t i;
-        for (i = 1; i < (size_t)argc; i++) {
-                char c1, c2;
-                c1 = tolower(argv[i][0]);
-                switch (c1) {
-                case ARGUMENT_DELIMIER:
-                        c2 = tolower(argv[i][1]);
-                        switch (c2) {
-                        case 'p':
-                                config->prompt = true;
-                                break;
-                        case 'f':
-                                config->force = true;
-                                break;
-                        case 'v':
-                                config->verbose = true;
-                                break;
-                        case 'r':
-                                config->recursive = true;
-                                break;
-                        case '?':
-                        case 'h':
-                                config->show_help = true;
-                                break;
-                        default:
-                                return false;
-                        }
+        int c;
+        do {
+                c = command_config_parse(argc, argv, &config->global);
+                switch (tolower(c)) {
+                case 'p':
+                        config->prompt = true;
                         break;
-
+                case 'f':
+                        config->force = true;
+                        break;
+                case 'r':
+                        config->recursive = true;
+                        break;
+                case ARG_PROCESSED:
+                        break;
+                case ARG_DONE:
+                        break;
                 default:
-                        /* ok its a file */
-                        config->file_glob[config->file_glob_count] = argv[i];
-                        config->file_glob_count++;
+                        return false;
                 }
-        }
+        } while (c >= 0);
         return true;
 }
 
 bool del_config_print(const struct del_config *config) {
         int i;
         printf("prompt for deletion: %s\n", str_bool(config->prompt));
-        printf("verbose: %s\n", str_bool(config->verbose));
         printf("recursive: %s\n", str_bool(config->recursive));
-        printf("show help %s\n", str_bool(config->show_help));
-        for (i = 0; i < config->file_glob_count; i++) {
-                printf(" -> %s\n", config->file_glob[i]);
+        printf("verbose: %s\n", str_bool(config->global.verbose));
+        printf("show help %s\n", str_bool(config->global.show_help));
+        for (i = 0; i < config->global.file_glob_count; i++) {
+                printf(" -> %s\n", config->global.file_glob[i]);
         }
 }
 
@@ -216,7 +195,7 @@ deletion_result del_single_file(struct del_config *config, const char *file_name
         if (!delete_file) {
                 return no;
         }
-        if (config->verbose && !config->prompt) {
+        if (config->global.verbose && !config->prompt) {
                 printf(" <f> %s\n", file_name);
         }
         r = remove(file_name);
@@ -268,7 +247,7 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                 /* this is actualy a directory */
                 remove(file_name);
                 (*deleted_dirs_count)++;
-                if (config->verbose) {
+                if (config->global.verbose) {
                         printf(" <d> %s\n", file_name);
                 }
         }

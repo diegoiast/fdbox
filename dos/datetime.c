@@ -16,6 +16,7 @@ For license - read license.txt
 
 #include "dos/datetime.h"
 #include "fdbox.h"
+#include "lib/args.h"
 #include "lib/strextra.h"
 
 #ifdef _POSIX_C_SOURCE
@@ -34,9 +35,10 @@ For license - read license.txt
 #endif
 
 struct date_time_config {
-        bool show_help;
         bool interactive;
         char *new_date_time;
+
+        struct command_config global;
 };
 
 static void date_time_config_init(struct date_time_config *config);
@@ -57,7 +59,7 @@ int command_time(int argc, char *argv[]) {
                 time_print_extended_help();
                 return EXIT_FAILURE;
         }
-        if (config.show_help) {
+        if (config.global.show_help) {
                 time_print_extended_help();
                 return EXIT_SUCCESS;
         }
@@ -83,7 +85,7 @@ int command_date(int argc, char *argv[]) {
         }
         /* date_config_print(&config); */
 
-        if (config.show_help) {
+        if (config.global.show_help) {
                 date_print_extended_help();
                 return EXIT_SUCCESS;
         }
@@ -104,40 +106,30 @@ const char *help_date() { return "Here should be a basic help for date"; }
 const char *help_time() { return "Here should be a basic help for time"; }
 
 static void date_time_config_init(struct date_time_config *config) {
-        config->show_help = false;
         config->interactive = true;
         config->new_date_time = NULL;
+        command_config_init(&config->global);
 }
 
 static bool date_time_config_parse(int argc, char *argv[], struct date_time_config *config,
                                    char interactive_char) {
-        size_t i;
-
-        interactive_char = toupper(interactive_char);
-        for (i = 1; i < (size_t)argc; i++) {
-                char c1, c2;
-                c1 = argv[i][0];
-                switch (c1) {
-                case ARGUMENT_DELIMIER:
-                        c2 = toupper(argv[i][1]);
-                        if (c2 == interactive_char) {
-                                config->interactive = false;
-                        } else if (c2 == 'H') {
-                                config->show_help = true;
-                        } else {
-                                return false;
-                        }
-                        break;
-                default:
-                        config->new_date_time = argv[i];
+        int c;
+        do {
+                c = command_config_parse(argc, argv, &config->global);
+                if (tolower(c) == interactive_char) {
                         config->interactive = false;
+                } else if (c == ARG_PROCESSED) {
+                        continue;
+                } else if (c != ARG_DONE) {
+                        return false;
                 }
-        }
+        } while (c >= 0);
+        config->new_date_time = (char *) config->global.file_glob[0];
         return true;
 }
 
 static void date_config_print(struct date_time_config *config) {
-        printf("\tShow help = %s\n", str_bool(config->show_help));
+        printf("\tShow help = %s\n", str_bool(config->global.show_help));
         printf("\tInteractive = %s\n", str_bool(config->interactive));
         printf("\tnew date = %s\n", config->new_date_time ? config->new_date_time : "NULL");
 }

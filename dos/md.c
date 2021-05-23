@@ -6,6 +6,7 @@
 #include "dos/md.h"
 #include "fdbox.h"
 #include "lib/strextra.h"
+#include "lib/args.h"
 
 /*
 This file is part of fdbox
@@ -36,11 +37,8 @@ For license - read license.txt
 #endif
 
 struct mkdir_config {
-        bool show_help;
-        bool verbose;
         bool recursive;
-        char *dir_names[128];
-        size_t dir_names_count;
+        struct command_config global;
 };
 
 static void mkdir_config_init(struct mkdir_config *config);
@@ -60,12 +58,12 @@ int command_md(int argc, char *argv[]) {
         }
         /* mkdir_config_print(&config); */
 
-        if (config.show_help) {
+        if (config.global.show_help) {
                 mkdir_print_extended_help();
                 return EXIT_SUCCESS;
         }
-        for (i = 0; i < config.dir_names_count; i++) {
-                char *name = config.dir_names[i];
+        for (i = 0; i < config.global.file_glob_count; i++) {
+                char *name = (char *) config.global.file_glob[i];
                 bool status = mkdir_create_dir(name, &config);
                 if (!status) {
                         return EXIT_FAILURE;
@@ -77,63 +75,47 @@ int command_md(int argc, char *argv[]) {
 const char *help_md() { return "Create one or more directories"; }
 
 void mkdir_config_init(struct mkdir_config *config) {
-        config->show_help = false;
-        config->verbose = false;
         config->recursive = false;
-        config->dir_names_count = 0;
-        memset(config->dir_names, 0, sizeof(config->dir_names));
+        command_config_init(&config->global);
 }
 
 bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *config) {
         size_t i;
-        for (i = 1; i < (size_t)argc; i++) {
-                char c1, c2;
-                c1 = tolower(argv[i][0]);
-                switch (c1) {
-                case ARGUMENT_DELIMIER:
-                        c2 = tolower(argv[i][1]);
-                        switch (c2) {
-                        case 'v':
-                                config->verbose = true;
-                                break;
-                        case 'r':
-                                config->recursive = true;
-                                break;
-                        case '?':
-                        case 'h':
-                                config->show_help = true;
-                                break;
-                        default:
-                                return false;
-                        }
-                        break;
 
+        int c;
+        do {
+                c = command_config_parse(argc, argv, &config->global);
+                switch (tolower(c)) {
+                case 'r':
+                        config->recursive = true;
+                        break;
+                case ARG_PROCESSED:
+                        break;
+                case ARG_DONE:
+                        break;
                 default:
-                        /* ok its a dir */
-                        config->dir_names[config->dir_names_count] = argv[i];
-                        config->dir_names_count++;
+                        return false;
                 }
-        }
+        } while (c >= 0);
+
         return true;
 }
 
 bool mkdir_config_print(const struct mkdir_config *config) {
         int i;
-        printf("verbose: %s\n", str_bool(config->verbose));
         printf("recursive: %s\n", str_bool(config->recursive));
-        printf("show help %s\n", str_bool(config->show_help));
-        for (i = 0; i < config->dir_names_count; i++) {
-                printf(" -> %s\n", config->dir_names[i]);
+        printf("verbose: %s\n", str_bool(config->global.verbose));
+        printf("show help %s\n", str_bool(config->global.show_help));
+        for (i = 0; i < config->global.file_glob_count; i++) {
+                printf(" -> %s\n", config->global.file_glob[i]);
         }
 }
 
 void mkdir_print_extended_help() {
         printf("%s\n", help_md());
 
-        printf("   md [files] /p /v /r /f\n");
-        printf("   /v Verbose delete\n");
-        printf("   /r Recursive delete (delete subdirs)\n");
-        printf("   /f Force deletion of subdirs, or RO files\n");
+        printf("   md [files] /r\n");
+        printf("   /r Recursive creation (otherwise, creates only top level)\n");
 }
 
 static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) {
@@ -169,6 +151,11 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
                 }
                 c2 = *c;
                 *c = 0;
+
+                if (!config->recursive) {
+                        failed_once = false;
+                        break;
+                }
         } while (r = !0);
 
         if (failed_once) {
