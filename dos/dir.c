@@ -105,7 +105,6 @@ static int dir_file_comperator(const void *a, const void *b);
 static bool found(const char *file_name, const struct file_entry files[], size_t file_count);
 
 /* TODO - should this be moved to a library? */
-static bool prefix(const char *pre, const char *str) { return strncmp(pre, str, strlen(pre)) == 0; }
 static bool flag_test(int value, int flag);
 static void flag_set(int *value, int flag, bool on);
 
@@ -197,7 +196,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 fname = files[i].file_name;
 
                 if (strcmp(dir_name, ".") != 0) {
-                        if (prefix(dir_name, fname)) {
+                        if (str_is_prefix(fname, dir_name)) {
                                 fname += strlen(dir_name) + 1;
                         }
                 }
