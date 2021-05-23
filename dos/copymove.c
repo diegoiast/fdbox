@@ -11,6 +11,7 @@
 #include "dos/copymove.h"
 #include "fdbox.h"
 #include "lib/strextra.h"
+#include "lib/args.h"
 
 /*
 This file is part of fdbox
@@ -39,15 +40,13 @@ For license - read license.txt
 #endif
 
 struct copy_config {
-        bool show_help;
         /*        bool verify; */
         bool ask_overwrite;
-        bool verbose;
         bool copy_attributes;
-
         bool move_files;
         const char *source_file;
         const char *dest_file;
+        struct command_config global;
 };
 
 static void copy_move_config_init(struct copy_config *config);
@@ -66,9 +65,9 @@ static int command_move_copy(int argc, char *argv[], struct copy_config *config)
 
         copy_move_config_init(config);
         copy_move_parse_config(argc, argv, config);
-        /* copy_print_config(&config); */
+        /* copy_move_print_config(config); */
 
-        if (config->show_help) {
+        if (config->global.show_help) {
                 if (config->move_files) {
                         copy_print_extended_help();
                 } else {
@@ -134,13 +133,16 @@ const char *help_move() { return "Moves one or more files to another location"; 
 
 static void copy_move_config_init(struct copy_config *config) {
         /*config->verify = false;*/
-        config->show_help = false;
         config->ask_overwrite = false;
-        config->verbose = false;
         config->copy_attributes = false;
         config->source_file = NULL;
         config->dest_file = NULL;
-        config->move_files = false;
+        command_config_init(&config->global);
+/*
+ *      This should be defined by the upper calling function. This is not
+ *      data that arrives from the user
+ *      config->move_files = false;
+ */
 }
 
 /*
@@ -160,46 +162,37 @@ static void copy_move_config_init(struct copy_config *config) {
 
 static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *config) {
         size_t i;
-
-        for (i = 1; i < (size_t)argc; i++) {
-                char c1, c2;
-                c1 = argv[i][0];
-                switch (c1) {
-                case ARGUMENT_DELIMIER:
-                        c2 = tolower(argv[i][1]);
-                        switch (c2) {
-                        case 'a':
-                                config->copy_attributes = true;
-                                break;
-                        case '?':
-                        case 'h':
-                                config->show_help = true;
-                                break;
-                        case 'y':
-                                config->ask_overwrite = false;
-                                break;
-                        case 'v':
-                                config->verbose = true;
-                                break;
-                        }
+        int c;
+        do {
+                c = command_config_parse(argc, argv, &config->global);
+                switch (tolower(c)) {
+                case 'a':
+                        if (config->move_files)
+                                return false;
+                        config->copy_attributes = true;
+                        break;
+                case 'y':
+                        config->ask_overwrite = true;
+                        break;
+                case ARG_PROCESSED:
+                        break;
+                case ARG_DONE:
                         break;
                 default:
-                        /* ok its a file */
-                        if (config->source_file == NULL) {
-                                config->source_file = argv[i];
-                        } else {
-                                config->dest_file = argv[i];
-                        }
+                        return false;
                 }
-        }
+        } while (c >= 0);
+
+        config->source_file = config->global.file_glob[0];
+        config->dest_file = config->global.file_glob[1];
 }
 
 static bool copy_move_print_config(struct copy_config *config) {
         printf("ask_overwrite=%d\n", config->ask_overwrite);
-        printf("verbose=%d\n", config->verbose);
         printf("copy_attributes=%d\n", config->copy_attributes);
         printf("source_file=%s\n", config->source_file);
         printf("dest_file=%s\n", config->dest_file);
+        printf("verbose=%d\n", config->global.verbose);
 }
 
 static void copy_print_extended_help() {
@@ -294,7 +287,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 }
 
                 current = ((total_written * 100) / total_size);
-                if (config->verbose && current != last_displayed) {
+                if (config->global.verbose && current != last_displayed) {
                         printf("\r%02d%% - %s\r", current, to);
                         fflush(stdout);
                         last_displayed = current;
@@ -334,7 +327,7 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         }
 
         /* TODO - clear all line */
-        if (config->verbose) {
+        if (config->global.verbose) {
                 if (total_size != 0) {
                         int per = (int)((total_written * 100) / total_size);
                         printf("\r%02d%% - %s -> %s %s\n", per, from, to,
@@ -350,7 +343,7 @@ static int move_single_file(const char *from, const char *to, struct copy_config
         int r = rename(from, to);
 
         if (r == 0) {
-                if (config->verbose) {
+                if (config->global.verbose) {
                         printf("\r %s -> %s\n", from, to);
                 }
                 return EXIT_SUCCESS;
