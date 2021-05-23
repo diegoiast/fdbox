@@ -54,7 +54,7 @@ static void time_print_extended_help();
 
 int command_time(int argc, char *argv[]) {
         struct date_time_config config;
-        date_time_config_init((&config));
+        date_time_config_init(&config);
         if (!date_time_config_parse(argc, argv, &config, 't')) {
                 time_print_extended_help();
                 return EXIT_FAILURE;
@@ -78,7 +78,7 @@ int command_time(int argc, char *argv[]) {
 
 int command_date(int argc, char *argv[]) {
         struct date_time_config config;
-        date_time_config_init((&config));
+        date_time_config_init(&config);
         if (!date_time_config_parse(argc, argv, &config, 'd')) {
                 date_print_extended_help();
                 return EXIT_FAILURE;
