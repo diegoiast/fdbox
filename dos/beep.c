@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,69 +11,71 @@
 
 #include "dos/beep.h"
 #include "fdbox.h"
+#include "lib/args.h"
 
 /*
 This file is part of fdbox
 For license - read license.txt
 */
 
-void debug_args(int argc, char *argv[]);
-
-const char *next(int argc, char *argv[], int current);
 
 int command_beep(int argc, char *argv[]) {
-        const char *v;
-        int frequency = 0;
-        int length = 0;
-        int i;
+        struct command_config config;
+        int frequency = -1;
+        int length = -1;
+        int c;
+        const char *argument;
 
-        /* debug_args(argc, argv); */
-        for (i = 1; i < argc; i++) {
-                int l;
-                /* I have no idea why this could happen. */
-                if (argv[i] == NULL) {
+        do {
+                c = command_config_parse(argc, argv, &config);
+                switch (tolower(c)) {
+                case 'f':
+                        argument = command_config_next(argc, argv, &config);
+                        if (argument == NULL) {
+                                printf("Missing argument /f - frequency\n");
+                                return EXIT_FAILURE;
+                        }
+                        frequency = strtol(argument, NULL, 0);
+                        if (errno != 0) {
+                                printf("Invalid time argument: %s\n", argument);
+                                return EXIT_FAILURE;
+                        }
                         break;
-                }
-                l = strlen(argv[i]);
-                if (argv[i][0] == '/') {
-                        char parameter;
-                        if (l != 2) {
-                                printf("Missing argument /? \n");
+                case 'l':
+                        argument = command_config_next(argc, argv, &config);
+                        if (argument == NULL) {
+                                printf("Missing argument /l - length\n");
                                 return EXIT_FAILURE;
                         }
-                        parameter = argv[i][1];
-                        switch (parameter) {
-                        case 't':
-                                v = next(argc, argv, i);
-                                if (v == NULL) {
-                                        printf("Missing argument /t - time\n");
-                                        return EXIT_FAILURE;
-                                }
-                                length = strtol(v, NULL, 0);
-                                if (errno != 0) {
-                                        printf("Invalid time argument: %s\n", v);
-                                        return EXIT_FAILURE;
-                                }
-                                break;
-                        case 'f':
-                                v = next(argc, argv, i);
-                                if (v == NULL) {
-                                        printf("Missing argument /f - frequency\n");
-                                        return EXIT_FAILURE;
-                                }
-                                if (errno != 0) {
-                                        printf("Invalid frequency argument: %s\n", v);
-                                        return EXIT_FAILURE;
-                                }
-                                frequency = strtol(v, NULL, 0);
-                                break;
-                        default:
-                                printf("No supported argument /%c\n", parameter);
+                        length = strtol(argument, NULL, 0);
+                        if (errno != 0) {
+                                printf("Invalid time argument: %s\n", argument);
                                 return EXIT_FAILURE;
                         }
+                        break;
+                case ARG_PROCESSED:
+                        break;
+                case ARG_DONE:
+                        break;
+                default:
+                        printf("No supported argument /%c\n", c);
+                        return EXIT_FAILURE;
                 }
+        } while (c >= 0);
+
+        if (config.file_glob_count != 0) {
+                printf("Invalid argument: %s\n", config.file_glob[0]);
+                return EXIT_FAILURE;
         }
 
+        if (config.show_help) {
+                printf("%s\n", help_beep());
+                printf("\n");
+                printf("    beep /f [frequency] /t [time/milliseconds]\n");
+                printf("\n  \f requecny in hertz");
+                printf("\n  \t length of the beep in milliseconds");
+                return EXIT_SUCCESS;
+        }
 #if defined(__unix__) || defined(__APPLE__)
         printf("\a");
         UNUSED(frequency);
@@ -96,19 +99,4 @@ const char *help_beep() {
 #elif defined(WIN32) || defined(__MSDOS__)
         return "Makes sound for a specified length in milliseconds";
 #endif
-}
-
-void debug_args(int argc, char *argv[]) {
-        int i;
-        printf("argc = %d\n", argc);
-        for (i = 0; i < argc; i++) {
-                printf("argv[%d] = %s\n", i, argv[i]);
-        }
-}
-
-const char *next(int argc, char *argv[], int current) {
-        if (current >= argc) {
-                return NULL;
-        }
-        return argv[current + 1];
 }

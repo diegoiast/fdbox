@@ -44,5 +44,6 @@ struct command_config {
 
 int command_config_init(struct command_config *config);
 int command_config_parse(int argc, char *argv[], struct command_config *config);
+const char* command_config_next(int argc, char *argv[], struct command_config *config);
 
 #endif //__args_h__

@@ -157,12 +157,13 @@ int command_config_init(struct command_config *config)
 
 int command_config_parse(int argc, char *argv[], struct command_config *config) {
         char c1, c2;
-        char *arg = argv[config->state.current_argument];
+        char *arg;
 
         if (config->state.current_argument >= argc) {
                 return ARG_DONE;
         }
 
+        arg = argv[config->state.current_argument];  
         config->state.current_argument ++;
 
         switch (arg[0]) {
@@ -187,4 +188,15 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
                 config->file_glob_count++;
                 return ARG_PROCESSED;
         }
+}
+
+const char* command_config_next(int argc, char *argv[], struct command_config *config) {
+        char *arg;
+
+        if (config->state.current_argument >= argc) {
+                return NULL;
+        }
+        arg = argv[config->state.current_argument];
+        config->state.current_argument ++;
+        return arg;
 }
