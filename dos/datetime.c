@@ -116,6 +116,7 @@ static bool date_time_config_parse(int argc, char *argv[], struct date_time_conf
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
+                /* cannot switch/case here - as we have a variable ... */
                 if (tolower(c) == interactive_char) {
                         config->interactive = false;
                 } else if (c == ARG_PROCESSED) {
