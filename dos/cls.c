@@ -25,7 +25,8 @@ int command_cls(int argc, char *argv[]) {
 #ifdef __MSDOS__
         clrscr();
 #endif
-
+        UNUSED(argc);
+        UNUSED(argv);
         return EXIT_FAILURE;
 }
 

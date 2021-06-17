@@ -145,7 +145,7 @@ int dos_parseargs(int *argc, char **argv[], const char *template, char **output)
 }
 #endif
 
-int command_config_init(struct command_config *config)
+void command_config_init(struct command_config *config)
 {
         config->verbose = false;
         config->show_help = false;
@@ -156,7 +156,7 @@ int command_config_init(struct command_config *config)
 }
 
 int command_config_parse(int argc, char *argv[], struct command_config *config) {
-        char c1, c2;
+        char c;
         char *arg;
 
         if (config->state.current_argument >= argc) {
@@ -168,8 +168,8 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
 
         switch (arg[0]) {
         case ARGUMENT_DELIMIER:
-                c2 = arg[1];
-                switch (tolower(c2)) {
+                c = arg[1];
+                switch (tolower(c)) {
                 case '?':
                 case 'h':
                         config->show_help = true;
@@ -178,7 +178,7 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
                         config->verbose = true;
                         return ARG_PROCESSED;
                 default:
-                        return c2;
+                        return c;
                 }
                 break;
 

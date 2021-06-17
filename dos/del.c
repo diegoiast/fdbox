@@ -47,7 +47,7 @@ typedef enum deletion_result { yes, no, cancel } deletion_result;
 
 static void del_config_init(struct del_config *config);
 static bool del_config_parse(int argc, char *argv[], struct del_config *config);
-static bool del_config_print(const struct del_config *config);
+static void del_config_print(const struct del_config *config);
 static void del_print_extended_help();
 static deletion_result del_single_file(struct del_config *config, const char *file_name);
 static deletion_result del_dir(struct del_config *config, const char *file_name,
@@ -55,7 +55,7 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
                                int *deleted_dirs_count, int *found_dirs_count);
 
 int command_del(int argc, char *argv[]) {
-        int i;
+        size_t i;
         int total_deleted_files = 0;
         int total_files = 0;
         int total_deleted_dirs = 0;
@@ -146,7 +146,7 @@ bool del_config_parse(int argc, char *argv[], struct del_config *config) {
         return true;
 }
 
-bool del_config_print(const struct del_config *config) {
+static void del_config_print(const struct del_config *config) {
         int i;
         printf("prompt for deletion: %s\n", str_bool(config->prompt));
         printf("recursive: %s\n", str_bool(config->recursive));
@@ -157,7 +157,7 @@ bool del_config_print(const struct del_config *config) {
         }
 }
 
-void del_print_extended_help() {
+static void del_print_extended_help() {
         printf("%s\n", help_del());
 
         printf("   del [files] /p /v /r /f\n");
@@ -167,7 +167,7 @@ void del_print_extended_help() {
         printf("   /f Force deletion of subdirs, or RO files\n");
 }
 
-deletion_result del_single_file(struct del_config *config, const char *file_name) {
+static deletion_result del_single_file(struct del_config *config, const char *file_name) {
         bool delete_file = true;
         int r;
 
@@ -209,7 +209,7 @@ static deletion_result del_dir(struct del_config *config, const char *file_name,
         deletion_result result = yes;
         bool delete_dir_on_exit = false;
         char fname[256];
-        int j;
+        size_t j;
         struct stat st;
 
         fname[0] = 0;
