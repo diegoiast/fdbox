@@ -5,8 +5,8 @@
 
 #include "dos/del.h"
 #include "fdbox.h"
-#include "lib/strextra.h"
 #include "lib/args.h"
+#include "lib/strextra.h"
 
 /*
 This file is part of fdbox

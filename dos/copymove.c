@@ -10,8 +10,8 @@
 
 #include "dos/copymove.h"
 #include "fdbox.h"
-#include "lib/strextra.h"
 #include "lib/args.h"
+#include "lib/strextra.h"
 
 /*
 This file is part of fdbox
@@ -138,11 +138,11 @@ static void copy_move_config_init(struct copy_config *config) {
         config->source_file = NULL;
         config->dest_file = NULL;
         command_config_init(&config->global);
-/*
- *      This should be defined by the upper calling function. This is not
- *      data that arrives from the user
- *      config->move_files = false;
- */
+        /*
+         *      This should be defined by the upper calling function. This is not
+         *      data that arrives from the user
+         *      config->move_files = false;
+         */
 }
 
 /*

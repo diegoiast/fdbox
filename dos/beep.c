@@ -18,7 +18,6 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-
 int command_beep(int argc, char *argv[]) {
         struct command_config config;
         int frequency = -1;

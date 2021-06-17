@@ -5,8 +5,8 @@
 
 #include "dos/md.h"
 #include "fdbox.h"
-#include "lib/strextra.h"
 #include "lib/args.h"
+#include "lib/strextra.h"
 
 /*
 This file is part of fdbox
@@ -63,7 +63,7 @@ int command_md(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
         for (i = 0; i < config.global.file_glob_count; i++) {
-                char *name = (char *) config.global.file_glob[i];
+                char *name = (char *)config.global.file_glob[i];
                 bool status = mkdir_create_dir(name, &config);
                 if (!status) {
                         return EXIT_FAILURE;
@@ -166,11 +166,11 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
         }
 
         if (config->global.verbose) {
-            if (r == 0)  {
-                printf("Created %s\n", dir_name);
-            } else {
-                printf("Failed creating %s\n", dir_name);
-            }
+                if (r == 0) {
+                        printf("Created %s\n", dir_name);
+                } else {
+                        printf("Failed creating %s\n", dir_name);
+                }
         }
         return r == 0;
 }

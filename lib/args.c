@@ -1,7 +1,7 @@
+#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "fdbox.h"
 #include "lib/args.h"
@@ -145,8 +145,7 @@ int dos_parseargs(int *argc, char **argv[], const char *template, char **output)
 }
 #endif
 
-void command_config_init(struct command_config *config)
-{
+void command_config_init(struct command_config *config) {
         config->verbose = false;
         config->show_help = false;
         config->file_glob_count = 0;
@@ -163,8 +162,8 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
                 return ARG_DONE;
         }
 
-        arg = argv[config->state.current_argument];  
-        config->state.current_argument ++;
+        arg = argv[config->state.current_argument];
+        config->state.current_argument++;
 
         switch (arg[0]) {
         case ARGUMENT_DELIMIER:
@@ -190,13 +189,13 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
         }
 }
 
-const char* command_config_next(int argc, char *argv[], struct command_config *config) {
+const char *command_config_next(int argc, char *argv[], struct command_config *config) {
         char *arg;
 
         if (config->state.current_argument >= argc) {
                 return NULL;
         }
         arg = argv[config->state.current_argument];
-        config->state.current_argument ++;
+        config->state.current_argument++;
         return arg;
 }
