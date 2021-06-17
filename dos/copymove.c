@@ -52,7 +52,6 @@ struct copy_config {
 
 static void copy_move_config_init(struct copy_config *config);
 static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *config);
-static bool copy_move_print_config(struct copy_config *config);
 static void copy_print_extended_help();
 static void move_print_extended_help();
 static bool copy_move_is_dir(const char *path);
@@ -61,7 +60,8 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 static int move_single_file(const char *from, const char *to, struct copy_config *config);
 
 static int command_move_copy(int argc, char *argv[], struct copy_config *config) {
-        int return_val, j;
+        int return_val = EXIT_SUCCESS;
+        size_t j;
         glob_t globbuf = {0};
 
         copy_move_config_init(config);
@@ -192,9 +192,10 @@ static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *c
                         }
                 }
         }
+        return false;;
 }
 
-static bool copy_move_print_config(struct copy_config *config) {
+static void copy_move_print_config(struct copy_config *config) {
         printf("ask_overwrite=%d\n", config->ask_overwrite);
         printf("verbose=%d\n", config->verbose);
         printf("copy_attributes=%d\n", config->copy_attributes);
@@ -365,5 +366,7 @@ static int move_single_file(const char *from, const char *to, struct copy_config
         r = remove(from);
         if (r != 0) {
                 fprintf(stderr, "Error: failed deleting original file: %s\n", from);
+                return EXIT_FAILURE;
         }
+        return EXIT_SUCCESS;
 }

@@ -45,12 +45,12 @@ struct mkdir_config {
 
 static void mkdir_config_init(struct mkdir_config *config);
 static bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *config);
-static bool mkdir_config_print(const struct mkdir_config *config);
+static void mkdir_config_print(const struct mkdir_config *config);
 static void mkdir_print_extended_help();
 static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config);
 
 int command_md(int argc, char *argv[]) {
-        int i;
+        size_t i;
         struct mkdir_config config;
 
         mkdir_config_init(&config);
@@ -76,7 +76,7 @@ int command_md(int argc, char *argv[]) {
 
 const char *help_md() { return "Create one or more directories"; }
 
-void mkdir_config_init(struct mkdir_config *config) {
+static void mkdir_config_init(struct mkdir_config *config) {
         config->show_help = false;
         config->verbose = false;
         config->recursive = false;
@@ -84,7 +84,7 @@ void mkdir_config_init(struct mkdir_config *config) {
         memset(config->dir_names, 0, sizeof(config->dir_names));
 }
 
-bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *config) {
+static bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *config) {
         size_t i;
         for (i = 1; i < (size_t)argc; i++) {
                 char c1, c2;
@@ -117,8 +117,8 @@ bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *config) {
         return true;
 }
 
-bool mkdir_config_print(const struct mkdir_config *config) {
-        int i;
+static void mkdir_config_print(const struct mkdir_config *config) {
+        size_t i;
         printf("verbose: %s\n", str_bool(config->verbose));
         printf("recursive: %s\n", str_bool(config->recursive));
         printf("show help %s\n", str_bool(config->show_help));
@@ -127,7 +127,7 @@ bool mkdir_config_print(const struct mkdir_config *config) {
         }
 }
 
-void mkdir_print_extended_help() {
+static void mkdir_print_extended_help() {
         printf("%s\n", help_md());
 
         printf("   md [files] /p /v /r /f\n");
@@ -169,7 +169,7 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
                 }
                 c2 = *c;
                 *c = 0;
-        } while (r = !0);
+        } while (r != 0);
 
         if (failed_once) {
 #if defined(__MSDOS__) || defined(__WIN32__)
@@ -177,6 +177,14 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
 #else
                 r = mkdir(dir_name, 0755);
 #endif
+        }
+
+        if (config->verbose) {
+            if (r == 0)  {
+                printf("Created %s\n", dir_name);
+            } else {
+                printf("Failed creating %s\n", dir_name);
+            }
         }
         return r == 0;
 }
