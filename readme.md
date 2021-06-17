@@ -1,8 +1,13 @@
 # fdshell
 
 A new shell for FreeDOS. Code will contain usable utilities
-borrowed from Unix and maintain compatibility with MSDOS 6.22
-`command.com`.
+borrowed from Unix and maintain (basic) compatibility with 
+MSDOS 6.22 `command.com`, while (sometimes) improving.
+
+![FDShell running on DOSBOX](fdshell-dosbox.png)
+
+The program compiles also as a Linux (and windows!) executable
+![FDShell running on Linux](fdshell-linux.png)
 
 ## Status
 
