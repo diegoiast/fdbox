@@ -5,4 +5,4 @@ build
 
 # TurboC creates garbage at the root dir, safe to ignore
 *.OBJ
-FDSHELL.EXE
+FDBOX.EXE

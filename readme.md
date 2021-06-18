@@ -1,13 +1,13 @@
-# fdshell
+# fdbox
 
-A new shell for FreeDOS. Code will contain usable utilities
+A new command interpreter for FreeDOS. Code will contain usable utilities
 borrowed from Unix and maintain (basic) compatibility with 
-MSDOS 6.22 `command.com`, while (sometimes) improving.
+MSDOS 6.22 `command.com`, while (sometimes) improving. 
 
-![FDShell running on DOSBOX](fdshell-dosbox.png)
+<div style="text-align:center"><img src="fdbox-dosbox.png" /></div>
 
-The program compiles also as a Linux (and windows!) executable
-![FDShell running on Linux](fdshell-linux.png)
+The program compiles also as a native Linux (and windows!) executable
+<div style="text-align:center"><img src="fdbox-linux.png" /></div>
 
 ## Status
 
@@ -16,34 +16,33 @@ The program compiles also as a Linux (and windows!) executable
  * Currently I am using LibC's functions - so I am limited to
    standard C code support for localization.
  * `TurboC` does need a proper makefile.
- * `beep` - works.
- * `cd` - works
- * `cls` - works
- * `copy`
-   * All copies are binaries. By design.
-   * Recursive copy not implemented yet
-   * Copy globs, and several files - not implemented yet
-   * Append files (copy file1+file2 file3) not implemented yet
- * `date`, `time`
-   * Missing AM/PM input
-   * Test localization (for example date, MM/DD)
-   * Not supported on Windows (only DOS/Linux)
- * `del` 
- * `dir`
-   * `/o?` Order is funky. I admit it's not traditional but it works.
-   * `/p` Pausing is not coded yet
- * `md`/`mkdir` - works
- * `move`/`rename`/`ren` - works
-   * The commands use the same syntax as copy and rename/move similar aliases.
-   * Currently only `move` works, default alias will be added "soon".
- * All other stuff in not implemented.
+ * All commands support multiple arguments (like Unix shells), unlike DOS
+   which you cannot do `del file1.txt *.bat`
+ * Some commands share the same code (`copy`+`move`, `date`+`time`)
+ * Interactive shell will follow. I want to have 4DOS command completion,
+   or bash. 
+
+## Implementation status of commands
+| command      | status | remark        |
+|------------- | ------ | -----------   |
+| `beep`       |  *done*  | needs to be tested on DOS/Windows, on unix it just beeps              |
+| `cd`         |  *done*  |  |
+| `cls`        |  *done*  |  |
+| `copy`       |  WIP  | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
+| `date`/`time`|  WIP  |  Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
+| `del`        |  *done*  | Prompt might need more testing |
+| `dir`        |  *WIP*  |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
+| `md`/`mkdir` |  *done*  |  |
+| `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
+| `type`       |  *done*  | Bonus: support also line numbers printing |
+
 
 ## Building
 
 The assumption is that this project will be developed on
 Linux (or any Posix compliant OS), and will maintain compatibilty
 with DOS at all times. The reason, is for better tooling (git,
-valgrind, strace, text-editors).
+valgrind, strace, text-editors, clag-format ...etc).
 
 Code is strictly C (asm where needed). Supported environments:
 
@@ -66,7 +65,7 @@ Code is strictly C (asm where needed). Supported environments:
 
 Check out this git repository:
 
-    git clone [todo]
+    git clone https://github.com/elcuco/fdbox/
     cmake -S . -B build -GNinja
     cmake --build build
 
@@ -89,6 +88,14 @@ since again it will default to NMake. In the build tab, in the "Initial CMake pa
     -DCMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}
     -DCMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}
     -GNinja
+
+In `etc/fdshell-qtcreator-indent.xml` you will find the indentaion
+configuration I use for. It should be equivalent to the `clang-format`
+one.
+
+I also managed to compile this project using VSCode. You willl
+need to install the CMake extension (https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
+and C++ support (https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools).
 
 If you plan on building this on DOS - there is a TurboC 2.02 project. Code
 does compile under TC - its tested all the time.
@@ -138,6 +145,11 @@ unsure how to automatically do this.
 GPL V3. See file license.txt
 
 ## TODO - future development
+ - I had this `configure` system which would create the sources for commands
+   and auto generate the `applets.c` file. Not against the idea.
+ - I need to make a TC makefile
+ - Add support for Github actions  - and build the binaries (windows, linux and MSDOS
+   on a tag).
  - There are commands that are available on Unix and DOS, but differ in syntax
    unsure how to handle.
  - MSDOS: Using XMS swapping wold be good, using SPWNO would be epic (http://www.cs.cmu.edu/%7Eralf/files.html)
