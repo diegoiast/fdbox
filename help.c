@@ -12,7 +12,7 @@
 
 extern struct applet commands[];
 
-int command_help(int arc, char *argv[]) {
+int command_help(int argc, char *argv[]) {
         struct applet *app = commands;
         printf("FDBox version %s (%d)\n", FDBOX_VERSION_STR, FDBOX_VERSION);
         printf("Available applets:\n");
@@ -21,6 +21,9 @@ int command_help(int arc, char *argv[]) {
                 printf("    %-20s%s\n", app->name, app->help_text());
                 app++;
         }
+
+        UNUSED(argv);
+        UNUSED(argc);
         return EXIT_FAILURE;
 }
 

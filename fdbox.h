@@ -12,8 +12,8 @@
                 (void)(expr);                                                                      \
         } while (0)
 
-#define FDBOX_MAJOR 1
-#define FDBOX_MINOR 2
+#define FDBOX_MAJOR 0
+#define FDBOX_MINOR 0
 #define FDBOX_PATCH 1
 #define FDBOX_RELEASE 1
 
