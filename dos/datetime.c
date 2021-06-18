@@ -125,7 +125,9 @@ static bool date_time_config_parse(int argc, char *argv[], struct date_time_conf
                         return false;
                 }
         } while (c >= 0);
-        config->new_date_time = (char *)config->global.file_glob[0];
+
+        /* yes, this looks ugly, but the memory can be modified... */
+        config->new_date_time = (char *)config->global.files.file[0];
         return true;
 }
 

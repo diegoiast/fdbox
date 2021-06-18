@@ -74,12 +74,7 @@ struct dir_config {
         bool subdirs;
         bool bare;
         bool lower_case;
-        /* All other options are treated as files */
-};
-
-struct dir_files {
-        char *files[MAX_DIR_FILES];
-        size_t files_count;
+        struct command_config global;
 };
 
 struct file_entry {
@@ -90,12 +85,12 @@ struct file_entry {
 /***************************************************************************
  * Forward declarations
  ***************************************************************************/
-static void dir_config_init(struct dir_config *config, struct dir_files *files);
+static void dir_config_init(struct dir_config *config, struct command_glob *files);
 static void dir_config_print(struct dir_config *config);
 static void dir_display_dir(struct dir_config *config, const char *dir_name,
-                            struct dir_files *files2, int depth);
+                            struct command_glob *files2, int depth);
 static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
-                             struct dir_files *files);
+                             struct command_glob *files);
 static void dir_format_date_time(long ff_date, long ff_time, char *time, char *date);
 static void dir_print_extended_help();
 
@@ -113,7 +108,7 @@ static void flag_set(int *value, int flag, bool on);
  ***************************************************************************/
 int command_dir(int argc, char *argv[]) {
         struct dir_config config;
-        struct dir_files files;
+        struct command_glob files;
 
         /* first read configuration from command line */
         dir_config_init(&config, &files);
@@ -128,9 +123,9 @@ int command_dir(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
 
-        if (files.files_count == 0) {
-                files.files[0] = ALL_FILES_GLOB;
-                files.files_count = 1;
+        if (files.count == 0) {
+                files.file[0] = ALL_FILES_GLOB;
+                files.count = 1;
         }
 
         dir_display_dir(&config, ".", &files, 1);
@@ -138,7 +133,7 @@ int command_dir(int argc, char *argv[]) {
 }
 
 static void dir_display_dir(struct dir_config *config, const char *dir_name,
-                            struct dir_files *files2, int depth) {
+                            struct command_glob *files2, int depth) {
         /* then find all available files */
         struct file_entry files[MAX_DIR_ENTRY_FILES];
         size_t file_count = 0, requested_count = 0;
@@ -157,9 +152,9 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
          * the values I see are OK.
          */
         memset(files, 0, sizeof(files));
-        for (i = 0; i < files2->files_count; i++) {
+        for (i = 0; i < files2->count; i++) {
                 glob_t globbuf = {0};
-                glob(files2->files[i], GLOB_DOOFFS, NULL, &globbuf);
+                glob(files2->file[i], GLOB_DOOFFS, NULL, &globbuf);
                 for (j = 0; j != globbuf.gl_pathc; j++) {
                         const char *file_name = globbuf.gl_pathv[j];
                         requested_count++;
@@ -258,7 +253,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         }
         for (i = 0; i < file_count; i++) {
                 if (config->subdirs) {
-                        struct dir_files f;
+                        struct command_glob f;
                         char *s;
 
                         if (!S_ISDIR(files[i].file_details.st_mode)) {
@@ -271,8 +266,8 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                         strcpy(s, files[i].file_name);
                         strcat(s, DIRECTORY_DELIMITER);
                         strcat(s, ALL_FILES_GLOB);
-                        f.files[0] = s;
-                        f.files_count = 1;
+                        f.file[0] = s;
+                        f.count = 1;
                         dir_display_dir(config, files[i].file_name, &f, depth + 1);
                         free(s);
                 }
@@ -285,7 +280,7 @@ const char *help_dir() { return "Displays a list of files and subdirectories in 
 /****************************************************************************
  * internal functions
  ***************************************************************************/
-static void dir_config_init(struct dir_config *config, struct dir_files *files) {
+static void dir_config_init(struct dir_config *config, struct command_glob *files) {
         config->pause = false;
         config->wide = false;
         config->bare = false;
@@ -293,7 +288,7 @@ static void dir_config_init(struct dir_config *config, struct dir_files *files) 
         config->lower_case = false;
         config->subdirs = false;
         config->show_help = false;
-        files->files_count = 0;
+        files->count = 0;
 }
 
 static void dir_config_print(struct dir_config *config) {
@@ -332,7 +327,7 @@ static void dir_config_print(struct dir_config *config) {
 }
 
 static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
-                             struct dir_files *files) {
+                             struct command_glob *files) {
         size_t i, files_requested = 0;
 
         for (i = 1; i < (size_t)argc; i++) {
@@ -433,14 +428,14 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
                         break;
                 default:
                         files_requested++;
-                        if (files->files_count < MAX_DIR_FILES) {
-                                files->files[files->files_count] = argv[i];
-                                files->files_count++;
+                        if (files->count < MAX_DIR_FILES) {
+                                files->file[files->count] = argv[i];
+                                files->count++;
                         }
                         break;
                 }
         }
-        if (files_requested != files->files_count) {
+        if (files_requested != files->count) {
                 fprintf(stderr, "Warning: %d/%d files not be displayed\n",
                         (int)files_requested - MAX_DIR_FILES, (int)files_requested);
         }

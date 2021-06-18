@@ -182,8 +182,8 @@ static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *c
                 }
         } while (c >= 0);
 
-        config->source_file = config->global.file_glob[0];
-        config->dest_file = config->global.file_glob[1];
+        config->source_file = config->global.files.file[0];
+        config->dest_file = config->global.files.file[1];
 
         return false;
 }

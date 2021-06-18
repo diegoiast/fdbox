@@ -25,17 +25,21 @@ For license - read license.txt
 #define ARG_PROCESSED 0
 #define ARG_NOT_EXISTING 1000
 #define ARG_EXTRA 1001
+#define ARG_MAX_FILES 128
 
 void hexDump(char *desc, void *addr, int len);
 void print_agrs(int argc, char *argv[]);
 /* int dos_parseargs(int *argc, char **argv[], const char* template, char **output); */
 
+struct command_glob {
+        const char *file[ARG_MAX_FILES];
+        size_t count;
+};
+
 struct command_config {
         bool show_help;
         bool verbose;
-
-        const char *file_glob[128];
-        size_t file_glob_count;
+        struct command_glob files;
 
         struct {
                 int current_argument;

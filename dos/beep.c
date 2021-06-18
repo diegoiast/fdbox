@@ -62,8 +62,8 @@ int command_beep(int argc, char *argv[]) {
                 }
         } while (c >= 0);
 
-        if (config.file_glob_count != 0) {
-                printf("Invalid argument: %s\n", config.file_glob[0]);
+        if (config.files.count != 0) {
+                printf("Invalid argument: %s\n", config.files.file[0]);
                 return EXIT_FAILURE;
         }
 

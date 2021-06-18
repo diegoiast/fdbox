@@ -148,8 +148,8 @@ int dos_parseargs(int *argc, char **argv[], const char *template, char **output)
 void command_config_init(struct command_config *config) {
         config->verbose = false;
         config->show_help = false;
-        config->file_glob_count = 0;
-        memset(config->file_glob, 0, sizeof(config->file_glob));
+        config->files.count = 0;
+        memset(config->files.file, 0, sizeof(config->files));
 
         config->state.current_argument = 1;
 }
@@ -183,8 +183,8 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
 
         default:
                 /* ok its a file */
-                config->file_glob[config->file_glob_count] = arg;
-                config->file_glob_count++;
+                config->files.file[config->files.count] = arg;
+                config->files.count ++;
                 return ARG_PROCESSED;
         }
 }

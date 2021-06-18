@@ -62,8 +62,11 @@ int command_md(int argc, char *argv[]) {
                 mkdir_print_extended_help();
                 return EXIT_SUCCESS;
         }
-        for (i = 0; i < config.global.file_glob_count; i++) {
-                char *name = (char *)config.global.file_glob[i];
+        for (i = 0; i < config.global.files.count; i++) {
+                /* This is used only to move forward in the pointer, we will not modify the
+                 * content of `dir_name`
+                 */
+                char *name = (char*) config.global.files.file[i];
                 bool status = mkdir_create_dir(name, &config);
                 if (!status) {
                         return EXIT_FAILURE;
@@ -105,8 +108,8 @@ static void mkdir_config_print(const struct mkdir_config *config) {
         printf("recursive: %s\n", str_bool(config->recursive));
         printf("verbose: %s\n", str_bool(config->global.verbose));
         printf("show help %s\n", str_bool(config->global.show_help));
-        for (i = 0; i < config->global.file_glob_count; i++) {
-                printf(" -> %s\n", config->global.file_glob[i]);
+        for (i = 0; i < config->global.files.count; i++) {
+                printf(" -> %s\n", config->global.files.file[i]);
         }
 }
 
@@ -132,7 +135,8 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
          * path at the first "/" found.
          */
         int r;
-        char *c = dir_name;
+
+        char *c = (char*) dir_name;
         char c2 = dir_name[0];
         bool failed_once = false;
 

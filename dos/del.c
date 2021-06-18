@@ -73,14 +73,14 @@ int command_del(int argc, char *argv[]) {
                 del_print_extended_help();
                 return EXIT_SUCCESS;
         }
-        for (i = 0; i < config.global.file_glob_count; i++) {
+        for (i = 0; i < config.global.files.count; i++) {
                 deletion_result result;
                 int tested_files = 0;
                 int tested_dirs = 0;
                 int deleted_files = 0;
                 int deleted_dirs = 0;
 
-                result = del_dir(&config, config.global.file_glob[i], &deleted_files, &tested_files,
+                result = del_dir(&config, config.global.files.file[i], &deleted_files, &tested_files,
                                  &deleted_dirs, &tested_dirs);
                 total_deleted_dirs += deleted_dirs;
                 total_deleted_files += deleted_files;
@@ -121,7 +121,6 @@ void del_config_init(struct del_config *config) {
 }
 
 bool del_config_parse(int argc, char *argv[], struct del_config *config) {
-        size_t i;
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
@@ -152,8 +151,8 @@ static void del_config_print(const struct del_config *config) {
         printf("recursive: %s\n", str_bool(config->recursive));
         printf("verbose: %s\n", str_bool(config->global.verbose));
         printf("show help %s\n", str_bool(config->global.show_help));
-        for (i = 0; i < config->global.file_glob_count; i++) {
-                printf(" -> %s\n", config->global.file_glob[i]);
+        for (i = 0; i < config->global.files.count; i++) {
+                printf(" -> %s\n", config->global.files.file[i]);
         }
 }
 
