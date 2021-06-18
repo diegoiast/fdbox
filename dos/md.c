@@ -106,11 +106,7 @@ static void mkdir_config_print(const struct mkdir_config *config) {
         size_t i;
 
         printf("recursive: %s\n", str_bool(config->recursive));
-        printf("verbose: %s\n", str_bool(config->global.verbose));
-        printf("show help %s\n", str_bool(config->global.show_help));
-        for (i = 0; i < config->global.files.count; i++) {
-                printf(" -> %s\n", config->global.files.file[i]);
-        }
+        command_config_print(&config->global);
 }
 
 static void mkdir_print_extended_help() {

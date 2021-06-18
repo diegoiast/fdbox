@@ -139,3 +139,15 @@ const char *command_config_next(int argc, char *argv[], struct command_config *c
         config->state.current_argument++;
         return arg;
 }
+
+void command_config_print(const struct command_config *config)
+{
+        size_t i;
+
+        printf("VERBOSE = %d\n", config->verbose);
+        printf("SHOW HELP = %d\n", config->show_help);
+        printf("Glob %zu requested, %zu overflow\n", config->files.count+config->files.overflow, config->files.overflow);
+        for (i = 0; i < config->files.count; i++) {
+                printf(" -> %s\n", config->files.file[i]);
+        }
+}

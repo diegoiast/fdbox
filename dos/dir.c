@@ -323,12 +323,7 @@ static void dir_config_print(struct dir_config *config) {
         }
         putchar('\n');
 
-        /*
-        for (size_t i=0; i<config->files_count; i++ ) {
-               printf("%s ", config->files[i]);
-        }
-        */
-        printf("\n");
+        command_config_print(&config->global);
 }
 
 

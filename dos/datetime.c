@@ -132,9 +132,10 @@ static bool date_time_config_parse(int argc, char *argv[], struct date_time_conf
 }
 
 static void date_config_print(struct date_time_config *config) {
-        printf("\tShow help = %s\n", str_bool(config->global.show_help));
         printf("\tInteractive = %s\n", str_bool(config->interactive));
         printf("\tnew date = %s\n", config->new_date_time ? config->new_date_time : "NULL");
+        printf("\tShow help = %s\n", str_bool(config->global.show_help));
+        command_config_print(&config->global);
 }
 
 static int date_set_new_date(char *new_date) {

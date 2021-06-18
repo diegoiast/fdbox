@@ -193,7 +193,7 @@ static void copy_move_print_config(struct copy_config *config) {
         printf("copy_attributes=%d\n", config->copy_attributes);
         printf("source_file=%s\n", config->source_file);
         printf("dest_file=%s\n", config->dest_file);
-        printf("verbose=%d\n", config->global.verbose);
+        command_config_print(&config->global);
 }
 
 static void copy_print_extended_help() {
