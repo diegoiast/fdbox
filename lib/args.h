@@ -21,8 +21,8 @@ For license - read license.txt
 #endif
 
 #define ARG_DONE -1
-#define ARG_STRING 0
 #define ARG_PROCESSED 0
+
 #define ARG_NOT_EXISTING 1000
 #define ARG_EXTRA 1001
 #define ARG_MAX_FILES 128
@@ -34,6 +34,7 @@ void print_agrs(int argc, char *argv[]);
 struct command_glob {
         const char *file[ARG_MAX_FILES];
         size_t count;
+        size_t overflow;
 };
 
 struct command_config {

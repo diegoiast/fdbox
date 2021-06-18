@@ -85,12 +85,11 @@ struct file_entry {
 /***************************************************************************
  * Forward declarations
  ***************************************************************************/
-static void dir_config_init(struct dir_config *config, struct command_glob *files);
+static void dir_config_init(struct dir_config *config);
 static void dir_config_print(struct dir_config *config);
 static void dir_display_dir(struct dir_config *config, const char *dir_name,
                             struct command_glob *files2, int depth);
-static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
-                             struct command_glob *files);
+static bool dir_parse_config(int argc, char *argv[], struct dir_config *config);
 static void dir_format_date_time(long ff_date, long ff_time, char *time, char *date);
 static void dir_print_extended_help();
 
@@ -108,11 +107,10 @@ static void flag_set(int *value, int flag, bool on);
  ***************************************************************************/
 int command_dir(int argc, char *argv[]) {
         struct dir_config config;
-        struct command_glob files;
 
         /* first read configuration from command line */
-        dir_config_init(&config, &files);
-        if (!dir_parse_config(argc, argv, &config, &files)) {
+        dir_config_init(&config);
+        if (!dir_parse_config(argc, argv, &config)) {
                 printf("Failed parsing command line args\n");
                 return EXIT_FAILURE;
         }
@@ -123,12 +121,19 @@ int command_dir(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
 
-        if (files.count == 0) {
-                files.file[0] = ALL_FILES_GLOB;
-                files.count = 1;
+        if (config.global.files.overflow != 0) {
+                fprintf(stderr, "Warning: %zd/%zd files not be displayed\n",
+                        config.global.files.overflow,
+                        config.global.files.overflow + config.global.files.count
+                );
         }
 
-        dir_display_dir(&config, ".", &files, 1);
+        if (config.global.files.count == 0) {
+                config.global.files.file[0] = ALL_FILES_GLOB;
+                config.global.files.count = 1;
+        }
+
+        dir_display_dir(&config, ".", &config.global.files, 1);
         return EXIT_SUCCESS;
 }
 
@@ -280,7 +285,7 @@ const char *help_dir() { return "Displays a list of files and subdirectories in 
 /****************************************************************************
  * internal functions
  ***************************************************************************/
-static void dir_config_init(struct dir_config *config, struct command_glob *files) {
+static void dir_config_init(struct dir_config *config) {
         config->pause = false;
         config->wide = false;
         config->bare = false;
@@ -288,7 +293,7 @@ static void dir_config_init(struct dir_config *config, struct command_glob *file
         config->lower_case = false;
         config->subdirs = false;
         config->show_help = false;
-        files->count = 0;
+        command_config_init(&config->global);
 }
 
 static void dir_config_print(struct dir_config *config) {
@@ -326,119 +331,85 @@ static void dir_config_print(struct dir_config *config) {
         printf("\n");
 }
 
-static bool dir_parse_config(int argc, char *argv[], struct dir_config *config,
-                             struct command_glob *files) {
-        size_t i, files_requested = 0;
 
-        for (i = 1; i < (size_t)argc; i++) {
-                char c1, c2;
+static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) {
 
-                c1 = argv[i][0];
-                switch (c1) {
-                case ARGUMENT_DELIMIER:
-                        c2 = tolower(argv[i][1]);
-                        switch (c2) {
-                        case 'p':
-                        case 'P':
-                                config->pause = true;
-                                if (argv[i][2] != 0) {
-                                        return false;
-                                }
+        int c;
+        const char *argument;
+
+        do {
+                c = command_config_parse(argc, argv, &config->global);
+                switch (tolower(c)) {
+                case 'p':
+                        config->pause = true;
+                        break;
+                case 'w':
+                        config->wide = true;
+                        break;
+                case 's':
+                        config->subdirs = true;
+                        break;
+                case 'b':
+                        config->bare = true;
+                        break;
+                case 'l':
+                        config->lower_case = true;
+                        break;
+
+                case 'a':
+                        /* TODO - attribute support is not supported yet */
+                        argument = argv[config->global.state.current_argument-1];
+                        c = tolower(argument[2]);
+                        switch (c) {
+                        case 'd':
                                 break;
-                        case 'w':
-                        case 'W':
-                                config->wide = true;
-                                if (argv[i][2] != 0) {
-                                        return false;
-                                }
-                                break;
-                        case 'a':
-                                switch (argv[i][2]) {
-                                case 'd':
-                                case 'D':
-                                        break;
-                                case 'h':
-                                case 'H':
-                                        break;
-                                case 's':
-                                case 'S':
-                                        break;
-                                case 'r':
-                                case 'R':
-                                        break;
-                                case 'a':
-                                case 'A':
-                                        break;
-                                default:
-                                        break;
-                                }
-                                break;
-                        case 'o':
-                                switch (argv[i][2]) {
-                                case 'n':
-                                case 'N':
-                                        flag_set(&config->sort_order, SORT_NAME, true);
-                                        break;
-                                case 'e':
-                                case 'E':
-                                        flag_set(&config->sort_order, SORT_EXTENTION, true);
-                                        break;
-                                case 'g':
-                                case 'G':
-                                        flag_set(&config->sort_order, SORT_DIRS, true);
-                                        break;
-                                case 'd':
-                                case 'D':
-                                        flag_set(&config->sort_order, SORT_DATE, true);
-                                        break;
-                                case 's':
-                                case 'S':
-                                        flag_set(&config->sort_order, SORT_SIZE, true);
-                                        break;
-                                default:
-                                        printf("invalid sort argument %d/\n", (int)i);
-                                        return false;
-                                }
+                        case 'h':
                                 break;
                         case 's':
-                                config->subdirs = true;
-                                if (argv[i][2] != 0) {
-                                        return false;
-                                }
                                 break;
-                        case 'b':
-                                config->bare = true;
-                                if (argv[i][2] != 0) {
-                                        return false;
-                                }
+                        case 'r':
                                 break;
-                        case 'l':
-                                config->lower_case = true;
-                                if (argv[i][2] != 0) {
-                                        return false;
-                                }
-                                break;
-                        case '?':
-                                config->show_help = true;
+                        case 'a':
                                 break;
                         default:
-                                fprintf(stderr, "invalid command line switch at index %ld\n", i);
+                                break;
+                        }
+
+                        break;
+                case 'o':
+                        argument = argv[config->global.state.current_argument-1];
+                        c = tolower(argument[2]);
+                        switch (c) {
+                        case 'n':
+                                flag_set(&config->sort_order, SORT_NAME, true);
+                                break;
+                        case 'e':
+                                flag_set(&config->sort_order, SORT_EXTENTION, true);
+                                break;
+                        case 'g':
+                                flag_set(&config->sort_order, SORT_DIRS, true);
+                                break;
+                        case 'd':
+                                flag_set(&config->sort_order, SORT_DATE, true);
+                                break;
+                        case 's':
+                                flag_set(&config->sort_order, SORT_SIZE, true);
+                                break;
+                        default:
+                                printf("invalid sort argument %c/\n", c);
                                 return false;
                         }
                         break;
+
+                case ARG_PROCESSED:
+                    break;
+                case ARG_DONE:
+                    break;
                 default:
-                        files_requested++;
-                        if (files->count < MAX_DIR_FILES) {
-                                files->file[files->count] = argv[i];
-                                files->count++;
-                        }
-                        break;
+                    return false;
                 }
-        }
-        if (files_requested != files->count) {
-                fprintf(stderr, "Warning: %d/%d files not be displayed\n",
-                        (int)files_requested - MAX_DIR_FILES, (int)files_requested);
-        }
+        } while (c >= 0);
+
         return true;
 }
 
