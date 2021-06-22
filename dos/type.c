@@ -66,7 +66,7 @@ int command_type(int argc, char *argv[]) {
                 fclose(file);
         }
 
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
 }
 
 const char *help_type() { return "Prints the content of a file"; }
