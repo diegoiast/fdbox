@@ -1,4 +1,3 @@
-
 #include "fdbox.h"
 #include "lib/applet.h"
 #include "lib/args.h"
@@ -18,8 +17,11 @@ bool test_strings();
 int main(int argc, char *argv[]) {
         bool ok = true;
         ok &= test("applets", test_applets);
-        //        ok &= test("args", test_args);
+        ok &= test("args", test_args);
         ok &= test("strings", test_strings);
+
+        UNUSED(argc);
+        UNUSED(argv);
         return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
@@ -67,99 +69,78 @@ bool verify_string_equals(const char *arg1, const char *arg2, const char *messag
 }
 
 ///////////////////////////////////////////
-// Argumnents
-
-int split_strings(char *c2, char *argv[][100]) {
-        int argc = 0;
-        char *token;
-        while ((token = strsep(&c2, " "))) {
-                if (*token == '\0') {
-                        continue;
-                }
-                (*argv)[argc] = token;
-                argc++;
-        }
-        return argc;
-}
-
-// Unused test, the API is not used
 bool test_args() {
+        #define MAX_ARGV 100
         bool ok = true;
         char c2[256], *c3;
-        char *argv[100];
-        int argc = -1, r;
+        const char *argv[MAX_ARGV];
+        int argc = -1;
+        bool parsing_ok;
 
         // basic argument parsing - can we create argc/argv?
-        argc = split_strings(strcpy(c2, ""), &argv);
-        ok |= verify_int_equals(0, argc, "no arguments");
-
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
         memset(c2, 'x', 256);
-        argc = split_strings(strcpy(c2, "asd asd"), &argv);
-        ok |= verify_int_equals(2, argc, "2 arguments");
+        c3 = "";
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
+        strcpy(c2, c3);
+        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        ok |= parsing_ok && verify_int_equals(0, argc, "no arguments");
 
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
         memset(c2, 'x', 256);
-        argc = split_strings(strcpy(c2, "111 222 333 44             555 666"), &argv);
-        ok |= verify_int_equals(6, argc, "6 arguments");
+        c3 = "asd asd";
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
+        strcpy(c2, c3);
+        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        ok |= parsing_ok && verify_int_equals(2, argc, "2 arguments");
 
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
         memset(c2, 'x', 256);
-        argc = split_strings(strcpy(c2, "dir /w"), &argv);
-        ok |= verify_int_equals(2, argc, "2 arguments");
+        c3 = "111 222 333 44             555 666";
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
+        strcpy(c2, c3);
+        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        ok |= parsing_ok && verify_int_equals(6, argc, "6 arguments, with spaces");
 
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
         memset(c2, 'x', 256);
-        argc = split_strings(strcpy(c2, "dir /w /w"), &argv);
-        ok |= verify_int_equals(3, argc, "3 arguments");
+        c3 = "dir /w";
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
+        strcpy(c2, c3);
+        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        ok |= parsing_ok && verify_int_equals(2, argc, "2 args - dir /w");
 
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
         memset(c2, 'x', 256);
-        argc = split_strings(strcpy(c2, "dir /w /e"), &argv);
-        ok |= verify_int_equals(3, argc, "3 arguments");
+        c3 = "dir /w /w";
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
+        strcpy(c2, c3);
+        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        ok |= parsing_ok && verify_int_equals(3, argc, "3 args - dir /w /w");
 
-        // let the fun begin
-        argc = split_strings(strcpy(c2, "dir /w"), &argv);
-        //     print_agrs(argc, argv);
-        hexDump("argc - 1", c2, 50);
-
-#if 0
-        //     DEBUG_LINE;
-        //     print_agrs(argc, argv);
-        // TODO - I am unhappy about this typocast
-        while ((r = dos_parseargs(&argc, (char ***)&argv, "w", &c3)) >= 0) {
-                if (r != 'w') {
-                        ok = false;
-                        printf(" * Checking %c: FAIL\n", 'w');
-                }
-        }
-        if (ok) {
-                printf(" * Checking single arg: OK\n");
-        }
-        argc = split_strings(strcpy(c2, "dir /w /e"), &argv);
-        print_agrs(argc, argv);
-        hexDump("argc - 2", c2, 50);
-        return ok;
-        //     print_agrs(argc, argv);
-        while ((r = dos_parseargs(&argc, (char ***)&argv, "we", &c3)) >= 0) {
-                if (r != 'w' || r != 'e') {
-                        ok = false;
-                        printf(" * Checking 2 args: FAIL\n");
-                }
-        }
-        if (ok) {
-                printf(" * Checking double arg: OK\n");
-        }
-#endif
-
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
+        memset(c2, 'x', 256);
+        c3 = "dir /w /2";
+        /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
+        strcpy(c2, c3);
+        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        ok |= parsing_ok && verify_int_equals(3, argc, "3 args - dir /w /2");
         return ok;
 }
 
 /////////// applets
-int applet1(int arc, char *argv[]) { return EXIT_SUCCESS; }
+int applet1(int argc, char *argv[]) { return EXIT_SUCCESS; UNUSED(argc); UNUSED(argv); }
 
-int applet2(int arc, char *argv[]) { return EXIT_SUCCESS; }
+int applet2(int argc, char *argv[]) { return EXIT_SUCCESS; UNUSED(argc); UNUSED(argv); }
 
-int applet3(int arc, char *argv[]) { return EXIT_SUCCESS; }
+int applet3(int argc, char *argv[]) { return EXIT_SUCCESS; UNUSED(argc); UNUSED(argv); }
 
 bool test_applets() {
         struct applet commands[] = {
-            {NULL, &applet1, "applet1"}, {NULL, &applet2, "applet2"}, {NULL, NULL, NULL}};
+                {NULL, &applet1, "applet1"},
+                {NULL, &applet2, "applet2"},
+                {NULL, NULL, NULL}
+        };
         bool ok = true;
         struct applet *c;
 

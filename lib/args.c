@@ -151,3 +151,30 @@ void command_config_print(const struct command_config *config)
                 printf(" -> %s\n", config->files.file[i]);
         }
 }
+
+/*
+ We could also use this command and get empty arguments. We are not
+ interested in that.
+ token = strsep(&full_cmd, white_space);
+
+ TODO:
+  * Handle quoting
+  * Handle dos splits (different arguments do not need to be separated
+    by space) this means allocating argv.
+ */
+bool command_split_args(char *full_cmd, int *argc, const char *argv[], size_t max_argv)
+{
+        char *token;
+        const char* white_space = " \t";
+        *argc = 0;
+        token = strtok(full_cmd, white_space);
+        while (token != NULL) {
+                argv[*argc] = token;
+                (*argc) ++;
+                if (*argc == max_argv) {
+                        return false;
+                }
+                token = strtok(NULL, white_space);
+        }
+        return true;
+}
