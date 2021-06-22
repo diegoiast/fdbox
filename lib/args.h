@@ -50,6 +50,6 @@ int command_config_parse(int argc, char *argv[], struct command_config *config);
 const char *command_config_next(int argc, char *argv[], struct command_config *config);
 void command_config_print(const struct command_config *config);
 
-bool command_split_args(char *full_cmd, int *argc, const char *argv[], size_t max_argv);
+bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv);
 
 #endif //__args_h__

@@ -74,7 +74,7 @@ bool test_args() {
         bool ok = true;
         char c2[256], *c3;
         const char *argv[MAX_ARGV];
-        int argc = -1;
+        size_t argc = 0;
         bool parsing_ok;
 
         // basic argument parsing - can we create argc/argv?

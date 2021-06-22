@@ -162,7 +162,7 @@ void command_config_print(const struct command_config *config)
   * Handle dos splits (different arguments do not need to be separated
     by space) this means allocating argv.
  */
-bool command_split_args(char *full_cmd, int *argc, const char *argv[], size_t max_argv)
+bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv)
 {
         char *token;
         const char* white_space = " \t";
