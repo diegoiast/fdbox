@@ -5,9 +5,9 @@
 #include <string.h>
 
 int snprintf(char *str, size_t size, const char *format, ...) {
-        UNUSED(size);
         int i;
         va_list argp;
+        UNUSED(size);
         va_start(argp, format);
         i = vsprintf(str, format, argp);
         va_end(argp);

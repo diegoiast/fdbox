@@ -11,6 +11,7 @@ dos/call.c
 dos/cd.c
 dos/cls.c
 dos/copymove.c (dos/copymove.h)
+dos/command.c (dos/command.h)
 dos/datetime.c (dos/datetime.h)
 dos/del.c (dos/del.h)
 dos/echo.c

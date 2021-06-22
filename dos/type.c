@@ -6,8 +6,12 @@
 #include "dos/type.h"
 #include "fdbox.h"
 
+#define LINE_PRINT "%5zd  "
+
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
+#undef LINE_PRINT
+#define LINE_PRINT "%5d  "
 #endif
 
 #ifdef _POSIX_C_SOURCE
@@ -59,7 +63,7 @@ int command_type(int argc, char *argv[]) {
                 while (fgets(line, sizeof(line), file)) {
                         line_number ++;
                         if (config.show_lines) {
-                                printf("%5zu  ", line_number);
+                                printf(LINE_PRINT, line_number);
                         }
                         printf("%s", line);
                 }
