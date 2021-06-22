@@ -13,6 +13,7 @@
 #include "dos/cls.h"
 #include "dos/cmd_dir.h"
 #include "dos/copymove.h"
+#include "dos/command.h"
 #include "dos/datetime.h"
 #include "dos/del.h"
 #include "dos/echo.h"
@@ -43,6 +44,7 @@ struct applet commands[] = {{help_beep, command_beep, "beep"},
                             {help_cd, command_cd, "cd"},
                             {help_cls, command_cls, "cls"},
                             {help_copy, command_copy, "copy"},
+                            {help_command, command_command, "command"},
                             {help_date, command_date, "date"},
                             {help_del, command_del, "del"},
                             {help_dir, command_dir, "dir"},

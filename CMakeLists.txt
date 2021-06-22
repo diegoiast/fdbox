@@ -44,6 +44,7 @@ add_executable(
   dos/call.c
   dos/cd.c
   dos/cls.c
+  dos/command.c
   dos/copymove.c
   dos/datetime.c
   dos/del.c
