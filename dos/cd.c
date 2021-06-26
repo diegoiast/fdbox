@@ -43,7 +43,7 @@ int command_cd(int argc, char *argv[]) {
 #error platform not supported yet
 #endif
                 printf("%s\n", cwd);
-                return EXIT_FAILURE;
+                return EXIT_SUCCESS;
         }
         if (argc != 2) {
                 printf("cd can only have a single directory\n");

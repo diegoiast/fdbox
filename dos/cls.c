@@ -27,7 +27,7 @@ int command_cls(int argc, char *argv[]) {
 #endif
         UNUSED(argc);
         UNUSED(argv);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
 }
 
 const char *help_cls() { return "Clear screen"; }
