@@ -40,6 +40,7 @@ add_executable(
   lib/applet.c
   lib/args.c
   lib/strextra.c
+  lib/environ.c
   dos/beep.c
   dos/call.c
   dos/cd.c

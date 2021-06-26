@@ -1,3 +1,8 @@
+/*
+This file is part of fdbox
+For license - read license.txt
+*/
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +10,7 @@
 
 #include "lib/args.h"
 #include "lib/applet.h"
+#include "lib/environ.h"
 #include "lib/strextra.h"
 
 #include "dos/type.h"
@@ -58,7 +64,9 @@ int command_command(int argc, char *argv[]) {
 
         do {
                 /* TODO - print correct prompt */
-                printf("> ");
+                char prompt[256];
+                get_prompt("$P$G", prompt, 256);
+                printf("%s ", prompt);
                 fgets(line, 1024, stdin);
 
                 if ((pos = strchr(line, '\n')) != NULL) {
