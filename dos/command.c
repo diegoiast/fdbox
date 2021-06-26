@@ -81,6 +81,10 @@ int command_command(int argc, char *argv[]) {
                         continue;
                 }
 
+                if (c_argc == 0) {
+                        continue;
+                }
+
                 /* Special handling for exit, as it should break the main loop */
                 if (strcasecmp(c_argv[0], "exit") == 0) {
                          break;
