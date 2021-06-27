@@ -66,7 +66,7 @@ int command_md(int argc, char *argv[]) {
                 /* This is used only to move forward in the pointer, we will not modify the
                  * content of `dir_name`
                  */
-                char *name = (char*) config.global.files.file[i];
+                char *name = (char *)config.global.files.file[i];
                 bool status = mkdir_create_dir(name, &config);
                 if (!status) {
                         return EXIT_FAILURE;
@@ -132,7 +132,7 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
          */
         int r;
 
-        char *c = (char*) dir_name;
+        char *c = (char *)dir_name;
         char c2 = dir_name[0];
         bool failed_once = false;
 

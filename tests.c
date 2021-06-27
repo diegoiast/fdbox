@@ -70,7 +70,7 @@ bool verify_string_equals(const char *arg1, const char *arg2, const char *messag
 
 ///////////////////////////////////////////
 bool test_args() {
-        #define MAX_ARGV 100
+#define MAX_ARGV 100
         bool ok = true;
         char c2[256], *c3;
         const char *argv[MAX_ARGV];
@@ -83,7 +83,7 @@ bool test_args() {
         c3 = "";
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
         strcpy(c2, c3);
-        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(0, argc, "no arguments");
 
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
@@ -91,7 +91,7 @@ bool test_args() {
         c3 = "asd asd";
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
         strcpy(c2, c3);
-        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(2, argc, "2 arguments");
 
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
@@ -99,7 +99,7 @@ bool test_args() {
         c3 = "111 222 333 44             555 666";
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
         strcpy(c2, c3);
-        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(6, argc, "6 arguments, with spaces");
 
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
@@ -107,7 +107,7 @@ bool test_args() {
         c3 = "dir /w";
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
         strcpy(c2, c3);
-        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(2, argc, "2 args - dir /w");
 
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
@@ -115,7 +115,7 @@ bool test_args() {
         c3 = "dir /w /w";
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
         strcpy(c2, c3);
-        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(3, argc, "3 args - dir /w /w");
 
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling) */
@@ -123,24 +123,29 @@ bool test_args() {
         c3 = "dir /w /2";
         /* NOLINTNEXTLINE(clang-analyzer-security.insecureAPI.strcpy) */
         strcpy(c2, c3);
-        parsing_ok = command_split_args(c2,  &argc, argv, MAX_ARGV);
+        parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(3, argc, "3 args - dir /w /2");
         return ok;
 }
 
 /////////// applets
+
+/* clang-format off */
 int applet1(int argc, char *argv[]) { return EXIT_SUCCESS; UNUSED(argc); UNUSED(argv); }
 
 int applet2(int argc, char *argv[]) { return EXIT_SUCCESS; UNUSED(argc); UNUSED(argv); }
 
 int applet3(int argc, char *argv[]) { return EXIT_SUCCESS; UNUSED(argc); UNUSED(argv); }
+/* clang-format on */
 
 bool test_applets() {
+        /* clang-format off */
         struct applet commands[] = {
                 {NULL, &applet1, "applet1"},
                 {NULL, &applet2, "applet2"},
                 {NULL, NULL, NULL}
         };
+        /* clang-format on */
         bool ok = true;
         struct applet *c;
 

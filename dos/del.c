@@ -80,8 +80,8 @@ int command_del(int argc, char *argv[]) {
                 int deleted_files = 0;
                 int deleted_dirs = 0;
 
-                result = del_dir(&config, config.global.files.file[i], &deleted_files, &tested_files,
-                                 &deleted_dirs, &tested_dirs);
+                result = del_dir(&config, config.global.files.file[i], &deleted_files,
+                                 &tested_files, &deleted_dirs, &tested_dirs);
                 total_deleted_dirs += deleted_dirs;
                 total_deleted_files += deleted_files;
                 total_dirs += tested_dirs;

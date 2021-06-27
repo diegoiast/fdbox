@@ -124,8 +124,7 @@ int command_dir(int argc, char *argv[]) {
         if (config.global.files.overflow != 0) {
                 fprintf(stderr, "Warning: %zd/%zd files not be displayed\n",
                         config.global.files.overflow,
-                        config.global.files.overflow + config.global.files.count
-                );
+                        config.global.files.overflow + config.global.files.count);
         }
 
         if (config.global.files.count == 0) {
@@ -326,7 +325,6 @@ static void dir_config_print(struct dir_config *config) {
         command_config_print(&config->global);
 }
 
-
 static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) {
 
         int c;
@@ -353,7 +351,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
 
                 case 'a':
                         /* TODO - attribute support is not supported yet */
-                        argument = argv[config->global.state.current_argument-1];
+                        argument = argv[config->global.state.current_argument - 1];
                         c = tolower(argument[2]);
                         switch (c) {
                         case 'd':
@@ -372,7 +370,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
 
                         break;
                 case 'o':
-                        argument = argv[config->global.state.current_argument-1];
+                        argument = argv[config->global.state.current_argument - 1];
                         c = tolower(argument[2]);
                         switch (c) {
                         case 'n':
@@ -397,11 +395,11 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                         break;
 
                 case ARG_PROCESSED:
-                    break;
+                        break;
                 case ARG_DONE:
-                    break;
+                        break;
                 default:
-                    return false;
+                        return false;
                 }
         } while (c >= 0);
 

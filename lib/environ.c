@@ -4,9 +4,9 @@ For license - read license.txt
 */
 
 #include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "fdbox.h"
@@ -15,12 +15,12 @@ For license - read license.txt
 #include <dir.h>
 #endif
 
-#if defined (_POSIX_C_SOURCE) || defined(__WIN32__)
+#if defined(_POSIX_C_SOURCE) || defined(__WIN32__)
 #include <unistd.h>
 #endif
 
-#include "lib/strextra.h"
 #include "lib/environ.h"
+#include "lib/strextra.h"
 
 /*
  * https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/prompt
@@ -55,10 +55,11 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                                 char date_str[25];
                                 int k;
 
-                                k = snprintf(date_str, 25, "%02d-%02d-%4d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+                                k = snprintf(date_str, 25, "%02d-%02d-%4d", tm.tm_mday,
+                                             tm.tm_mon + 1, tm.tm_year + 1900);
                                 *prompt_string = 0;
                                 strncat(prompt_string, date_str, prompt_str_len);
-                                prompt_string += k -1;
+                                prompt_string += k - 1;
                                 break;
                         }
                         case 'e':
@@ -91,7 +92,7 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                                 prompt--;
                                 break;
                         case 'p': {
-                                char * cwd = (char *)malloc(128);
+                                char *cwd = (char *)malloc(128);
                                 getcwd(cwd, 128);
 /* On Windows and Unix, there are mixed case file systems
  * We will show eaxctly whats given to us
@@ -100,12 +101,12 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
  */
 #ifndef __MSDOS__
                                 if (*prompt == 'p') {
-                                        str_to_lower( cwd );
+                                        str_to_lower(cwd);
                                 }
 #endif
                                 *prompt_string = 0;
                                 strncat(prompt_string, cwd, prompt_str_len);
-                                prompt_string += strlen(cwd) -1;
+                                prompt_string += strlen(cwd) - 1;
                                 free(cwd);
                                 break;
                         }
@@ -120,10 +121,11 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                                 struct tm tm = *localtime(&t);
                                 char time_str[25];
                                 int k;
-                                k = snprintf(time_str, 25, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+                                k = snprintf(time_str, 25, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min,
+                                             tm.tm_sec);
                                 *prompt_string = 0;
                                 strncat(prompt_string, time_str, prompt_str_len);
-                                prompt_string += k -1;
+                                prompt_string += k - 1;
                                 break;
                         case 'v':
                                 *prompt_string = 0;
@@ -140,7 +142,7 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                         break;
                 }
                 prompt++;
-                prompt_string ++;
+                prompt_string++;
         }
 
         *prompt_string = 0;

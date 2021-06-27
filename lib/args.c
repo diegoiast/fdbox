@@ -80,7 +80,6 @@ void print_agrs(int argc, char *argv[]) {
         }
 }
 
-
 void command_config_init(struct command_config *config) {
         config->verbose = false;
         config->show_help = false;
@@ -120,11 +119,11 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
         default:
                 /* ok its a file */
                 if (config->files.count == ARG_MAX_FILES) {
-                        config->files.overflow ++;
+                        config->files.overflow++;
                         return ARG_PROCESSED;
                 }
                 config->files.file[config->files.count] = arg;
-                config->files.count ++;
+                config->files.count++;
                 return ARG_PROCESSED;
         }
 }
@@ -140,13 +139,13 @@ const char *command_config_next(int argc, char *argv[], struct command_config *c
         return arg;
 }
 
-void command_config_print(const struct command_config *config)
-{
+void command_config_print(const struct command_config *config) {
         size_t i;
 
         printf("VERBOSE = %d\n", config->verbose);
         printf("SHOW HELP = %d\n", config->show_help);
-        printf("Glob %zu requested, %zu overflow\n", config->files.count+config->files.overflow, config->files.overflow);
+        printf("Glob %zu requested, %zu overflow\n", config->files.count + config->files.overflow,
+               config->files.overflow);
         for (i = 0; i < config->files.count; i++) {
                 printf(" -> %s\n", config->files.file[i]);
         }
@@ -162,15 +161,14 @@ void command_config_print(const struct command_config *config)
   * Handle dos splits (different arguments do not need to be separated
     by space) this means allocating argv.
  */
-bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv)
-{
+bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv) {
         char *token;
-        const char* white_space = " \t";
+        const char *white_space = " \t";
         *argc = 0;
         token = strtok(full_cmd, white_space);
         while (token != NULL) {
                 argv[*argc] = token;
-                (*argc) ++;
+                (*argc)++;
                 if (*argc == max_argv) {
                         return false;
                 }

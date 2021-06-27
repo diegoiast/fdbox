@@ -8,8 +8,8 @@ For license - read license.txt
 #include <stdlib.h>
 #include <string.h>
 
-#include "lib/args.h"
 #include "lib/applet.h"
+#include "lib/args.h"
 #include "lib/environ.h"
 #include "lib/strextra.h"
 
@@ -70,12 +70,12 @@ int command_command(int argc, char *argv[]) {
                 fgets(line, 1024, stdin);
 
                 if ((pos = strchr(line, '\n')) != NULL) {
-                    *pos = '\0';
+                        *pos = '\0';
                 }
                 /* this function will not modify the args, so its marked `const
                  * but some commands (date/time) will modify the args instead of making copies
                  * this is OK for now */
-                parsed_ok = command_split_args(line, &c_argc, (const char**) c_argv, 256);
+                parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
                 if (!parsed_ok) {
                         fprintf(stderr, "Command line parsing failed\n");
                         continue;
@@ -87,7 +87,7 @@ int command_command(int argc, char *argv[]) {
 
                 /* Special handling for exit, as it should break the main loop */
                 if (strcasecmp(c_argv[0], "exit") == 0) {
-                         break;
+                        break;
                 }
 
                 /* otherwise - we know the drill, we did it once in main.c */
@@ -107,13 +107,12 @@ int command_command(int argc, char *argv[]) {
 const char *help_command() { return "Runs an MS-DOS interactive shell"; }
 
 /* internal API, all functions bellow should be static */
-static void command_shell_config_init(struct command_shell_config *config)
-{
+static void command_shell_config_init(struct command_shell_config *config) {
         command_config_init(&config->global);
 }
 
-static bool command_shell_config_parse(int argc, char *argv[], struct command_shell_config *config)
-{
+static bool command_shell_config_parse(int argc, char *argv[],
+                                       struct command_shell_config *config) {
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
@@ -129,13 +128,11 @@ static bool command_shell_config_parse(int argc, char *argv[], struct command_sh
         return true;
 }
 
-static void command_shell_config_print(const struct command_shell_config *config)
-{
+static void command_shell_config_print(const struct command_shell_config *config) {
         command_config_print(&config->global);
 }
 
-static void command_shell_print_extended_help()
-{
+static void command_shell_print_extended_help() {
         printf("%s\n", help_type());
 
         printf("   type [files] /l\n");

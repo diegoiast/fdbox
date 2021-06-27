@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lib/args.h"
 #include "dos/type.h"
 #include "fdbox.h"
+#include "lib/args.h"
 
 #define LINE_PRINT "%5zd  "
 
@@ -54,14 +54,14 @@ int command_type(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
 
-        for (i=0; i< config.global.files.count; i++) {
-                const char* file_name = config.global.files.file[i];
+        for (i = 0; i < config.global.files.count; i++) {
+                const char *file_name = config.global.files.file[i];
                 FILE *file = fopen(file_name, "r");
                 char line[1024];
                 size_t line_number = 0;
 
                 while (fgets(line, sizeof(line), file)) {
-                        line_number ++;
+                        line_number++;
                         if (config.show_lines) {
                                 printf(LINE_PRINT, line_number);
                         }
@@ -76,20 +76,18 @@ int command_type(int argc, char *argv[]) {
 const char *help_type() { return "Prints the content of a file"; }
 
 /* internal API, all functions bellow should be static */
-static void type_config_init(struct type_config *config)
-{
+static void type_config_init(struct type_config *config) {
         config->show_lines = false;
         command_config_init(&config->global);
 }
 
-static bool type_config_parse(int argc, char *argv[], struct type_config *config)
-{
+static bool type_config_parse(int argc, char *argv[], struct type_config *config) {
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
                 switch (tolower(c)) {
                 case 'l':
-                        config->show_lines= true;
+                        config->show_lines = true;
                         break;
                 case ARG_PROCESSED:
                         break;
@@ -102,14 +100,12 @@ static bool type_config_parse(int argc, char *argv[], struct type_config *config
         return true;
 }
 
-static void type_config_print(const struct type_config *config)
-{
+static void type_config_print(const struct type_config *config) {
         printf("Show lines = %d", config->show_lines);
         command_config_print(&config->global);
 }
 
-static void type_print_extended_help()
-{
+static void type_print_extended_help() {
         printf("%s\n", help_type());
 
         printf("   type [files] /l\n");
