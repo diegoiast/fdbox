@@ -1,7 +1,9 @@
 #include "fdbox.h"
 #include "lib/applet.h"
 #include "lib/args.h"
+#include "lib/environ.h"
 #include "lib/strextra.h"
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,12 +15,14 @@ bool test(const char *message, function_test unittest);
 bool test_args();
 bool test_applets();
 bool test_strings();
+bool test_prompts();
 
 int main(int argc, char *argv[]) {
         bool ok = true;
         ok &= test("applets", test_applets);
         ok &= test("args", test_args);
         ok &= test("strings", test_strings);
+        ok &= test("prompts", test_prompts);
 
         UNUSED(argc);
         UNUSED(argv);
@@ -280,5 +284,52 @@ bool test_strings() {
         ok &= test_str_char_suffix();
         ok &= test_file_basename();
         ok &= test_file_extensions();
+        return ok;
+}
+
+bool test_prompt_letter(char l, char k) {
+        bool ok = true;
+        char p1[16], p2[16];
+        char message[100];
+        int i;
+
+        snprintf(p1, 16, "$%c", l);
+        get_prompt(p1, p2, 256);
+        i = strlen(p2);
+        snprintf(message, 100, "prompt size for $%c", l);
+        ok &= verify_int_equals(i, 1, message);
+        snprintf(message, 100, "char $%c = %d", l, k);
+        ok &= verify_int_equals(p2[0], k, message);
+        return ok;
+}
+
+bool test_prompts() {
+        bool ok = true;
+        char prompt[100], message[200];
+
+        ok &= test_prompt_letter('$', '$');
+        ok &= test_prompt_letter('_', '\n');
+        ok &= test_prompt_letter('a', '&');
+        ok &= test_prompt_letter('b', '|');
+        ok &= test_prompt_letter('c', '(');
+        ok &= test_prompt_letter('e', 27);
+        ok &= test_prompt_letter('g', '>');
+        ok &= test_prompt_letter('h', 8);
+        ok &= test_prompt_letter('l', '<');
+        ok &= test_prompt_letter('q', '=');
+        ok &= test_prompt_letter('s', ' ');
+
+        /* TODO */
+        /* date */
+        /* time */
+        /* drive */
+
+        get_prompt("$V", prompt, 100);
+        ok &= verify_int_equals(strlen(prompt), strlen(FDBOX_VERSION_STR),
+                                "testing prompt version length");
+        snprintf(message, 200, "testing for prompt version, get %s, expected %s", prompt,
+                 FDBOX_VERSION_STR);
+        ok &= verify_string_equals(prompt, FDBOX_VERSION_STR, message);
+
         return ok;
 }

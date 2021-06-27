@@ -26,6 +26,7 @@ add_executable(
   lib/applet.c
   lib/args.c
   lib/strextra.c
+  lib/environ.c
   )
 target_include_directories(tests PUBLIC "${PROJECT_BINARY_DIR}"
                                         "${PROJECT_SOURCE_DIR}")
