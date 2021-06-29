@@ -43,15 +43,53 @@ static bool command_shell_config_parse(int argc, char *argv[], struct command_sh
 static void command_shell_config_print(const struct command_shell_config *config);
 static void command_shell_print_extended_help();
 
-int command_command(int argc, char *argv[]) {
-        char line[1024], *pos;
-        int code;
+/* TODO - I am unsure if this is the best way to tell the main loop
+ * we should exit. For now it works
+ */
+static int command_execute_line(char* line) {
         size_t c_argc;
         char *c_argv[256];
         bool parsed_ok;
-        struct command_shell_config config;
         struct applet *cmd;
+        int code;
         extern struct applet commands[];
+
+        /* this function will not modify the args, so its marked `const
+         * but some commands (date/time) will modify the args instead of making copies
+         * this is OK for now */
+        parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
+        if (!parsed_ok) {
+                fprintf(stderr, "Command line parsing failed\n");
+                return  EXIT_SUCCESS;
+        }
+
+        if (c_argc == 0) {
+                return EXIT_SUCCESS;
+        }
+
+        /* Special handling for exit, as it should break the main loop */
+        if (strcasecmp(c_argv[0], "exit") == 0) {
+                return EXIT_FAILURE;
+        }
+
+        /* otherwise - we know the drill, we did it once in main.c */
+        cmd = find_applet(c_argv[0], commands);
+        if (cmd != NULL) {
+                code = cmd->handler(c_argc, c_argv);
+                if (code != EXIT_SUCCESS) {
+                        fprintf(stderr, "Command failed (%d)\n", code);
+                }
+        } else {
+                fprintf(stderr, "Command not found\n");
+        }
+
+        return EXIT_SUCCESS;
+}
+
+int command_command(int argc, char *argv[]) {
+        char line[1024], *pos;
+        int code;
+        struct command_shell_config config;
 
         command_shell_config_init(&config);
         command_shell_config_parse(argc, argv, &config);
@@ -63,42 +101,23 @@ int command_command(int argc, char *argv[]) {
         }
 
         do {
-                /* TODO - print correct prompt */
                 char prompt[256];
-                get_prompt("$P$G", prompt, 256);
+                const char *t;
+
+                t = getenv("PROMPT");
+                if (t == NULL) {
+                        t = "$P$G";
+                }
+                get_prompt(t, prompt, 256);
                 printf("%s ", prompt);
                 fgets(line, 1024, stdin);
 
                 if ((pos = strchr(line, '\n')) != NULL) {
                         *pos = '\0';
                 }
-                /* this function will not modify the args, so its marked `const
-                 * but some commands (date/time) will modify the args instead of making copies
-                 * this is OK for now */
-                parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
-                if (!parsed_ok) {
-                        fprintf(stderr, "Command line parsing failed\n");
-                        continue;
-                }
-
-                if (c_argc == 0) {
-                        continue;
-                }
-
-                /* Special handling for exit, as it should break the main loop */
-                if (strcasecmp(c_argv[0], "exit") == 0) {
+                code = command_execute_line(line);
+                if (code != EXIT_SUCCESS) {
                         break;
-                }
-
-                /* otherwise - we know the drill, we did it once in main.c */
-                cmd = find_applet(c_argv[0], commands);
-                if (cmd != NULL) {
-                        code = cmd->handler(c_argc, c_argv);
-                        if (code != EXIT_SUCCESS) {
-                                fprintf(stderr, "Command failed (%d)\n", code);
-                        }
-                } else {
-                        fprintf(stderr, "Command not found\n");
                 }
         } while (true);
         return EXIT_SUCCESS;
