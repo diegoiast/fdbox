@@ -18,7 +18,7 @@ int command_help(int argc, char *argv[]) {
         printf("Available applets:\n");
 
         while (app != NULL && app->name != NULL) {
-                printf("    %-20s%s\n", app->name, app->help_text());
+                printf("    %-15s%s\n", app->name, app->help_text());
                 app++;
         }
 

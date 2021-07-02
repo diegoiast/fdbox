@@ -102,8 +102,8 @@ int command_date(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_date() { return "Here should be a basic help for date"; }
-const char *help_time() { return "Here should be a basic help for time"; }
+const char *help_date() { return "Display or modify system time"; }
+const char *help_time() { return "Display or modify system date"; }
 
 static void date_time_config_init(struct date_time_config *config) {
         config->interactive = true;
