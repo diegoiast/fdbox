@@ -5,17 +5,17 @@ borrowed from Unix and maintain (basic) compatibility with
 MSDOS 6.22 `command.com`, while (sometimes) improving. 
 
 <p align="center">
-<div><img src="fdbox-dosbox.png" /></div>
+<img src="fdbox-dosbox.png" />
 </p>
 
 The program compiles also as a native Linux executable
 <p align="center">
-<div ><img src="fdbox-linux.png" /></div>
+<img src="fdbox-linux.png" />
 </p>
 
 .. and Windows as well 
 <p align="center">
-<div ><img src="fdbox-win10.png" /></div>
+<img src="fdbox-win10.png" />
 </p>
 
 ## Status
