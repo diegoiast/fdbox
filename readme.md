@@ -4,10 +4,19 @@ A new command interpreter for FreeDOS. Code will contain usable utilities
 borrowed from Unix and maintain (basic) compatibility with 
 MSDOS 6.22 `command.com`, while (sometimes) improving. 
 
-<div style="text-align:center"><img src="fdbox-dosbox.png" /></div>
+<p align="center">
+<div><img src="fdbox-dosbox.png" /></div>
+</p>
 
-The program compiles also as a native Linux (and windows!) executable
-<div style="text-align:center"><img src="fdbox-linux.png" /></div>
+The program compiles also as a native Linux executable
+<p align="center">
+<div ><img src="fdbox-linux.png" /></div>
+</p>
+
+.. and Windows as well 
+<p align="center">
+<div ><img src="fdbox-win10.png" /></div>
+</p>
 
 ## Status
 
@@ -17,9 +26,10 @@ The program compiles also as a native Linux (and windows!) executable
    standard C code support for localization.
  * `TurboC` does need a proper makefile.
  * All commands support multiple arguments (like Unix shells), unlike DOS
-   which you cannot do `del file1.txt *.bat`
+   which you cannot do `del file1.txt *.bat`, and arguments can come
+   even after file names (not only at the begining of the command).
  * Some commands share the same code (`copy`+`move`, `date`+`time`)
- * Interactive shell will follow. I want to have 4DOS command completion,
+ * Interactive is beeing worked on. I want to have 4DOS command completion,
    or bash. 
 
 ## Implementation status of commands
@@ -35,6 +45,7 @@ The program compiles also as a native Linux (and windows!) executable
 | `md`/`mkdir` |  *done*  |  |
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
 | `type`       |  *done*  | Bonus: support also line numbers printing |
+| `command`    | WIP | This is the main interactive shell. Works only on internal commands for now |
 
 
 ## Building
