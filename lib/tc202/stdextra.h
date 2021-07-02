@@ -3,11 +3,13 @@
 
 #include <stddef.h>
 
-#ifdef __MSDOS__
+#if defined(__MSDOS__)
 /* This came in C99, as we do not have it - emulate it lamely */
 int snprintf(char *str, size_t size, const char *format, ...);
 #define strcasecmp strcmpi
+#endif
 
+#if defined(__MSDOS__) || defined(__WIN32__)
 #define setenv setenv_impl
 #endif
 

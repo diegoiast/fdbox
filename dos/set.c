@@ -11,7 +11,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-#ifdef __MSDOS__
+#if defined(__MSDOS__) || defined(__WIN32__)
 /* setenv is not supported under TC, implement this locally
  * using `putenv()`
  */

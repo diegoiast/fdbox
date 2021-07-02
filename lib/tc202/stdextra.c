@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #endif
 
+#if defined(__MSDOS__)
 int snprintf(char *str, size_t size, const char *format, ...) {
         int i;
         va_list argp;
@@ -21,13 +22,13 @@ int snprintf(char *str, size_t size, const char *format, ...) {
         va_end(argp);
         return i;
 }
+#endif
 
 bool save_env_locally(const char *name, char *value);
 
 #define SAVED_ENV_LENGTH 20
 char *saved_env[SAVED_ENV_LENGTH] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-
 
 int setenv_impl(const char *name, const char *value, int overwrite) {
         char *c;

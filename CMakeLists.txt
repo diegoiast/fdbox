@@ -71,7 +71,11 @@ add_executable(
   unix/tail.c)
 
 if(WIN32)
-  target_sources(fdbox PRIVATE lib/win32/win32-glob.c lib/win32/win32-glob.h)
+  target_sources(fdbox PRIVATE
+      lib/win32/win32-glob.c
+      lib/win32/win32-glob.h
+      lib/tc202/stdextra.c
+    )
 endif()
 
 target_include_directories(fdbox PUBLIC "${PROJECT_BINARY_DIR}"
