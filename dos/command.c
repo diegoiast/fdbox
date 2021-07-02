@@ -109,7 +109,7 @@ int command_command(int argc, char *argv[]) {
                         t = "$P$G";
                 }
                 get_prompt(t, prompt, 256);
-                printf("%s ", prompt);
+                printf("%s", prompt);
                 fgets(line, 1024, stdin);
 
                 if ((pos = strchr(line, '\n')) != NULL) {

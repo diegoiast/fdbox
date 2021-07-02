@@ -46,6 +46,8 @@ The program compiles also as a native Linux executable
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
 | `type`       |  *done*  | Bonus: support also line numbers printing |
 | `command`    | WIP | This is the main interactive shell. Works only on internal commands for now |
+| `prompt`     |  *done*  | |
+| `set`        |  *done*  | Does not handle quoting properly due to internal library issues |
 
 
 ## Building
