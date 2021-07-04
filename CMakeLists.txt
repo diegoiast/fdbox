@@ -59,7 +59,6 @@ add_executable(
   dos/md.c
   dos/path.c
   dos/prompt.c
-  dos/pwd.c
   dos/reboot.c
   dos/rem.c
   dos/set.c
