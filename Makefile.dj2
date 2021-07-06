@@ -1,4 +1,4 @@
-CFLAGS=-I. -Ilib -Idos
+CFLAGS=-I. -Ilib -Idos -O2
 
 OBJECTS=applets.o main.o help.o \
 	dos/beep.o \

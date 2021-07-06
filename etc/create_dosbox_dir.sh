@@ -2,7 +2,7 @@
 
 set -x
 set -e
-MAIN=dosbox2
+MAIN=dosbox
 DOWNLOAD_DIR=zip
 
 # TurboC can be downloaded from here, but from argive.org its easier
@@ -42,9 +42,9 @@ $DJGPP_BASE/v2/faq230b.zip
 $DJGPP_BASE/v2/pakk023b.zip
 $DJGPP_BASE/v2apps/rhid15ab.zip
 $DJGPP_BASE/v2gnu/bnu2351b.zip
-$DJGPP_BASE/v2gnu/gcc930b.zip
+$DJGPP_BASE/v2gnu/gcc1030b.zip
 $DJGPP_BASE/v2gnu/gdb801b.zip
-$DJGPP_BASE/v2gnu/gpp930b.zip
+$DJGPP_BASE/v2gnu/gpp1030b.zip
 $DJGPP_BASE/v2gnu/mak43b.zip
 $DJGPP_BASE/v2misc/csdpmi7b.zip
 $DJGPP_BASE/v2tk/allegro/all422ar2.zip
