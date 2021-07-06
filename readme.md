@@ -50,6 +50,13 @@ The program compiles also as a native Linux executable
 | `set`        |  *done*  | Does not handle quoting properly due to internal library issues |
 
 
+## Compiler support
+ 1. Linux: Clang/GCC - this is the main development environment. Supported.
+ 2. Windows10: MinGW/TCM (9) - this is the main development environment. Supported.
+ 3. DOS: TC 2.02 - this is the main development environment. Supported.
+ 4. DOS: DJGPP - I am haing problems in runtime. Seems like `tolower()` is breaking
+    my code. Might be a compiler bug, I should choose another version of DJGPP.
+
 ## Building
 
 The assumption is that this project will be developed on
