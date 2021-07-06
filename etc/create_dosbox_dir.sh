@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 set -x
 set -e
@@ -31,23 +31,27 @@ https://github.com/open-watcom/open-watcom-v2/releases/download/Current-build/op
 '
 
 # Choose the zip picker, been doing this since 1998. Crap.
-DJGPP_FILES='
-http://www.delorie.com/pub/djgpp/current/v2/copying.dj
-http://www.delorie.com/pub/djgpp/current/v2/djdev205.zip
-http://www.delorie.com/pub/djgpp/current/v2/faq230b.zip
-http://www.delorie.com/pub/djgpp/current/v2/pakk023b.zip
-http://www.delorie.com/pub/djgpp/current/v2apps/rhid15ab.zip
-http://www.delorie.com/pub/djgpp/current/v2gnu/bnu234b.zip
-http://www.delorie.com/pub/djgpp/current/v2gnu/gcc930b.zip
-http://www.delorie.com/pub/djgpp/current/v2gnu/gdb801b.zip
-http://www.delorie.com/pub/djgpp/current/v2gnu/gpp930b.zip
-http://www.delorie.com/pub/djgpp/current/v2gnu/mak43b.zip
-http://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
-http://www.delorie.com/pub/djgpp/current/v2tk/allegro/all422ar2.zip
-http://www.delorie.com/pub/djgpp/current/v2tk/allegro/all422br2.zip
-http://www.delorie.com/pub/djgpp/current/v2tk/grx249s.zip
-http://www.delorie.com/pub/djgpp/current/v2tk/pdcur39a.zip
-'
+DJGPP_BASE="http://www.delorie.com/pub/djgpp/current"
+# DJGPP_BASE="ftp://ftp.fu-berlin.de/pc/languages/djgpp/current"
+# DJGPP_BASE="http://djgpp.mirror.garr.it/current"
+
+DJGPP_FILES="
+$DJGPP_BASE/v2/copying.dj
+$DJGPP_BASE/v2/djdev205.zip
+$DJGPP_BASE/v2/faq230b.zip
+$DJGPP_BASE/v2/pakk023b.zip
+$DJGPP_BASE/v2apps/rhid15ab.zip
+$DJGPP_BASE/v2gnu/bnu2351b.zip
+$DJGPP_BASE/v2gnu/gcc930b.zip
+$DJGPP_BASE/v2gnu/gdb801b.zip
+$DJGPP_BASE/v2gnu/gpp930b.zip
+$DJGPP_BASE/v2gnu/mak43b.zip
+$DJGPP_BASE/v2misc/csdpmi7b.zip
+$DJGPP_BASE/v2tk/allegro/all422ar2.zip
+$DJGPP_BASE/v2tk/allegro/all422br2.zip
+$DJGPP_BASE/v2tk/grx249s.zip
+$DJGPP_BASE/v2tk/pdcur39a.zip
+"
 
 # still have no idea how to use this :)
 GCC_IA16_FILES='
@@ -60,11 +64,13 @@ https://github.com/tkchia/build-ia16/releases/download/20191010/i16elklc.zip
 '
 
 # this is nice - but I am having bash problems, and unsure how safe it is to use
-# https://winworldpc.com/download/c28d2431-c28d-5737-11c3-a7c29d255254
+# https://winworldpc.com/product/borland-turbo-c/2x
 TC1_FILE='http://julian.winworldpc.com/Abandonware Applications/PC/Borland Turbo C++ 1.01 (3.5).7z'
+TC1_FILE='https://dl-alt1.winworldpc.com/Abandonware%20Applications/PC/Borland%20Turbo%20C%202.01%20(3.5).7z'
 
-# https://winworldpc.com/download/c28d2431-c28d-5737-11c3-a7c29d255254
+# https://winworldpc.com/product/turbo-c/3x
 TC30_FILE='http://julian.winworldpc.com/Borland Turbo CPP 3.0 (5.25-1.2mb).7z'
+TC30_FILE='https://dl.winworldpc.com/Borland%20Turbo%20CPP%203.0%20(5.25-1.2mb).7z'
 
 FREEDOS="
 https://github.com/FDOS/freecom/releases/download/com084pre7/com084b7-xmsswap.zip
@@ -72,14 +78,13 @@ http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/append/appe506x.zip
 http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/xcopy/xwcpy081.zip
 http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/attrib/attrib121.zip
 http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/deltree/deltree102g.zip
-http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/mem/mem1_11.zip
-http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/more/more43.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/mem/1.11/mem1_11.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/more/4.3/more43.zip
 http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/type/type20.zip
-http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/tree/tree372x.zip
-http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/edit/edit09ax.zip
-http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/label/label122.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/tree/3.7/tree372x.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/edit/0.9/edit09ax.zip
+http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/label/1.4/label14.zip
 "
-
 
 function download_files()
 {
@@ -99,17 +104,17 @@ function download_files()
         # gcc ia16 are not dos compatible, are compressed using 7z the following
         # command does not work for them:
         # unzip -qxu $i -d $EXTRACT_DIR
-        7z x -y -O$EXTRACT_DIR $i > /dev/null
+        7z x -y -O$EXTRACT_DIR "$i" > /dev/null
     done
 }
 
 rm -fr $MAIN
 
 download_files "$ONLINE_ZIPS"    $DOWNLOAD_DIR         $MAIN
-download_files "$GCC_IA16_FILES" $DOWNLOAD_DIR/GCC     $MAIN/GCC
+# download_files "$GCC_IA16_FILES" $DOWNLOAD_DIR/GCC     $MAIN/GCC
 download_files "$DJGPP_FILES"    $DOWNLOAD_DIR/DJGPP   $MAIN/DJGPP
 download_files "$FREEDOS"        $DOWNLOAD_DIR/FREEDOS $MAIN/FREEDOS
-#download_files "$TC1_FILE"      $DOWNLOAD_DIR/TC1     $MAIN/TC1
+# download_files "$TC1_FILE"      $DOWNLOAD_DIR/TC1     $MAIN/TC1
 #download_files "$TC30_FILE"     $DOWNLOAD_DIR/TC1     $MAIN/TC3
 
 # special unzip - this is an EXE, not handled by the function
@@ -132,9 +137,9 @@ mv $MAIN/FREEDOS/help/*     $MAIN/FREEDOS/HELP/
 rm -fr $MAIN/FREEDOS/help/
 mv $MAIN/FREEDOS/nls/*     $MAIN/FREEDOS/NLS/
 rm -fr $MAIN/FREEDOS/nls/
-mv $MAIN/FREEDOS/*.exe     $MAIN/FREEDOS/BIN/
-mv $MAIN/FREEDOS/*.com     $MAIN/FREEDOS/BIN/
-mv $MAIN/FREEDOS/*.EXE     $MAIN/FREEDOS/BIN/
-mv $MAIN/FREEDOS/*.COM     $MAIN/FREEDOS/BIN/
+mv $MAIN/FREEDOS/*.exe     $MAIN/FREEDOS/BIN/ || true
+mv $MAIN/FREEDOS/*.com     $MAIN/FREEDOS/BIN/ || true
+mv $MAIN/FREEDOS/*.EXE     $MAIN/FREEDOS/BIN/ || true
+mv $MAIN/FREEDOS/*.COM     $MAIN/FREEDOS/BIN/ || true
 
 cp autoexec.bat            $MAIN/AUTOEXEC.BAT
