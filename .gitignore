@@ -6,3 +6,7 @@ build
 # TurboC creates garbage at the root dir, safe to ignore
 *.OBJ
 FDBOX.EXE
+TESTS.EXE
+
+# DJGGPP's makefile is a mess :)
+*.O

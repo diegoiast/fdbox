@@ -57,23 +57,25 @@ Linux (or any Posix compliant OS), and will maintain compatibilty
 with DOS at all times. The reason, is for better tooling (git,
 valgrind, strace, text-editors, clag-format ...etc).
 
-Code is strictly C (asm where needed). Supported environments:
+Code is strictly C (asm where needed, nothing added yet). Supported environments:
 
- * MS-DOS/FreeDOS/dosbox
+ * FreeDOS/MS-DOS/dosbox
     * TurboC 2.01 -  http://edn.embarcadero.com/article/20841
-    * PacificC - http://www.grifo.com/SOFT/Pacific/uk_pacific.html (WIP)
-    * OpenWatcoom  -http://www.openwatcom.com/ (WIP)
-    * GCC ia16 - https://github.com/tkchia/gcc-ia16 (WIP)
-    * OrangcC - https://github.com/LADSoft/OrangeC (WIP)
+    * DJGPP - http://www.delorie.com/djgpp/ (WIP, interactive shell not working)
+    * PacificC - http://www.grifo.com/SOFT/Pacific/uk_pacific.html (soon)
+    * OpenWatcoom  - http://www.openwatcom.com/ (soon)
+    * GCC ia16 - https://github.com/tkchia/gcc-ia16 (soon)
+    * OrangcC - https://github.com/LADSoft/OrangeC (soon)
  * Linux
     * GCC / CLang + CMake.
  * Windows
     * GCC / CLang + CMake
-    * https://github.com/LADSoft/OrangeC (WIP)
+    * https://github.com/LADSoft/OrangeC (soon)
     * VisualStudio (?)
- * BSD ? (should work)
- * OSX ? (should work)
- * SerenityOS (WIP)
+    * OpenWatcoom  - http://www.openwatcom.com/ (soon)
+ * BSD ? (should work, untested)
+ * OSX ? (should work, untested)
+ * SerenityOS (soon)
 
 
 Check out this git repository:
@@ -111,7 +113,9 @@ need to install the CMake extension (https://marketplace.visualstudio.com/items?
 and C++ support (https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools).
 
 If you plan on building this on DOS - there is a TurboC 2.02 project. Code
-does compile under TC - its tested all the time.
+does compile under TC - its tested all the time. If you want to test DJGPP/RHIDE
+there is a batch file which will run the correct Makefile (under the generated dos drive, 
+see DosBox setup bellow).
 
 ## Why?
 Because.

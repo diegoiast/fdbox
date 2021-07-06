@@ -54,4 +54,3 @@ void globfree(glob_t *pglob);
 #endif
 
 #endif /* ifndef GLOB_H */
-

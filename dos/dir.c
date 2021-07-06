@@ -332,7 +332,8 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
 
         do {
                 c = command_config_parse(argc, argv, &config->global);
-                switch (tolower(c)) {
+                c = tolower(c);
+                switch (c) {
                 case 'p':
                         config->pause = true;
                         break;
@@ -393,7 +394,6 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                                 return false;
                         }
                         break;
-
                 case ARG_PROCESSED:
                         break;
                 case ARG_DONE:

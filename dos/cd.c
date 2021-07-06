@@ -1,8 +1,9 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if __linux__
+#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__)
 #include <limits.h>
 #include <pwd.h>
 #include <stdio.h>

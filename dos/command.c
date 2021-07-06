@@ -135,7 +135,8 @@ static bool command_shell_config_parse(int argc, char *argv[],
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
-                switch (tolower(c)) {
+                c = tolower(c);
+                switch (c) {
                 case ARG_PROCESSED:
                         break;
                 case ARG_DONE:

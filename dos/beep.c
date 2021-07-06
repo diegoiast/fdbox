@@ -27,7 +27,8 @@ int command_beep(int argc, char *argv[]) {
 
         do {
                 c = command_config_parse(argc, argv, &config);
-                switch (tolower(c)) {
+                c = tolower(c);
+                switch (c) {
                 case 'f':
                         argument = command_config_next(argc, argv, &config);
                         if (argument == NULL) {
@@ -75,16 +76,13 @@ int command_beep(int argc, char *argv[]) {
                 printf("\n  \t length of the beep in milliseconds");
                 return EXIT_SUCCESS;
         }
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__) || defined(__APPLE__) || defined(__DJGPP__)
         printf("\a");
         UNUSED(frequency);
         UNUSED(length);
-#endif
-
-#if defined(WIN32)
+#elif defined(WIN32)
         Beep(frequency, length);
 #elif defined(__MSDOS__)
-
         sound(frequency);
         delay(length);
         nosound();

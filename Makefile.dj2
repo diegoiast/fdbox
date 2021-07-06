@@ -1,0 +1,110 @@
+CFLAGS=-I. -Ilib -Idos
+
+OBJECTS=applets.o main.o help.o \
+	dos/beep.o \
+	dos/call.o \
+	dos/cd.o \
+	dos/cls.o \
+	dos/command.o \
+	dos/copymove.o \
+	dos/datetime.o \
+	dos/del.o \
+	dos/dir.o \
+	dos/echo.o \
+	dos/exit.o \
+	dos/for.o \
+	dos/goto.o \
+	dos/if.o \
+	dos/md.o \
+	dos/rem.o \
+	dos/path.o \
+	dos/prompt.o \
+	dos/set.o \
+	dos/shift.o \
+	dos/type.o \
+	dos/reboot.o \
+	lib/applet.o \
+	lib/args.o \
+	lib/strextra.o \
+	lib/environ.o \
+
+.PHONY: clean all
+
+all: fdbox tests
+
+clean:
+	del *.o
+	del dos\*.o
+	del lib\*.o
+
+fdbox: $(OBJECTS)
+	$(CC) $(OBJECTS) -o fdbox.exe
+
+tests: tests.o lib/applet.o lib/args.o lib/strextra.o lib/environ.o
+	$(CC) tests.o lib/applet.o lib/args.o lib/strextra.o lib/environ.o -o tests.exe
+
+##################
+
+main.o: main.c
+
+tests.o: tests.c
+
+applets.o: applets.c
+
+help.o: help.c
+
+dos/beep.o: dos/beep.c
+
+dos/call.o: dos/call.c
+
+dos/cd.o: dos/cd.c
+
+dos/cls.o: dos/cls.c
+
+dos/command.o: dos/command.c
+
+dos/copymove.o: dos/copymove.c
+
+dos/datetime.o: dos/datetime.c
+
+dos/del.o: dos/del.c
+
+dos/dir.o: dos/dir.c
+
+dos/echo.o: dos/echo.c
+
+dos/exit.o: dos/exit.c
+
+dos/for.o: dos/for.c
+
+dos/goto.o: dos/goto.c
+
+dos/if.o: dos/if.c
+
+dos/md.o: dos/md.c
+
+dos/path.o: dos/path.c
+
+dos/prompt.o: dos/prompt.c
+
+dos/reboot.o: dos/reboot.c
+
+dos/rem.o: dos/rem.c
+
+dos/set.o: dos/set.c
+
+dos/shift.o: dos/shift.c
+
+dos/type.o: dos/type.c
+
+dos/reboot.o: dos/reboot.c
+
+help.o: help.c
+
+lib/applet.o: lib/applet.c
+
+lib/args.o: lib/args.c
+
+lib/environ.o: lib/environ.c
+
+lib/strextra.o: lib/strextra.c

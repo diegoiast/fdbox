@@ -18,13 +18,13 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-#ifdef __MSDOS__
+#ifdef __TURBOC__
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #endif
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__)
 #include <glob.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -164,7 +164,8 @@ static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *c
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
-                switch (tolower(c)) {
+                c = tolower(c);
+                switch (c) {
                 case 'a':
                         if (config->move_files)
                                 return false;

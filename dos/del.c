@@ -124,7 +124,8 @@ bool del_config_parse(int argc, char *argv[], struct del_config *config) {
         int c;
         do {
                 c = command_config_parse(argc, argv, &config->global);
-                switch (tolower(c)) {
+                c = tolower(c);
+                switch (c) {
                 case 'p':
                         config->prompt = true;
                         break;
