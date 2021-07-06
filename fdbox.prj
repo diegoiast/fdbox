@@ -23,7 +23,6 @@ dos/if.c
 dos/md.c (dos/md.h)
 dos/path.c
 dos/prompt.c
-dos/pwd.c
 dos/reboot.c
 dos/rem.c
 dos/set.c
