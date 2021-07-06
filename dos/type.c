@@ -82,10 +82,11 @@ static void type_config_init(struct type_config *config) {
 }
 
 static bool type_config_parse(int argc, char *argv[], struct type_config *config) {
-        int c;
+        int c1, c2;
         do {
-                c = command_config_parse(argc, argv, &config->global);
-                switch (tolower(c)) {
+                c1 = command_config_parse(argc, argv, &config->global);
+                c2 = tolower(c1);
+                switch (c2) {
                 case 'l':
                         config->show_lines = true;
                         break;
@@ -96,7 +97,7 @@ static bool type_config_parse(int argc, char *argv[], struct type_config *config
                 default:
                         return false;
                 }
-        } while (c >= 0);
+        } while (c1 >= 0);
         return true;
 }
 

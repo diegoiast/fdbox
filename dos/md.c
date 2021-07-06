@@ -83,11 +83,11 @@ static void mkdir_config_init(struct mkdir_config *config) {
 }
 
 static bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *config) {
-        int c;
+        int c1, c2;
         do {
-                c = command_config_parse(argc, argv, &config->global);
-                c = tolower(c);
-                switch (c) {
+                c1 = command_config_parse(argc, argv, &config->global);
+                c2 = tolower(c1);
+                switch (c2) {
                 case 'r':
                         config->recursive = true;
                         break;
@@ -98,7 +98,7 @@ static bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *conf
                 default:
                         return false;
                 }
-        } while (c >= 0);
+        } while (c1 >= 0);
 
         return true;
 }

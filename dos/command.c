@@ -132,11 +132,11 @@ static void command_shell_config_init(struct command_shell_config *config) {
 
 static bool command_shell_config_parse(int argc, char *argv[],
                                        struct command_shell_config *config) {
-        int c;
+        int c1, c2;
         do {
-                c = command_config_parse(argc, argv, &config->global);
-                c = tolower(c);
-                switch (c) {
+                c1 = command_config_parse(argc, argv, &config->global);
+                c2 = tolower(c1);
+                switch (c2) {
                 case ARG_PROCESSED:
                         break;
                 case ARG_DONE:
@@ -144,7 +144,7 @@ static bool command_shell_config_parse(int argc, char *argv[],
                 default:
                         return false;
                 }
-        } while (c >= 0);
+        } while (c1 >= 0);
         return true;
 }
 

@@ -327,13 +327,13 @@ static void dir_config_print(struct dir_config *config) {
 
 static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) {
 
-        int c;
+        int c1, c2;
         const char *argument;
 
         do {
-                c = command_config_parse(argc, argv, &config->global);
-                c = tolower(c);
-                switch (c) {
+                c1 = command_config_parse(argc, argv, &config->global);
+                c2 = tolower(c1);
+                switch (c2) {
                 case 'p':
                         config->pause = true;
                         break;
@@ -353,8 +353,8 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                 case 'a':
                         /* TODO - attribute support is not supported yet */
                         argument = argv[config->global.state.current_argument - 1];
-                        c = tolower(argument[2]);
-                        switch (c) {
+                        c2 = tolower(argument[2]);
+                        switch (c2) {
                         case 'd':
                                 break;
                         case 'h':
@@ -372,8 +372,8 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                         break;
                 case 'o':
                         argument = argv[config->global.state.current_argument - 1];
-                        c = tolower(argument[2]);
-                        switch (c) {
+                        c2 = tolower(argument[2]);
+                        switch (c2) {
                         case 'n':
                                 flag_set(&config->sort_order, SORT_NAME, true);
                                 break;
@@ -390,7 +390,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                                 flag_set(&config->sort_order, SORT_SIZE, true);
                                 break;
                         default:
-                                printf("invalid sort argument %c/\n", c);
+                                printf("invalid sort argument %c/\n", c2);
                                 return false;
                         }
                         break;
@@ -401,7 +401,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                 default:
                         return false;
                 }
-        } while (c >= 0);
+        } while (c1 >= 0);
 
         return true;
 }

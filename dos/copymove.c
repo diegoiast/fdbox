@@ -161,11 +161,11 @@ static void copy_move_config_init(struct copy_config *config) {
  */
 
 static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *config) {
-        int c;
+        int c1, c2;
         do {
-                c = command_config_parse(argc, argv, &config->global);
-                c = tolower(c);
-                switch (c) {
+                c1 = command_config_parse(argc, argv, &config->global);
+                c2 = tolower(c1);
+                switch (c2) {
                 case 'a':
                         if (config->move_files)
                                 return false;
@@ -181,7 +181,7 @@ static bool copy_move_parse_config(int argc, char *argv[], struct copy_config *c
                 default:
                         return false;
                 }
-        } while (c >= 0);
+        } while (c1 >= 0);
 
         config->source_file = config->global.files.file[0];
         config->dest_file = config->global.files.file[1];

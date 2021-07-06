@@ -22,13 +22,13 @@ int command_beep(int argc, char *argv[]) {
         struct command_config config;
         int frequency = -1;
         int length = -1;
-        int c;
+        int c1, c2;
         const char *argument;
 
         do {
-                c = command_config_parse(argc, argv, &config);
-                c = tolower(c);
-                switch (c) {
+                c1 = command_config_parse(argc, argv, &config);
+                c2 = tolower(c1);
+                switch (c2) {
                 case 'f':
                         argument = command_config_next(argc, argv, &config);
                         if (argument == NULL) {
@@ -58,10 +58,10 @@ int command_beep(int argc, char *argv[]) {
                 case ARG_DONE:
                         break;
                 default:
-                        printf("No supported argument /%c\n", c);
+                        printf("No supported argument /%c\n", c2);
                         return EXIT_FAILURE;
                 }
-        } while (c >= 0);
+        } while (c1 >= 0);
 
         if (config.files.count != 0) {
                 printf("Invalid argument: %s\n", config.files.file[0]);
