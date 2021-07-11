@@ -15,6 +15,7 @@ dos/copymove.c (dos/copymove.h)
 dos/command.c (dos/command.h)
 dos/datetime.c (dos/datetime.h)
 dos/del.c (dos/del.h)
+dos/dir.c (dos/cmd_dir.h)
 dos/echo.c
 dos/exit.c
 dos/for.c
@@ -28,4 +29,4 @@ dos/rem.c
 dos/set.c
 dos/shift.c
 dos/type.c
-dos/dir.c (dos/cmd_dir.h)
+dos/ver.c

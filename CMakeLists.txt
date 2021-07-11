@@ -64,6 +64,7 @@ add_executable(
   dos/set.c
   dos/shift.c
   dos/type.c
+  dos/ver.c
   unix/cal.c
   unix/head.c
   unix/hexdump.c

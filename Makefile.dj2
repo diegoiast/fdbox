@@ -19,10 +19,11 @@ OBJECTS=applets.o main.o help.o \
 	dos/rem.o \
 	dos/path.o \
 	dos/prompt.o \
+	dos/reboot.o \
 	dos/set.o \
 	dos/shift.o \
 	dos/type.o \
-	dos/reboot.o \
+	dos/ver.o \
 	lib/applet.o \
 	lib/args.o \
 	lib/strextra.o \
