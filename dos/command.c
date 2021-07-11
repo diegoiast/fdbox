@@ -46,7 +46,7 @@ static void command_shell_print_extended_help();
 /* TODO - I am unsure if this is the best way to tell the main loop
  * we should exit. For now it works
  */
-static int command_execute_line(char* line) {
+static int command_execute_line(char *line) {
         size_t c_argc;
         char *c_argv[256];
         bool parsed_ok;
@@ -60,7 +60,7 @@ static int command_execute_line(char* line) {
         parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
         if (!parsed_ok) {
                 fprintf(stderr, "Command line parsing failed\n");
-                return  EXIT_SUCCESS;
+                return EXIT_SUCCESS;
         }
 
         if (c_argc == 0) {

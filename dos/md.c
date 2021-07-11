@@ -140,7 +140,7 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
         do {
 #if defined(__DJGPP__) || defined(_POSIX_C_SOURCE)
                 r = mkdir(dir_name, 0755);
-#elif defined( __TURBOC__) || defined(__WIN32__)
+#elif defined(__TURBOC__) || defined(__WIN32__)
                 r = mkdir(dir_name);
 #endif
                 failed_once |= r != 0;
@@ -161,7 +161,7 @@ static bool mkdir_create_dir(char *dir_name, const struct mkdir_config *config) 
         if (failed_once) {
 #if defined(__DJGPP__) || defined(_POSIX_C_SOURCE)
                 r = mkdir(dir_name, 0755);
-#elif defined( __TURBOC__) || defined(__WIN32__)
+#elif defined(__TURBOC__) || defined(__WIN32__)
                 r = mkdir(dir_name);
 #endif
         }

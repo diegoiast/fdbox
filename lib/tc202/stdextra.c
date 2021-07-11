@@ -51,8 +51,7 @@ int setenv_impl(const char *name, const char *value, int overwrite) {
         return putenv(var);
 }
 
-void clear_env()
-{
+void clear_env() {
         int i;
         for (i = 0; i < SAVED_ENV_LENGTH; i++) {
                 free(saved_env[i]);

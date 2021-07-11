@@ -13,7 +13,6 @@ int snprintf(char *str, size_t size, const char *format, ...);
 #define setenv setenv_impl
 #endif
 
-
 int setenv_impl(const char *name, const char *value, int overwrite);
 void clear_env();
 

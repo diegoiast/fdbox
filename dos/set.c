@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lib/tc202/stdextra.h"
 #include "dos/set.h"
 #include "fdbox.h"
+#include "lib/tc202/stdextra.h"
 
 /*
 This file is part of fdbox

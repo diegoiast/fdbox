@@ -18,8 +18,8 @@ For license - read license.txt
 
 int command_prompt(int argc, char *argv[]) {
         int r;
-        const char* name = "PROMPT";
-        const char* val;
+        const char *name = "PROMPT";
+        const char *val;
         if (argc == 1) {
                 val = "$P$G";
         } else {
