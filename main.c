@@ -1,3 +1,5 @@
+#include "dos/command.h"
+#include "dos/ver.h"
 #include "fdbox.h"
 #include "help.h"
 #include "lib/applet.h"
@@ -14,6 +16,19 @@ int main(int argc, char *argv[]) {
                 /* shift argument list left, now applet name is argv[0] */
                 return cmd->handler(argc - 1, ++argv);
         }
-        command_help(argc, argv);
-        return EXIT_FAILURE;
+
+        struct command_config config;
+        command_config_init(&config);
+        command_config_parse(argc, argv, &config);
+
+        if (config.show_help) {
+                command_help(argc - 1, ++argv);
+                return EXIT_SUCCESS;
+        }
+
+        /* OK - this is not verbose, but version */
+        if (config.verbose) {
+                return command_ver(argc - 1, ++argv);
+        }
+        return command_command(argc - 1, ++argv);
 }
