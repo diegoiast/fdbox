@@ -12,12 +12,13 @@ extern struct applet commands[];
 
 int main(int argc, char *argv[]) {
         struct applet *cmd = find_applet(argv[1], commands);
+        struct command_config config;
+
         if (cmd != NULL) {
                 /* shift argument list left, now applet name is argv[0] */
                 return cmd->handler(argc - 1, ++argv);
         }
 
-        struct command_config config;
         command_config_init(&config);
         command_config_parse(argc, argv, &config);
 
