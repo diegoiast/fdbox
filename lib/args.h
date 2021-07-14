@@ -51,5 +51,6 @@ const char *command_config_next(int argc, char *argv[], struct command_config *c
 void command_config_print(const struct command_config *config);
 
 bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv);
+bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_line_size);
 
 #endif //__args_h__
