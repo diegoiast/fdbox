@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#include "lib/args.h"
-#include "lib/environ.h"
 #include "dos/echo.h"
 #include "fdbox.h"
+#include "lib/args.h"
+#include "lib/environ.h"
 
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
@@ -21,11 +20,11 @@ For license - read license.txt
 bool echo_is_on;
 
 int command_echo(int argc, char *argv[]) {
-        char line[1024*4];
-        char expanded[1024*4];
+        char line[1024 * 4];
+        char expanded[1024 * 4];
 
         if (argc == 1) {
-                printf("Echo is %s\n", echo_is_on ? "ON" : "OFF" );
+                printf("Echo is %s\n", echo_is_on ? "ON" : "OFF");
                 return EXIT_SUCCESS;
         }
 
@@ -40,7 +39,7 @@ int command_echo(int argc, char *argv[]) {
                 }
         }
 
-        if (!command_merge_args(argc-1, argv+1, line, sizeof (line))) {
+        if (!command_merge_args(argc - 1, argv + 1, line, sizeof(line))) {
                 fprintf(stderr, "Warning - could not expand line\n");
         }
 

@@ -176,19 +176,18 @@ bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t
         return true;
 }
 
-bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_line_size)
-{
+bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_line_size) {
         size_t i = 0, l = 0;
 
         line[0] = 0;
-        for (i=0; i < argc; i++) {
+        for (i = 0; i < argc; i++) {
                 size_t k = strlen(argv[i]);
                 if (l + k >= max_line_size) {
                         return false;
                 }
                 strncat(line, argv[i], max_line_size);
-                strncat(line,  " ", max_line_size);
+                strncat(line, " ", max_line_size);
                 l += k;
         };
-        return  true;
+        return true;
 }

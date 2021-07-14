@@ -140,7 +140,6 @@ bool test_var_expand() {
         char parsed[256];
         bool ok = true;
 
-
         strcpy(orig, "");
         expand_string(orig, parsed, sizeof(parsed));
         ok |= verify_string_equals(orig, parsed, "empty string");
@@ -148,7 +147,6 @@ bool test_var_expand() {
         strcpy(orig, "hello");
         expand_string(orig, parsed, sizeof(parsed));
         ok |= verify_string_equals(orig, parsed, "no vars");
-
 
         strcpy(orig, "[%%]");
         expand_string(orig, parsed, sizeof(parsed));

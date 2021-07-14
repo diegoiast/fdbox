@@ -10,5 +10,5 @@ For license - read license.txt
 
 char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len);
 
-void expand_string(const char* src, char* dest, size_t dest_length);
+void expand_string(const char *src, char *dest, size_t dest_length);
 #endif // FDBOX_ENVIRON
