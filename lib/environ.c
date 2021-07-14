@@ -19,6 +19,10 @@ For license - read license.txt
 #include <unistd.h>
 #endif
 
+#ifdef __TURBOC__
+#include "lib/tc202/stdextra.h"
+#endif
+
 #include "lib/environ.h"
 #include "lib/strextra.h"
 
