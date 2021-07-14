@@ -148,3 +148,55 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
         *prompt_string = 0;
         return prompt_string;
 }
+
+void expand_string(const char* src, char* dest, size_t dest_length)
+{
+        char var_name[100], *var_p = NULL;
+        char *var_value;
+        size_t var_len;
+        char *dest_p = dest;
+        size_t dest_written = 0;
+
+        *dest_p = 0;
+        while (*src != 0 && dest_written < dest_length) {
+                switch (*src) {
+                        case '%':
+                                if (var_p == NULL) {
+                                        /* we start a new variable */
+                                        var_p = var_name;
+                                        *var_p = 0;
+                                        var_len = 0;
+                                } else {
+                                        /* we end a variable */
+                                        *var_p = 0;
+                                        if (var_name[0] != '\0') {
+                                                var_value = getenv(var_name);
+                                                if (var_value != NULL) {
+                                                        var_len = strlen(var_value);
+                                                        /* we stop processing if we don't have more space */
+                                                        if ( dest_written + var_len >= dest_length) {
+                                                                return;
+                                                        }
+                                                        strcat(dest_p, var_value);
+                                                        dest_p += var_len;
+                                                        dest_written += var_len;
+                                                }
+                                        }
+                                        var_p = 0;
+                                }
+                                break;
+                        default:
+                                if (var_p == NULL) {
+                                        *dest_p = *src;
+                                        dest_p++;
+                                        dest_written+=1;
+                                        *dest_p = 0;
+                                } else {
+                                        *var_p = *src;
+                                        var_p++;
+                                }
+                }
+                src++;
+        }
+        *dest_p = 0;
+}

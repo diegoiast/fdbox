@@ -16,13 +16,16 @@ bool test_args();
 bool test_applets();
 bool test_strings();
 bool test_prompts();
+bool test_var_expand();
 
 int main(int argc, char *argv[]) {
         bool ok = true;
+
         ok &= test("applets", test_applets);
         ok &= test("args", test_args);
         ok &= test("strings", test_strings);
         ok &= test("prompts", test_prompts);
+        ok &= test("variables expansion", test_var_expand);
 
         UNUSED(argc);
         UNUSED(argv);
@@ -129,6 +132,53 @@ bool test_args() {
         strcpy(c2, c3);
         parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(3, argc, "3 args - dir /w /2");
+        return ok;
+}
+
+bool test_var_expand() {
+        char orig[256];
+        char parsed[256];
+        bool ok = true;
+
+
+        strcpy(orig, "");
+        expand_string(orig, parsed, sizeof(parsed));
+        ok |= verify_string_equals(orig, parsed, "empty string");
+
+        strcpy(orig, "hello");
+        expand_string(orig, parsed, sizeof(parsed));
+        ok |= verify_string_equals(orig, parsed, "no vars");
+
+
+        strcpy(orig, "[%%]");
+        expand_string(orig, parsed, sizeof(parsed));
+        ok |= verify_string_equals("[]", parsed, "empty var name");
+
+        setenv("FOOBAR", "***", 1);
+        strcpy(orig, "%FOOBAR%");
+        expand_string(orig, parsed, sizeof(parsed));
+        ok |= verify_string_equals("***", parsed, "normal var");
+
+        setenv("ZOIP", "abc", 1);
+        strcpy(orig, "%FOOBAR%%ZOIP%");
+        expand_string(orig, parsed, sizeof(parsed));
+        ok |= verify_string_equals("***abc", parsed, "2 normal vars");
+
+        strcpy(orig, "%FOOBAR%[%ZOIP%]");
+        expand_string(orig, parsed, sizeof(parsed));
+        ok |= verify_string_equals("***[abc]", parsed, "2 normal vars (mixed)");
+
+        strcpy(orig, "%FOOBAR%");
+        expand_string(orig, parsed, 1);
+        ok |= verify_string_equals("", parsed, "1 var, truncated");
+
+        strcpy(orig, "%FOOBAR%%ZOIP%");
+        expand_string(orig, parsed, 7);
+        ok |= verify_string_equals("***abc", parsed, "2 vars un-truncated");
+
+        expand_string(orig, parsed, 6);
+        ok |= verify_string_equals("***", parsed, "2 vars truncated");
+
         return ok;
 }
 
