@@ -24,7 +24,7 @@ int command_help(int argc, char *argv[]) {
 
         UNUSED(argv);
         UNUSED(argc);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
 }
 
 const char *help_help() { return "Displays about text (this help)"; }
