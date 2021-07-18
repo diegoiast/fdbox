@@ -42,12 +42,14 @@ The program compiles also as a native Linux executable
 | `date`/`time`|  WIP  |  Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
 | `del`        |  *done*  | Prompt might need more testing |
 | `dir`        |  *WIP*  |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
+| `echo`       |  *WIP*  |  Can display a line, however splitting arguments is still WIP |
 | `md`/`mkdir` |  *done*  |  |
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
 | `type`       |  *done*  | Bonus: support also line numbers printing |
-| `command`    | WIP | This is the main interactive shell. Works only on internal commands for now |
+| `command`    | WIP | This is the main interactive shell. Works only on internal commands for now, no editing support |
 | `prompt`     |  *done*  | |
 | `set`        |  *done*  | Does not handle quoting properly due to internal library issues |
+| `rem`        |  *done*  | |
 
 
 ## Compiler support
