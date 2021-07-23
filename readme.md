@@ -58,6 +58,8 @@ The program compiles also as a native Linux executable
  3. DOS: TC 2.02 - this is the main development environment. Supported.
  4. DOS: DJGPP - I am haing problems in runtime. Seems like `tolower()` is breaking
     my code. Might be a compiler bug, I should choose another version of DJGPP.
+ 5. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
+    which contains the work needed to make this project compile with that compiler.
 
 ## Building
 
