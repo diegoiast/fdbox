@@ -25,6 +25,7 @@ int command_beep(int argc, char *argv[]) {
         int c1, c2;
         const char *argument;
 
+        command_config_init(&config);
         do {
                 c1 = command_config_parse(argc, argv, &config);
                 c2 = tolower(c1);

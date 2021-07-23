@@ -96,6 +96,9 @@ int command_config_parse(int argc, char *argv[], struct command_config *config) 
         if (config->state.current_argument >= argc) {
                 return ARG_DONE;
         }
+        if (argc == 1) {
+                return ARG_DONE;
+        }
 
         arg = argv[config->state.current_argument];
         config->state.current_argument++;
