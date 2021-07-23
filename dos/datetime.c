@@ -131,7 +131,7 @@ static bool date_time_config_parse(int argc, char *argv[], struct date_time_conf
         return true;
 }
 
-static void date_config_print(struct date_time_config *config) {
+static void date_time_config_print(struct date_time_config *config) {
         printf("\tInteractive = %s\n", str_bool(config->interactive));
         printf("\tnew date = %s\n", config->new_date_time ? config->new_date_time : "NULL");
         printf("\tShow help = %s\n", str_bool(config->global.show_help));
@@ -186,11 +186,11 @@ static int date_set_new_date(char *new_date) {
 
 static void date_print_date() {
         time_t t = time(NULL);
-        struct tm tm = *localtime(&t);
-        printf("Current date is %02d-%02d-%4d\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+        struct tm *tm = localtime(&t);
+        printf("Current date is %02d-%02d-%4d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
 }
 
-int date_set_new_time(char *new_time) {
+static int date_set_new_time(char *new_time) {
         int hour = -1, minute = -1, second = -1;
         char *token;
 
@@ -261,10 +261,10 @@ int date_set_new_time(char *new_time) {
         return EXIT_SUCCESS;
 }
 
-void date_print_time() {
+static void date_print_time() {
         time_t t = time(NULL);
-        struct tm tm = *localtime(&t);
-        printf("Current time is %02d:%02d:%02d\n", tm.tm_hour, tm.tm_min, tm.tm_sec);
+        struct tm *tm = localtime(&t);
+        printf("Current time is %02d:%02d:%02d\n", tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
 
 static void date_print_extended_help() {

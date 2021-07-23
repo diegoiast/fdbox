@@ -16,7 +16,7 @@ For license - read license.txt
 #include <stdbool.h>
 #endif
 
-#ifdef __MSDOS__
+#if defined(__TURBOC__)
 #include "lib/tc202/stdbool.h"
 #endif
 

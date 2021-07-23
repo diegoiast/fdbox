@@ -13,7 +13,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-#ifdef __MSDOS__
+#if defined(__TURBOC__)
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdextra.h"
 #include <sys/stat.h>
@@ -114,13 +114,13 @@ int command_del(int argc, char *argv[]) {
 
 const char *help_del() { return "Delete one or more files"; }
 
-void del_config_init(struct del_config *config) {
+static void del_config_init(struct del_config *config) {
         config->prompt = false;
         config->recursive = false;
         command_config_init(&config->global);
 }
 
-bool del_config_parse(int argc, char *argv[], struct del_config *config) {
+static bool del_config_parse(int argc, char *argv[], struct del_config *config) {
         int c1, c2;
         do {
                 c1 = command_config_parse(argc, argv, &config->global);
@@ -147,7 +147,6 @@ bool del_config_parse(int argc, char *argv[], struct del_config *config) {
 }
 
 static void del_config_print(const struct del_config *config) {
-        int i;
         printf("prompt for deletion: %s\n", str_bool(config->prompt));
         printf("recursive: %s\n", str_bool(config->recursive));
         printf("verbose: %s\n", str_bool(config->global.verbose));
@@ -186,7 +185,6 @@ static deletion_result del_single_file(struct del_config *config, const char *fi
                 case 'c':
                 default:
                         return cancel;
-                        break;
                 }
         }
 

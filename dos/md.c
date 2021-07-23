@@ -104,8 +104,6 @@ static bool mkdir_config_parse(int argc, char *argv[], struct mkdir_config *conf
 }
 
 static void mkdir_config_print(const struct mkdir_config *config) {
-        size_t i;
-
         printf("recursive: %s\n", str_bool(config->recursive));
         command_config_print(&config->global);
 }

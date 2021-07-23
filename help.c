@@ -5,6 +5,10 @@
 #include "help.h"
 #include "lib/applet.h"
 
+#if defined(__TURBOC__)
+#include "lib/tc202/stdextra.h"
+#endif
+
 /*
  * This file is part of fdbox
  * For license - read license.txt

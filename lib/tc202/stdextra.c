@@ -1,18 +1,19 @@
 #include "lib/tc202/stdextra.h"
 #include "fdbox.h"
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__MSDOS__)
+#if defined(__TURBOC__)
 #include "lib/tc202/stdbool.h"
 #elif defined(__linux__) || defined(__WIN32__)
 #include <stdbool.h>
 #endif
 
-#if defined(__MSDOS__)
+#if defined(__TURBOC__)
 int snprintf(char *str, size_t size, const char *format, ...) {
         int i;
         va_list argp;

@@ -7,7 +7,7 @@
 #include "lib/args.h"
 #include "lib/environ.h"
 
-#ifdef __MSDOS__
+#if defined(__TURBOC__)
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #endif
