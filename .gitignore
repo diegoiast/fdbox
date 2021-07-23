@@ -10,3 +10,7 @@ TESTS.EXE
 
 # DJGGPP's makefile is a mess :)
 *.O
+
+# PacificC
+*.00?
+*.SWP
