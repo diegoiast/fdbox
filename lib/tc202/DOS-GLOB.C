@@ -1,12 +1,21 @@
+#if !defined(HI_TECH_C)
 #include <dir.h>
-#include <dos.h>
 #include <errno.h>
+#endif
+#include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "lib/tc202/dos-glob.h"
 #define ATTRIBUTES FA_RDONLY | FA_HIDDEN | FA_SYSTEM | FA_DIREC
+
+#if defined(HI_TECH_C)
+#define ENOMEM	 8		/* Not enough core		*/
+#define EINVENV 10		/* Invalid environment		*/
+
+extern int errno;
+#endif
 
 struct file_entry {
         char name[MAX_PATH];

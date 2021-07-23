@@ -1,8 +1,13 @@
 #include <ctype.h>
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if !defined(HI_TECH_C)
+#include <errno.h>
+#else
+#include "lib/tc202/stdextra.h"
+#endif
 
 #ifdef WIN32
 // https://docs.microsoft.com/en-us/windows/desktop/api/utilapiset/nf-utilapiset-beep
@@ -93,7 +98,7 @@ int command_beep(int argc, char *argv[]) {
 const char *help_beep() {
 #if defined(__unix__) || defined(__APPLE__)
         return "Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with DOS)";
-#elif defined(WIN32) || defined(__MSDOS__)
+#elif defined(WIN32) || defined(__MSDOS__) || defined(HI_TECH_C)
         return "Makes sound for a specified length in milliseconds";
 #endif
 }

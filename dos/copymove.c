@@ -1,11 +1,8 @@
 #include <ctype.h>
-#include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
 
 #include "dos/copymove.h"
@@ -13,12 +10,22 @@
 #include "lib/args.h"
 #include "lib/strextra.h"
 
+#if !defined(HI_TECH_C)
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#else
+#include <unixio.h>
+#include <stat.h>
+extern int	errno;			/* system error number */
+#endif
+
 /*
 This file is part of fdbox
 For license - read license.txt
 */
 
-#ifdef __TURBOC__
+#if defined(__TURBOC__) || defined(HI_TECH_C)
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
@@ -63,6 +70,7 @@ static int command_move_copy(int argc, char *argv[], struct copy_config *config)
         size_t j;
         glob_t globbuf = {0};
 
+        memset(&globbuf, 0, sizeof (globbuf));
         copy_move_config_init(config);
         copy_move_parse_config(argc, argv, config);
         /* copy_move_print_config(config); */

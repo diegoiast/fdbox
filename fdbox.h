@@ -31,10 +31,14 @@
 #define ALL_FILES_GLOB "*"
 #endif
 
-#if defined(__WIN32__) || defined(__MSDOS__)
+#if defined(__WIN32__) || defined(__MSDOS__) || defined(HI_TECH_C)
 #define DIRECTORY_DELIMITER "\\"
 #define ARGUMENT_DELIMIER '/'
 #define ALL_FILES_GLOB "*.*"
 #endif
+
+
+/* This part is a hack, to avoid nesting ifdefs for each compiler */
+#include "lib/tc202/stdextra.h"
 
 #endif // __fdbox_h__

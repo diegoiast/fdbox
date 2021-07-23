@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef HI_TECH_C
+#include "lib/tc202/stdextra.h"
+#endif
+
 extern struct applet commands[];
 
 int main(int argc, char *argv[]) {

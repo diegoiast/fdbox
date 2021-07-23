@@ -14,6 +14,10 @@
 #include <dir.h>
 #endif
 
+#ifdef HI_TECH_C
+#include <sys.h>
+#endif
+
 #ifdef WIN32
 // Windows needs this specific include order, and clang-format will
 // try to re-order by ABC. Lets not.
@@ -38,6 +42,8 @@ int command_cd(int argc, char *argv[]) {
                 char cwd[128];
 #if defined(__linux__) || defined(__MSDOS__)
                 getcwd(cwd, 128);
+#elif defined(HI_TECH_C)
+                getcwd(cwd);
 #elif defined(__WIN32__)
                 DWORD err = GetCurrentDirectory(128, cwd);
 #else

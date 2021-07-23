@@ -7,7 +7,7 @@
 #include "lib/args.h"
 #include "lib/environ.h"
 
-#if defined(__TURBOC__)
+#if defined(__TURBOC__) || defined(HI_TECH_C)
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #endif

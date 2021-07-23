@@ -16,7 +16,7 @@ For license - read license.txt
 #include <stdbool.h>
 #endif
 
-#if defined(__TURBOC__)
+#if defined(__TURBOC__) || defined(HI_TECH_C)
 #include "lib/tc202/stdbool.h"
 #endif
 

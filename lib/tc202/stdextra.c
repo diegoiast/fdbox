@@ -97,3 +97,28 @@ bool save_env_locally(const char *name, char *value) {
         saved_env[first_available_slot] = value;
         return true;
 }
+
+#if defined(HI_TECH_C)
+int putenv(char *string)
+{
+	// TODO properly implement
+	return 0;
+}
+
+int strcasecmp(const char *s1, const char *s2)
+{
+	while (*s1 != 0 && *s2 !=0) {
+		if (tolower(*s1) < tolower(*s2))
+			return -1;
+		if (tolower(*s1) > tolower(*s2))
+			return 1;
+	}
+	if (*s1 == 0 && *s2 != 0) {
+		return 1;
+	}
+	if (*s1 != 0 && *s2 != 0) {
+		return 1;
+	}
+	return 0;
+}
+#endif

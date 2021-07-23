@@ -13,7 +13,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-#if defined(__TURBOC__)
+#if defined(__TURBOC__) || defined(HI_TECH_C)
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdextra.h"
 #include <sys/stat.h>

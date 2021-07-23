@@ -11,8 +11,8 @@ For license - read license.txt
 
 #include "fdbox.h"
 
-#ifdef __MSDOS__
-#include <dir.h>
+#ifdef HI_TECH_C
+#include <sys.h>
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__WIN32__) || defined(__DJGPP__)
@@ -20,6 +20,7 @@ For license - read license.txt
 #endif
 
 #ifdef __TURBOC__
+#include <dir.h>
 #include "lib/tc202/stdextra.h"
 #endif
 
@@ -55,12 +56,12 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                                 break;
                         case 'd': {
                                 time_t t = time(NULL);
-                                struct tm tm = *localtime(&t);
+                                struct tm *tm = localtime(&t);
                                 char date_str[25];
                                 int k;
 
-                                k = snprintf(date_str, 25, "%02d-%02d-%4d", tm.tm_mday,
-                                             tm.tm_mon + 1, tm.tm_year + 1900);
+                                k = snprintf(date_str, 25, "%02d-%02d-%4d", tm->tm_mday,
+                                             tm->tm_mon + 1, tm->tm_year + 1900);
                                 *prompt_string = 0;
                                 strncat(prompt_string, date_str, prompt_str_len);
                                 prompt_string += k - 1;
@@ -97,7 +98,11 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                                 break;
                         case 'p': {
                                 char *cwd = (char *)malloc(128);
+#if defined(HI_TECH_C)
+                                getcwd(cwd);
+#else
                                 getcwd(cwd, 128);
+#endif
 /* On Windows and Unix, there are mixed case file systems
  * We will show eaxctly whats given to us
  * On MSDOS (well, also FreeDOS...) the OS will give us upper case
@@ -122,11 +127,11 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                                 break;
                         case 't': {
                                 time_t t = time(NULL);
-                                struct tm tm = *localtime(&t);
+                                struct tm *tm = localtime(&t);
                                 char time_str[25];
                                 int k;
-                                k = snprintf(time_str, 25, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min,
-                                             tm.tm_sec);
+                                k = snprintf(time_str, 25, "%02d:%02d:%02d", tm->tm_hour, tm->tm_min,
+                                             tm->tm_sec);
                                 *prompt_string = 0;
                                 strncat(prompt_string, time_str, prompt_str_len);
                                 prompt_string += k - 1;

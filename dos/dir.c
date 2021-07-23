@@ -46,7 +46,7 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "lib/win32/win32-glob.h"
 #endif
 
-#if defined(__TURBOC__)
+#if defined(__TURBOC__) || defined(HI_TECH_C)
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
