@@ -1,16 +1,171 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "dos/if.h"
-#include "fdbox.h"
-
 /*
 This file is part of fdbox
 For license - read license.txt
 */
+
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "dos/if.h"
+#include "dos/command.h"
+#include "lib/strextra.h"
+#include "fdbox.h"
+
+#ifdef _POSIX_C_SOURCE
+#include <stdbool.h>
+#include <glob.h>
+#include <sys/stat.h>
+#endif
+
+#ifdef __WIN32__
+#include <stdbool.h>
+#include "lib/win32/win32-glob.h"
+#endif
+
+#if defined(__TURBOC__)
+#include "lib/tc202/dos-glob.h"
+#include "lib/tc202/stdbool.h"
+#include "lib/tc202/stdextra.h"
+#include <sys/stat.h>
+#endif
+
+
+static bool if_file_exists(const char* path);
+static char *find_if_command(int argc, char *argv[]);
+static char *find_else_command(int argc, char *argv[]);
+
 int command_if(int argc, char *argv[]) {
-        printf("if - TODO: Unimplemented yet\n");
-        return EXIT_FAILURE;
+        bool reverse_token = false;
+        bool evaluated_value;
+        char *command_to_execute;
+        int arg_index = 1;
+        int rc = EXIT_FAILURE;
+        int save_errno = errno;
+
+
+        if (strcasecmp(argv[arg_index], "not") == 0) {
+                reverse_token = true;
+                arg_index ++;
+        }
+
+        if (strcasecmp(argv[arg_index], "exist") == 0) {
+                arg_index ++;
+                evaluated_value = if_file_exists(argv[arg_index]);
+         } else if (strcasecmp(argv[arg_index], "ERRORLEVEL") == 0) {
+                arg_index ++;
+                if (argv[arg_index] != NULL && arg_index < argc) {
+                        int error_test = 0;
+                        error_test = strtol(argv[arg_index], NULL, 10);
+                        evaluated_value = error_test == save_errno;
+                } else {
+                        /* we could not even parse the error level, this is bad */
+                        evaluated_value = false;
+                        reverse_token = false;
+                }
+
+        } else  {
+                /* this is a comperation, command extensions are not suported yet */
+                /* see https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/if */
+                evaluated_value = false;
+                reverse_token = false;
+        }
+
+        evaluated_value = reverse_token ? !evaluated_value : evaluated_value;
+
+        if (evaluated_value) {
+                command_to_execute = find_if_command( argc-arg_index, argv+arg_index);
+        } else {
+                command_to_execute = find_else_command( argc-arg_index, argv+arg_index);
+        }
+        if (command_to_execute != NULL) {
+                rc = command_execute_line(command_to_execute);
+                free(command_to_execute);
+        }
+        return rc;
 }
 
-const char *help_if() { return "Here should be a basic help for if"; }
+const char *help_if() { return "Conditionally execute a command"; }
+
+/* this implementation also returns true for directories, is this OK? */
+static bool if_file_exists(const char* path)
+{
+        struct stat path_stat;
+        int rc = stat(path, &path_stat);
+        return rc == 0;
+}
+
+/* This function concatinates all arguments for the
+ * positive resolution of "if".
+ * The input is the first token to be added
+ *
+ * if [condition] [ok_statements] else [fail_statments]
+ *
+ * it will return [ok_statements]
+ */
+static char *find_if_command(int argc, char *argv[])
+{
+        char *c = strdup("");
+        int l = 0;
+
+        while (argc > 1) {
+                if (argv[1] != NULL) {
+                        if (strcasecmp(argv[1], "else") == 0) {
+                                break;
+                        }
+                        c = realloc(c, l + strlen(argv[1]) + 2 );
+                        strcat(c, argv[1]);
+                        strcat(c, " ");
+                        l = strlen(c);
+                }
+                argv ++;
+                argc --;
+        }
+
+        return c;
+}
+
+/* This function concatinates all arguments for the
+ * positive resolution of "if".
+ * The input is the first token to be added
+ *
+ * if [condition] [ok_statements] else [fail_statments]
+ *
+ * it will return [fail_statments]
+ */
+static char *find_else_command(int argc, char *argv[])
+{
+        char *c = strdup("");
+        int l = 0;
+
+        while (argc != 0) {
+                if (argv[1] != NULL) {
+                        if (strcasecmp(argv[1], "else") == 0) {
+                                break;
+                        }
+                }
+                argv ++;
+                argc --;
+        }
+        /* are we at the "else" ?*/
+        /* TODO - should we skip nulls? */
+        if (strcasecmp(argv[1], "else") != 0) {
+                return NULL;
+        }
+        argv ++;
+        argc --;
+
+        while (argc > 1) {
+                if (argv[1] != NULL) {
+                        c = realloc(c, l + strlen(argv[1]) + 2);
+                        strcat(c, argv[1]);
+                        strcat(c, " ");
+                        l = strlen(c);
+                }
+                argv ++;
+                argc --;
+        }
+
+        return c;
+}

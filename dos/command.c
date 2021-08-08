@@ -3,6 +3,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
+#include <errno.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +14,7 @@ For license - read license.txt
 #include "lib/environ.h"
 #include "lib/strextra.h"
 
-#include "dos/type.h"
+#include "dos/prompt.h"
 #include "fdbox.h"
 
 #ifdef __MSDOS__
@@ -46,7 +47,7 @@ static void command_shell_print_extended_help();
 /* TODO - I am unsure if this is the best way to tell the main loop
  * we should exit. For now it works
  */
-static int command_execute_line(char *line) {
+int command_execute_line(char *line) {
         size_t c_argc;
         char *c_argv[256];
         bool parsed_ok;
@@ -72,15 +73,16 @@ static int command_execute_line(char *line) {
                 return EXIT_FAILURE;
         }
 
-        /* otherwise - we know the drill, we did it once in main.c */
         cmd = find_applet(c_argv[0], commands);
         if (cmd != NULL) {
                 code = cmd->handler(c_argc, c_argv);
+                errno = code;
                 if (code != EXIT_SUCCESS) {
                         fprintf(stderr, "Command failed (%d)\n", code);
                 }
         } else {
                 fprintf(stderr, "Command not found\n");
+                errno = ENOENT;
         }
 
         return EXIT_SUCCESS;
@@ -106,7 +108,8 @@ int command_command(int argc, char *argv[]) {
 
                 t = getenv("PROMPT");
                 if (t == NULL) {
-                        t = "$P$G";
+                        command_prompt(1, NULL);
+                        t = getenv("PROMPT");
                 }
                 get_prompt(t, prompt, 256);
                 printf("%s", prompt);
@@ -153,8 +156,9 @@ static void command_shell_config_print(const struct command_shell_config *config
 }
 
 static void command_shell_print_extended_help() {
-        printf("%s\n", help_type());
+        printf("%s\n", help_command());
 
-        printf("   type [files] /l\n");
+        printf("   command {shell command} /l\n");
         printf("   Runs an interactive shell \n");
+        printf("   TODO: properly implement the command.com swithces \n");
 }
