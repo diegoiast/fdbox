@@ -26,11 +26,14 @@ The program compiles also as a native Linux executable
    standard C code support for localization.
  * `TurboC` does need a proper makefile.
  * All commands support multiple arguments (like Unix shells), unlike DOS
-   which you cannot do `del file1.txt *.bat`, and arguments can come
+   which you cannot do `del /r file1.txt *.bat /f`, and arguments can come
    even after file names (not only at the begining of the command).
  * Some commands share the same code (`copy`+`move`, `date`+`time`)
- * Interactive is beeing worked on. I want to have 4DOS command completion,
-   or bash. 
+ * Interactive shell is beeing worked on. I want to have 4DOS command  
+   completion, or bash/zsh. I like what the SerenityOS guys are doing -
+   this can be another implementation detail.
+ * Contains a bash shell script to generate the development enviroment
+   for DOS+DosBOX
 
 ## Implementation status of commands
 | command      | status | remark        |
@@ -41,10 +44,10 @@ The program compiles also as a native Linux executable
 | `copy`       |  WIP  | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
 | `date`/`time`|  WIP  |  Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
 | `del`        |  *done*  | Prompt might need more testing |
-| `dir`        |  *WIP*  |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
-| `echo`       |  *WIP*  | splitting arguments is still WIP  |
-| `if`         |  *WIP*  |  Missing equality tests |
-| `echo`       |  *WIP*  |  Can display a line, however splitting arguments is still WIP |
+| `dir`        |  WIP  |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
+| `echo`       |  WIP  | splitting arguments is still WIP  |
+| `if`         |  WIP  |  Missing equality tests |
+| `echo`       |  WIP  |  Can display a line, however splitting arguments is still WIP |
 | `md`/`mkdir` |  *done*  |  |
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
 | `type`       |  *done*  | Bonus: support also line numbers printing |
@@ -59,12 +62,14 @@ The program compiles also as a native Linux executable
  1. Linux: Clang/GCC - this is the main development environment. Supported.
  2. Windows10: MinGW/TCM (9) - this is the main development environment. Supported.
  3. DOS: TC 2.02 - this is the main development environment. Supported.
-    BUG: `glob()` functionlaity tends to allocate too much memory, and the code is fauly,
-          not reporting this to the app. Resules in garbage in the screen when
-	  `dir ` on a directory with lots of files (~80 on my tests, but it depends
-	  on memory available).
+    > __BUG__:
+    >
+    > `glob()` functionlaity tends to allocate too much >memory, and the code is faulty,
+          not reporting this to the app. Results in garbage in the screen when
+	  > `dir ` on a directory with lots of files (~80 on my tests, but it depends
+	  > on memory available).
  4. DOS: DJGPP - I am haing problems in runtime. Seems like `tolower()` is breaking
-    my code. Might be a compiler bug, I should choose another version of DJGPP.
+    my code. Might be a compiler bug.
  5. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
     which contains the work needed to make this project compile with that compiler.
 
