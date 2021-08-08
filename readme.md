@@ -41,13 +41,13 @@ The program compiles also as a native Linux executable
 | `beep`       |  *done*  | needs to be tested on DOS/Windows, on unix it just beeps              |
 | `cd`         |  *done*  |  |
 | `cls`        |  *done*  |  |
-| `copy`       |  WIP  | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
-| `date`/`time`|  WIP  |  Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
+| `copy`       |  WIP     | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
+| `date`/`time`|  WIP     |  Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
 | `del`        |  *done*  | Prompt might need more testing |
-| `dir`        |  WIP  |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
-| `echo`       |  WIP  | splitting arguments is still WIP  |
-| `if`         |  WIP  |  Missing equality tests |
-| `echo`       |  WIP  |  Can display a line, however splitting arguments is still WIP |
+| `dir`        |  WIP     |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
+| `echo`       |  WIP     | splitting arguments is still WIP  |
+| `if`         |  WIP     | Equality test is borked because of args split, no unit tests |
+| `echo`       |  WIP     | Can display a line, however splitting arguments is still WIP |
 | `md`/`mkdir` |  *done*  |  |
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
 | `type`       |  *done*  | Bonus: support also line numbers printing |

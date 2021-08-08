@@ -11,6 +11,7 @@ For license - read license.txt
 #include "dos/command.h"
 #include "dos/if.h"
 #include "fdbox.h"
+#include "lib/environ.h"
 #include "lib/strextra.h"
 
 #ifdef _POSIX_C_SOURCE
@@ -68,8 +69,31 @@ int command_if(int argc, char *argv[]) {
                 /* see
                  * https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/if
                  */
-                evaluated_value = false;
-                reverse_token = false;
+                /* HACK:
+                 * for now we support a simple scenario:
+                 * `if %PATH% == "c:\" echo ok else echo fail`
+                 * Note how we need a separator between  the "==".
+                 * We need to fix `command_split_args()` to be more compatible with MSDOS
+                 * arguments separation.
+                 */
+
+                if (argc - arg_index > 3 && strcmp(argv[arg_index + 1], "==") == 0) {
+                        char *arg1 = argv[arg_index];
+                        char *arg2 = argv[arg_index + 2];
+                        char exp1[128];
+                        char exp2[128];
+
+                        expand_string(arg1, exp1, 128);
+                        expand_string(arg2, exp2, 128);
+
+                        arg_index += 2;
+
+                        evaluated_value = strncmp(exp1, exp2, 128) == 0;
+                } else {
+                        /* this is not a valid assignment, let it fail randomly */
+                        evaluated_value = false;
+                        reverse_token = false;
+                }
         }
 
         evaluated_value = reverse_token ? !evaluated_value : evaluated_value;
