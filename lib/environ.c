@@ -3,6 +3,7 @@ This file is part of fdbox
 For license - read license.txt
 */
 
+#include <errno.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +34,7 @@ For license - read license.txt
  */
 
 char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len) {
+        int  save_errno = errno;
         while (*prompt) {
                 switch (*prompt) {
                 case '$':
@@ -116,7 +118,18 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
                         }
                         case 'q':
                                 *prompt_string = '=';
+                                break;                                        
+                        case 'r': {
+                                /* fdbox extension - we can print last errno on the prompt */
+                                char str[25];
+                                int k;
+
+                                k = snprintf(str, 25, "%0d", save_errno);
+                                *prompt_string = 0;
+                                strncat(prompt_string, str, prompt_str_len);
+                                prompt_string += k - 1;
                                 break;
+                        }
                         case 's':
                                 *prompt_string = ' ';
                                 break;
