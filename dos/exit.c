@@ -14,4 +14,4 @@ int command_exit(int argc, char *argv[]) {
         return EXIT_FAILURE;
 }
 
-const char *help_exit() { return "Here should be a basic help for exit"; }
+const char *help_exit() { return "Exits the interactive shell"; }

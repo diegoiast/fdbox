@@ -8,20 +8,20 @@ For license - read license.txt
 #include <stdlib.h>
 #include <string.h>
 
-#include "dos/if.h"
 #include "dos/command.h"
-#include "lib/strextra.h"
+#include "dos/if.h"
 #include "fdbox.h"
+#include "lib/strextra.h"
 
 #ifdef _POSIX_C_SOURCE
-#include <stdbool.h>
 #include <glob.h>
+#include <stdbool.h>
 #include <sys/stat.h>
 #endif
 
 #ifdef __WIN32__
-#include <stdbool.h>
 #include "lib/win32/win32-glob.h"
+#include <stdbool.h>
 #endif
 
 #if defined(__TURBOC__)
@@ -31,8 +31,7 @@ For license - read license.txt
 #include <sys/stat.h>
 #endif
 
-
-static bool if_file_exists(const char* path);
+static bool if_file_exists(const char *path);
 static char *find_if_command(int argc, char *argv[]);
 static char *find_else_command(int argc, char *argv[]);
 
@@ -44,17 +43,16 @@ int command_if(int argc, char *argv[]) {
         int rc = EXIT_FAILURE;
         int save_errno = errno;
 
-
         if (strcasecmp(argv[arg_index], "not") == 0) {
                 reverse_token = true;
-                arg_index ++;
+                arg_index++;
         }
 
         if (strcasecmp(argv[arg_index], "exist") == 0) {
-                arg_index ++;
+                arg_index++;
                 evaluated_value = if_file_exists(argv[arg_index]);
-         } else if (strcasecmp(argv[arg_index], "ERRORLEVEL") == 0) {
-                arg_index ++;
+        } else if (strcasecmp(argv[arg_index], "ERRORLEVEL") == 0) {
+                arg_index++;
                 if (argv[arg_index] != NULL && arg_index < argc) {
                         int error_test = 0;
                         error_test = strtol(argv[arg_index], NULL, 10);
@@ -65,9 +63,11 @@ int command_if(int argc, char *argv[]) {
                         reverse_token = false;
                 }
 
-        } else  {
+        } else {
                 /* this is a comperation, command extensions are not suported yet */
-                /* see https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/if */
+                /* see
+                 * https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/if
+                 */
                 evaluated_value = false;
                 reverse_token = false;
         }
@@ -75,9 +75,9 @@ int command_if(int argc, char *argv[]) {
         evaluated_value = reverse_token ? !evaluated_value : evaluated_value;
 
         if (evaluated_value) {
-                command_to_execute = find_if_command( argc-arg_index, argv+arg_index);
+                command_to_execute = find_if_command(argc - arg_index, argv + arg_index);
         } else {
-                command_to_execute = find_else_command( argc-arg_index, argv+arg_index);
+                command_to_execute = find_else_command(argc - arg_index, argv + arg_index);
         }
         if (command_to_execute != NULL) {
                 rc = command_execute_line(command_to_execute);
@@ -89,8 +89,7 @@ int command_if(int argc, char *argv[]) {
 const char *help_if() { return "Conditionally execute a command"; }
 
 /* this implementation also returns true for directories, is this OK? */
-static bool if_file_exists(const char* path)
-{
+static bool if_file_exists(const char *path) {
         struct stat path_stat;
         int rc = stat(path, &path_stat);
         return rc == 0;
@@ -104,8 +103,7 @@ static bool if_file_exists(const char* path)
  *
  * it will return [ok_statements]
  */
-static char *find_if_command(int argc, char *argv[])
-{
+static char *find_if_command(int argc, char *argv[]) {
         char *c = strdup("");
         int l = 0;
 
@@ -114,13 +112,13 @@ static char *find_if_command(int argc, char *argv[])
                         if (strcasecmp(argv[1], "else") == 0) {
                                 break;
                         }
-                        c = realloc(c, l + strlen(argv[1]) + 2 );
+                        c = realloc(c, l + strlen(argv[1]) + 2);
                         strcat(c, argv[1]);
                         strcat(c, " ");
                         l = strlen(c);
                 }
-                argv ++;
-                argc --;
+                argv++;
+                argc--;
         }
 
         return c;
@@ -134,8 +132,7 @@ static char *find_if_command(int argc, char *argv[])
  *
  * it will return [fail_statments]
  */
-static char *find_else_command(int argc, char *argv[])
-{
+static char *find_else_command(int argc, char *argv[]) {
         char *c = strdup("");
         int l = 0;
 
@@ -145,16 +142,16 @@ static char *find_else_command(int argc, char *argv[])
                                 break;
                         }
                 }
-                argv ++;
-                argc --;
+                argv++;
+                argc--;
         }
         /* are we at the "else" ?*/
         /* TODO - should we skip nulls? */
         if (strcasecmp(argv[1], "else") != 0) {
                 return NULL;
         }
-        argv ++;
-        argc --;
+        argv++;
+        argc--;
 
         while (argc > 1) {
                 if (argv[1] != NULL) {
@@ -163,8 +160,8 @@ static char *find_else_command(int argc, char *argv[])
                         strcat(c, " ");
                         l = strlen(c);
                 }
-                argv ++;
-                argc --;
+                argv++;
+                argc--;
         }
 
         return c;

@@ -64,7 +64,7 @@ struct applet commands[] = {
         {help_shift, command_shift, "shift"},
         {help_time, command_time, "time"},
         {help_type, command_type, "type"},
-        {help_type, command_ver, "ver"},
+        {help_ver, command_ver, "ver"},
 #if 0
         { help_type,  command_type, "type" },
         { help_cal,  command_cal, "cal" },

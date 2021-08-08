@@ -48,4 +48,4 @@ int command_echo(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_echo() { return "Here should be a basic help for echo"; }
+const char *help_echo() { return "Prints a string"; }

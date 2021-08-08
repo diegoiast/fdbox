@@ -3,8 +3,8 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-#include <errno.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

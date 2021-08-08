@@ -44,4 +44,4 @@ int command_set(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_set() { return "Here should be a basic help for set"; }
+const char *help_set() { return "Display or modify environment variable"; }
