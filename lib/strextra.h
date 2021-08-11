@@ -37,6 +37,9 @@ const char *file_base_name(const char *file_name);
 /* returns the last tip of the file name */
 const char *file_get_extesnsion(const char *fname);
 
+/* this implementation also returns true for directories, is this OK? */
+bool file_exists(const char *path);
+
 #if defined(__WIN32__)
 /* This function is available on Linux, but now on Windows */
 char *strsep(char **stringp, const char *delim);
