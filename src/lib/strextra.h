@@ -53,6 +53,9 @@ char *file_get_dir(const char *file_name);
 char *strsep(char **stringp, const char *delim);
 #endif
 
+/* this implementation also returns true for directories, is this OK? */
+bool file_exists(const char *path);
+
 struct str_list {
         size_t length;
         size_t next;

@@ -38,7 +38,6 @@ For license - read license.txt
 #include <sys/stat.h>
 #endif
 
-static bool if_file_exists(const char *path);
 static char *find_if_command(int argc, char *argv[]);
 static char *find_else_command(int argc, char *argv[]);
 
@@ -57,7 +56,7 @@ int command_if(int argc, char *argv[]) {
 
         if (strcasecmp(argv[arg_index], "exist") == 0) {
                 arg_index++;
-                evaluated_value = if_file_exists(argv[arg_index]);
+                evaluated_value = file_exists(argv[arg_index]);
         } else if (strcasecmp(argv[arg_index], "ERRORLEVEL") == 0) {
                 arg_index++;
                 if (argv[arg_index] != NULL && arg_index < argc) {
@@ -117,13 +116,6 @@ int command_if(int argc, char *argv[]) {
 }
 
 const char *help_if() { return "Conditionally execute a command"; }
-
-/* this implementation also returns true for directories, is this OK? */
-static bool if_file_exists(const char *path) {
-        struct stat path_stat;
-        int rc = stat(path, &path_stat);
-        return rc == 0;
-}
 
 /* This function concatinates all arguments for the
  * positive resolution of "if".

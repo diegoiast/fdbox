@@ -2,6 +2,14 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <sys/stat.h>
+
+#if defined(__TURBOC__)
+#include "lib/tc202/dos-glob.h"
+#include "lib/tc202/stdbool.h"
+#include "lib/tc202/stdextra.h"
+#endif
+
 const char *str_bool(bool b) { return b ? "true" : "false"; }
 
 char *str_to_lower(char *s) {
@@ -93,6 +101,12 @@ const char *file_get_extension(const char *fname) {
                 p++;
         }
         return p;
+}
+
+bool file_exists(const char *path) {
+        struct stat path_stat;
+        int rc = stat(path, &path_stat);
+        return rc == 0;
 }
 
 #if defined(__WIN32__)
