@@ -73,7 +73,7 @@ int command_execute_line(char *line) {
                 return EXIT_FAILURE;
         }
 
-        cmd = find_applet(c_argv[0], commands);
+        cmd = find_applet(CASE_INSENSITVE, c_argv[0], commands);
         if (cmd != NULL) {
                 code = cmd->handler(c_argc, c_argv);
                 errno = code;
