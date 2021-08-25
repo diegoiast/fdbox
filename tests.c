@@ -13,6 +13,7 @@ typedef bool (*function_test)();
 
 bool test(const char *message, function_test unittest);
 bool test_args();
+bool test_args_split();
 bool test_applets();
 bool test_strings();
 bool test_prompts();
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]) {
         ok &= test("strings", test_strings);
         ok &= test("prompts", test_prompts);
         ok &= test("variables expansion", test_var_expand);
-
+        ok &= test("argument split", test_args_split);
         UNUSED(argc);
         UNUSED(argv);
         return ok ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -132,6 +133,67 @@ bool test_args() {
         strcpy(c2, c3);
         parsing_ok = command_split_args(c2, &argc, argv, MAX_ARGV);
         ok |= parsing_ok && verify_int_equals(3, argc, "3 args - dir /w /2");
+        return ok;
+}
+
+bool test_args_split() {
+        bool ok = true;
+        struct command_args args;
+        int rc;
+
+        rc = command_args_split("", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(0, args.argc, "no arguments");
+        command_args_free(&args);
+
+        rc = command_args_split("x", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(1, args.argc, "single argument");
+        command_args_free(&args);
+
+        rc = command_args_split("asd asd", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(2, args.argc, "2 arguments");
+        command_args_free(&args);
+
+        rc = command_args_split("one, two three!", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 words");
+        command_args_free(&args);
+
+        rc = command_args_split("111 222 333 44             555 666", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(6, args.argc, "6 arguments - spaces");
+        command_args_free(&args);
+
+        rc = command_args_split("'one', 'two'", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(2, args.argc, "2 args, quoting");
+        command_args_free(&args);
+
+        rc = command_args_split("\"1 2\", 'three'", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(2, args.argc, "2 args, double quoting");
+        command_args_free(&args);
+
+        rc = command_args_split("'t \" a", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(1, args.argc, "1 arg, containing open quote");
+        command_args_free(&args);
+
+        rc = command_args_split("'one', \"two's three \"", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(2, args.argc, "2 arg, containing quote");
+        command_args_free(&args);
+
+        rc = command_args_split("'one', \"two's three \" - four", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(4, args.argc, "3 words and '-', containing quote");
+        command_args_free(&args);
+
+        rc = command_args_split("dir /w", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(2, args.argc, "2 args - dir /w");
+        command_args_free(&args);
+
+        rc = command_args_split("dir /w /w", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 args - dir /w /w");
+        command_args_free(&args);
+
+        rc = command_args_split("dir /w /2", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 args - dir /w /2");
+        command_args_free(&args);
+
+
         return ok;
 }
 

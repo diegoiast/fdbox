@@ -53,4 +53,20 @@ void command_config_print(const struct command_config *config);
 bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv);
 bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_line_size);
 
+struct command_args {
+        /* these two are the ones passwed to `main` like functions */
+        size_t argc;
+        char **argv;
+
+        /* in practice - some argv, will be null. The real length of argv is not
+         * argc, but max_args. The rest is uninitialized
+         */
+        size_t max_args;
+};
+
+void command_args_allocate(struct command_args *args, size_t count);
+void command_args_free(struct command_args *args);
+int command_args_split(const char *line, struct command_args *args);
+
+
 #endif //__args_h__

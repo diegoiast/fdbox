@@ -157,11 +157,6 @@ void command_config_print(const struct command_config *config) {
  We could also use this command and get empty arguments. We are not
  interested in that.
  token = strsep(&full_cmd, white_space);
-
- TODO:
-  * Handle quoting
-  * Handle dos splits (different arguments do not need to be separated
-    by space) this means allocating argv.
  */
 bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t max_argv) {
         char *token;
@@ -193,4 +188,112 @@ bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_
                 l += k;
         };
         return true;
+}
+
+/* new argument parsing API */
+enum parsing_state {
+        appending,
+        scanning,
+        escaping
+};
+
+void command_args_allocate(struct command_args *args, size_t count)
+{
+        size_t i = args->argc;
+        args->argv = realloc( args->argv, sizeof(const char*) * count );
+        while (i < count) {
+                args->argv[i] = NULL;
+                i ++;
+        }
+        args->max_args = count;
+}
+
+void command_args_free(struct command_args *args)
+{
+        size_t i;
+        for (i = 0; i< args->argc; i++) {
+                free(args->argv[i]);
+        }
+        free(args->argv);
+        args->argc = 0;
+        args->argv = NULL;
+        args->max_args = 0;
+}
+
+/* More advanced arguments split. Supports
+ *  - quoting
+ *  - non-srparated agrs (WIP)
+ *  - does not nodify original string (allocates)
+ */
+int command_args_split(const char *line, struct command_args *args)
+{
+        char word[256], *p_word = word;
+        size_t wordlen = 0;
+        const char* c = line;
+        char bracket = 0;
+        enum parsing_state state = scanning;
+
+        memset(args, 0, sizeof(struct command_args));
+        command_args_allocate(args, 8);
+        word[0] = '\0';
+        while (*c != 0) {
+                bool copy_word = false;
+                bool copy_char = false;
+
+                if (isspace(*c)) {
+                        /* do not copy empty words */
+                        if (state == appending) {
+                                if (bracket != 0) {
+                                        copy_char = true;
+                                } else {
+                                        copy_word = true;
+                                }
+                                if (word[0] == '\0') {
+                                        copy_word = true;
+                                }
+                        }
+                } else if (*c == '\'' || *c == '"') {
+                        if (state == scanning) {
+                                state = appending;
+                                bracket = *c;
+                        } else if (state == appending) {
+                                /* non-matching bracket is copied */
+                                if (*c == bracket) {
+                                        copy_char = false;
+                                        bracket = 0;
+                                } else {
+                                        copy_char = true;
+                                }
+                        }
+                } else {
+                        copy_char = true;
+                        state = appending;
+                }
+                if (copy_char) {
+                        if (wordlen < 256) {
+                                *p_word = *c;
+                                p_word ++;
+                                *p_word = '\0';
+                                wordlen ++;
+                        }
+                }
+                if (copy_word) {
+                        command_args_allocate(args, args->max_args + 5);
+                        args->argv[args->argc] = strdup(word);
+                        args->argc ++;
+                        word[0] = '\0';
+                        p_word = word;
+                        *p_word = '\0';
+                        bracket = 0;
+                        state = scanning;
+                }
+                c++;
+        }
+
+        command_args_allocate(args, args->max_args + 5);
+        if (word[0] != '\0') {
+                args->argv[args->argc] = strdup(word);
+                args->argc ++;
+        }
+        return  EXIT_SUCCESS;
 }

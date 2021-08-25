@@ -47,7 +47,50 @@ static void command_shell_print_extended_help();
 /* TODO - I am unsure if this is the best way to tell the main loop
  * we should exit. For now it works
  */
-int command_execute_line(char *line) {
+
+int command_execute_line_new(const char *line) {
+        struct command_args args;
+        struct applet *cmd;
+        int code;
+        extern struct applet commands[];
+
+        /* this function will not modify the args, so its marked `const
+         * but some commands (date/time) will modify the args instead of making copies
+         * this is OK for now */
+
+        if (command_args_split(line,&args)) {
+                fprintf(stderr, "Command line parsing failed\n");
+                return EXIT_SUCCESS;
+        }
+
+        if (args.argc == 0) {
+                command_args_free(&args);
+                return EXIT_SUCCESS;
+        }
+
+        /* Special handling for exit, as it should break the main loop */
+        if (strcasecmp(args.argv[0], "exit") == 0) {
+                command_args_free(&args);
+                return EXIT_FAILURE;
+        }
+
+        cmd = find_applet(CASE_INSENSITVE, args.argv[0], commands);
+        if (cmd != NULL) {
+                code = cmd->handler(args.argc, args.argv);
+                errno = code;
+                if (code != EXIT_SUCCESS) {
+                        fprintf(stderr, "Command failed (%d)\n", code);
+                }
+        } else {
+                fprintf(stderr, "Command not found\n");
+                errno = ENOENT;
+        }
+
+        command_args_free(&args);
+        return EXIT_SUCCESS;
+}
+
+int command_execute_line_old(char *line) {
         size_t c_argc;
         char *c_argv[256];
         bool parsed_ok;
@@ -86,6 +129,10 @@ int command_execute_line(char *line) {
         }
 
         return EXIT_SUCCESS;
+}
+
+int command_execute_line(char *line) {
+        return command_execute_line_new(line);
 }
 
 int command_command(int argc, char *argv[]) {
