@@ -157,7 +157,7 @@ static char *find_if_command(int argc, char *argv[]) {
  * it will return [fail_statments]
  */
 static char *find_else_command(int argc, char *argv[]) {
-        char *c = strdup("");
+        char *c;
         int l = 0;
 
         while (argc != 0) {
@@ -169,6 +169,11 @@ static char *find_else_command(int argc, char *argv[]) {
                 argv++;
                 argc--;
         }
+        /* now else */
+        if (argc == 0) {
+                return NULL;
+        }
+
         /* are we at the "else" ?*/
         /* TODO - should we skip nulls? */
         if (strcasecmp(argv[1], "else") != 0) {
@@ -177,6 +182,7 @@ static char *find_else_command(int argc, char *argv[]) {
         argv++;
         argc--;
 
+        c = strdup("");
         while (argc > 1) {
                 if (argv[1] != NULL) {
                         c = realloc(c, l + strlen(argv[1]) + 2);
