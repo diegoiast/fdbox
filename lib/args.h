@@ -68,5 +68,4 @@ void command_args_allocate(struct command_args *args, size_t count);
 void command_args_free(struct command_args *args);
 int command_args_split(const char *line, struct command_args *args);
 
-
 #endif //__args_h__

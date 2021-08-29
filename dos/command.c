@@ -58,7 +58,7 @@ int command_execute_line_new(const char *line) {
          * but some commands (date/time) will modify the args instead of making copies
          * this is OK for now */
 
-        if (command_args_split(line,&args)) {
+        if (command_args_split(line, &args)) {
                 fprintf(stderr, "Command line parsing failed\n");
                 return EXIT_SUCCESS;
         }
@@ -131,9 +131,7 @@ int command_execute_line_old(char *line) {
         return EXIT_SUCCESS;
 }
 
-int command_execute_line(char *line) {
-        return command_execute_line_new(line);
-}
+int command_execute_line(char *line) { return command_execute_line_new(line); }
 
 int command_command(int argc, char *argv[]) {
         char line[1024], *pos;

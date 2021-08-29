@@ -191,28 +191,21 @@ bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_
 }
 
 /* new argument parsing API */
-enum parsing_state {
-        appending,
-        scanning,
-        escaping,
-        equals
-};
+enum parsing_state { appending, scanning, escaping, equals };
 
-void command_args_allocate(struct command_args *args, size_t count)
-{
+void command_args_allocate(struct command_args *args, size_t count) {
         size_t i = args->argc;
-        args->argv = realloc( args->argv, sizeof(const char*) * count );
+        args->argv = realloc(args->argv, sizeof(const char *) * count);
         while (i < count) {
                 args->argv[i] = NULL;
-                i ++;
+                i++;
         }
         args->max_args = count;
 }
 
-void command_args_free(struct command_args *args)
-{
+void command_args_free(struct command_args *args) {
         size_t i;
-        for (i = 0; i< args->argc; i++) {
+        for (i = 0; i < args->argc; i++) {
                 free(args->argv[i]);
         }
         free(args->argv);
@@ -226,11 +219,10 @@ void command_args_free(struct command_args *args)
  *  - non-srparated agrs (WIP)
  *  - does not nodify original string (allocates)
  */
-int command_args_split(const char *line, struct command_args *args)
-{
+int command_args_split(const char *line, struct command_args *args) {
         char word[256], *p_word = word;
         size_t wordlen = 0;
-        const char* c = line;
+        const char *c = line;
         char bracket = 0;
         enum parsing_state state = scanning;
 
@@ -288,15 +280,15 @@ int command_args_split(const char *line, struct command_args *args)
                 if (copy_char) {
                         if (wordlen < 256) {
                                 *p_word = *c;
-                                p_word ++;
+                                p_word++;
                                 *p_word = '\0';
-                                wordlen ++;
+                                wordlen++;
                         }
                 }
                 if (copy_word) {
                         command_args_allocate(args, args->max_args + 5);
                         args->argv[args->argc] = strdup(word);
-                        args->argc ++;
+                        args->argc++;
                         word[0] = '\0';
                         p_word = word;
                         *p_word = '\0';
@@ -309,9 +301,9 @@ int command_args_split(const char *line, struct command_args *args)
                 if (new_word) {
                         if (wordlen < 256) {
                                 *p_word = *c;
-                                p_word ++;
+                                p_word++;
                                 *p_word = '\0';
-                                wordlen ++;
+                                wordlen++;
                         }
                 }
                 c++;
@@ -320,7 +312,7 @@ int command_args_split(const char *line, struct command_args *args)
         command_args_allocate(args, args->max_args + 5);
         if (word[0] != '\0') {
                 args->argv[args->argc] = strdup(word);
-                args->argc ++;
+                args->argc++;
         }
-        return  EXIT_SUCCESS;
+        return EXIT_SUCCESS;
 }
