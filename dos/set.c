@@ -21,7 +21,6 @@ For license - read license.txt
 int command_set(int argc, char *argv[]) {
         extern char **environ;
         char **s = environ;
-        char *c;
         int r;
 
         if (argc == 1) {
@@ -31,17 +30,15 @@ int command_set(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
 
-        c = strchr(argv[1], '=');
-        if (c == 0) {
+        if (argc == 2) {
                 printf("%s\n", getenv(argv[1]));
-        } else {
-                const char *name = argv[1];
-                const char *val = c + 1;
-                *c = 0;
-                r = setenv(name, val, 1);
-                return r;
+                return EXIT_SUCCESS;
         }
-        return EXIT_SUCCESS;
+
+        const char *name = argv[1];
+        const char *val = argv[3];
+        r = setenv(name, val, 1);
+        return r;
 }
 
 const char *help_set() { return "Display or modify environment variable"; }

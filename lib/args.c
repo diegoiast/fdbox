@@ -194,7 +194,8 @@ bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_
 enum parsing_state {
         appending,
         scanning,
-        escaping
+        escaping,
+        equals
 };
 
 void command_args_allocate(struct command_args *args, size_t count)
@@ -239,6 +240,7 @@ int command_args_split(const char *line, struct command_args *args)
         while (*c != 0) {
                 bool copy_word = false;
                 bool copy_char = false;
+                bool new_word = false;
 
                 if (isspace(*c)) {
                         /* do not copy empty words */
@@ -265,9 +267,23 @@ int command_args_split(const char *line, struct command_args *args)
                                         copy_char = true;
                                 }
                         }
+                } else if (*c == '=') {
+                        if (state == appending) {
+                                copy_word = true;
+                                new_word = true;
+                                state = equals;
+                        } else {
+                                copy_char = true;
+                        }
                 } else {
-                        copy_char = true;
-                        state = appending;
+                        if (state == equals) {
+                                new_word = true;
+                                copy_word = true;
+                                state = appending;
+                        } else {
+                                copy_char = true;
+                                state = appending;
+                        }
                 }
                 if (copy_char) {
                         if (wordlen < 256) {
@@ -284,8 +300,19 @@ int command_args_split(const char *line, struct command_args *args)
                         word[0] = '\0';
                         p_word = word;
                         *p_word = '\0';
+                        wordlen = 0;
                         bracket = 0;
-                        state = scanning;
+                        if (state != equals) {
+                                state = scanning;
+                        }
+                }
+                if (new_word) {
+                        if (wordlen < 256) {
+                                *p_word = *c;
+                                p_word ++;
+                                *p_word = '\0';
+                                wordlen ++;
+                        }
                 }
                 c++;
         }

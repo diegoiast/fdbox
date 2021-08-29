@@ -193,6 +193,9 @@ bool test_args_split() {
         ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 args - dir /w /2");
         command_args_free(&args);
 
+        rc = command_args_split("a=12", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 args - a=12");
+        command_args_free(&args);
 
         return ok;
 }
