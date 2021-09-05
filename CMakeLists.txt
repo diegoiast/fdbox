@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-# add the executable
+# set the project name
 project(fdbox VERSION 0.1)
 
 include(cmake/CPM.cmake)
