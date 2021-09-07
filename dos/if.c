@@ -21,6 +21,7 @@ For license - read license.txt
 #endif
 
 #ifdef __WIN32__
+#include "lib/win32/dirent.h"
 #include "lib/win32/win32-glob.h"
 #include <stdbool.h>
 #endif

@@ -76,6 +76,11 @@ if(WIN32)
       lib/win32/win32-glob.h
       lib/tc202/stdextra.c
     )
+
+  target_sources(tests PRIVATE
+      lib/tc202/stdextra.c
+    )
+
 endif()
 
 target_include_directories(fdbox PUBLIC "${PROJECT_BINARY_DIR}"

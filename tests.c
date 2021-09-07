@@ -2,6 +2,7 @@
 #include "lib/applet.h"
 #include "lib/args.h"
 #include "lib/environ.h"
+#include "lib/tc202/stdextra.h"
 #include "lib/strextra.h"
 
 #include <stdbool.h>
