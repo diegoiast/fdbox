@@ -22,6 +22,8 @@ int command_set(int argc, char *argv[]) {
         extern char **environ;
         char **s = environ;
         int r;
+        const char *name = argv[1];
+        const char *val = argv[3];
 
         if (argc == 1) {
                 for (; *s; s++) {
@@ -35,8 +37,6 @@ int command_set(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
 
-        const char *name = argv[1];
-        const char *val = argv[3];
         r = setenv(name, val, 1);
         return r;
 }
