@@ -18,6 +18,11 @@ The program compiles also as a native Linux executable
 <img src="fdbox-win10.png" />
 </p>
 
+.. and Apple silicon as well 
+<p align="center">
+<img src="fdbox-osx-apple-silicon.png" />
+</p>
+
 ## Status
 
  * Only DOS commands are supported. Unix commands might follow.
