@@ -15,16 +15,10 @@ jobs:
         include:
           - os: windows-latest
             triplet: x64-windows
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-            vcpkgPackages: 'sqlite3'
           - os: ubuntu-latest
             triplet: x64-linux
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-            vcpkgPackages: 'sqlite3'
           - os: macos-latest
             triplet: x64-osx
-            vcpkgCommitId: '30124253eecff36bc90f73341edbfb4f845e2a1e'
-            vcpkgPackages: 'sqlite3'
 
     steps:
       - uses: actions/checkout@v1
@@ -32,19 +26,13 @@ jobs:
           submodules: true
 
       - uses: lukka/get-cmake@latest
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
-      - name: dir
-        run: find $RUNNER_WORKSPACE
-        shell: bash
       - name: Run CMake+Ninja without triplet
         uses: lukka/run-cmake@main
         id: runcmake
         with:
           cmakeGenerator: 'Ninja'  
           cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/cmakeliststxt/CMakeLists.txt'
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildWithCMakeArgs: '-- -v'
           buildDirectory: '${{ runner.workspace }}/b/ninja/'
       - name: Run CMake+Ninja with triplet (cmd)
@@ -53,21 +41,12 @@ jobs:
         with:
           cmakeGenerator: 'Ninja'  
           cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/cmakeliststxt/CMakeLists.txt'
-          useVcpkgToolchainFile: true
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildWithCMakeArgs: '-- -v'
-          vcpkgTriplet: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}
           buildDirectory: '${{ runner.workspace }}/b/ninja/'
-      - name: Run CMake+Ninja with triplet (bash)
-        if: false
-        uses: lukka/run-cmake@main
-        id: runcmake_bash
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
         with:
-          cmakeGenerator: 'Ninja'  
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/cmakeliststxt/CMakeLists.txt'
-          useVcpkgToolchainFile: true
-          buildWithCMakeArgs: '-- -v'
-          vcpkgTriplet: ${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET_OUT }}
-          buildDirectory: '${{ runner.workspace }}/b/ninja-bash/'
-          useShell: bash
+          name: archive
+          path: '${{ runner.workspace }}/b/ninja/'
+ 
