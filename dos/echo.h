@@ -8,7 +8,7 @@ For license - read license.txt
 
 #include <stdlib.h>
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <stdbool.h>
 #endif
 

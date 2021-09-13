@@ -32,11 +32,10 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "lib/args.h"
 #include "lib/strextra.h"
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <dirent.h>
 #include <fcntl.h>
 #include <glob.h>
-#include <malloc.h>
 #include <stdbool.h>
 #include <sys/stat.h>
 #endif

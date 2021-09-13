@@ -25,7 +25,7 @@
 
 #define DEBUG_LINE printf("%s:%d %s() - PING\n", __FILE__, __LINE__, __FUNCTION__)
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined (__APPLE__)
 #define DIRECTORY_DELIMITER "/"
 #define ARGUMENT_DELIMIER '-'
 #define ALL_FILES_GLOB "*"

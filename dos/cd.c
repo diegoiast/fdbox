@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__)
+#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined (__APPLE__)
 #include <limits.h>
 #include <pwd.h>
 #include <stdio.h>
@@ -36,7 +36,7 @@ int command_cd(int argc, char *argv[]) {
         const char *path = argv[1];
         if (argc == 1) {
                 char cwd[128];
-#if defined(__linux__) || defined(__MSDOS__)
+#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__)
                 getcwd(cwd, 128);
 #elif defined(__WIN32__)
                 DWORD err = GetCurrentDirectory(128, cwd);

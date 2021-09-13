@@ -14,7 +14,7 @@ For license - read license.txt
 #include "lib/environ.h"
 #include "lib/strextra.h"
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <glob.h>
 #include <stdbool.h>
 #include <sys/stat.h>

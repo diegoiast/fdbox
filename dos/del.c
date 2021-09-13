@@ -19,7 +19,7 @@ For license - read license.txt
 #include <sys/stat.h>
 #endif
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <glob.h>
 #include <sys/stat.h>
 #include <unistd.h>

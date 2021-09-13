@@ -16,7 +16,7 @@ For license - read license.txt
 #include <dir.h>
 #endif
 
-#if defined(_POSIX_C_SOURCE) || defined(__WIN32__) || defined(__DJGPP__)
+#if defined(_POSIX_C_SOURCE) || defined(__WIN32__) || defined(__DJGPP__) || defined(__APPLE__)
 #include <unistd.h>
 #endif
 
