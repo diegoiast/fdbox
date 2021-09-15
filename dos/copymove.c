@@ -24,7 +24,7 @@ For license - read license.txt
 #include "lib/tc202/stdextra.h"
 #endif
 
-#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined (__APPLE__)
+#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined(__APPLE__)
 #include <glob.h>
 #include <stdbool.h>
 #include <unistd.h>

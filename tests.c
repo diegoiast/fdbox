@@ -2,8 +2,8 @@
 #include "lib/applet.h"
 #include "lib/args.h"
 #include "lib/environ.h"
-#include "lib/tc202/stdextra.h"
 #include "lib/strextra.h"
+#include "lib/tc202/stdextra.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -179,7 +179,8 @@ bool test_args_split() {
         command_args_free(&args);
 
         rc = command_args_split("'one', \"two's three \" - four", &args);
-        ok |= rc == EXIT_SUCCESS && verify_int_equals(4, args.argc, "3 words and '-', containing quote");
+        ok |= rc == EXIT_SUCCESS &&
+              verify_int_equals(4, args.argc, "3 words and '-', containing quote");
         command_args_free(&args);
 
         rc = command_args_split("dir /w", &args);

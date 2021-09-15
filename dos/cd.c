@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined (__APPLE__)
+#if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined(__APPLE__)
 #include <limits.h>
 #include <pwd.h>
 #include <stdio.h>
