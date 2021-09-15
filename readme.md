@@ -26,7 +26,10 @@ The program compiles also as a native Linux executable
 ## Status
 
  * Only DOS commands are supported. Unix commands might follow.
- * Code compiles only under GCC (Windows+Linux). TCC (DOS).
+ * Code compiles only under GCC (Windows+Linux). TCC (DOS). 
+ * Github actions compiles all the code for Linux, Windows and OSX, 
+   the worlflow also runs the test on all platforms. (DOS automatic builds
+   are not available yet).
  * Currently I am using LibC's functions - so I am limited to
    standard C code support for localization.
  * `TurboC` does need a proper makefile.
