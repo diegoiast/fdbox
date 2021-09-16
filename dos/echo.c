@@ -8,8 +8,11 @@
 #include "lib/environ.h"
 
 #if defined(__TURBOC__)
-#include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#endif
+
+#if defined(__WATCOMC__)
+#include <strings.h>
 #endif
 
 /*

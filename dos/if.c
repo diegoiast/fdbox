@@ -33,6 +33,12 @@ For license - read license.txt
 #include <sys/stat.h>
 #endif
 
+#if defined(__WATCOMC__)
+#include <strings.h>
+#include <sys/stat.h>
+#include "lib/tc202/DOS-GLOB.H"
+#endif
+
 static bool if_file_exists(const char *path);
 static char *find_if_command(int argc, char *argv[]);
 static char *find_else_command(int argc, char *argv[]);

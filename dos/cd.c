@@ -10,8 +10,12 @@
 #include <unistd.h>
 #endif
 
-#ifdef __MSDOS__
+#if defined (__TURBOC__)
 #include <dir.h>
+#endif
+
+#if defined(__WATCOMC__)
+#include <direct.h> 
 #endif
 
 #ifdef WIN32
@@ -36,7 +40,7 @@ int command_cd(int argc, char *argv[]) {
         const char *path = argv[1];
         if (argc == 1) {
                 char cwd[128];
-#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__) || defined(__WATCOMC__)
                 getcwd(cwd, 128);
 #elif defined(__WIN32__)
                 DWORD err = GetCurrentDirectory(128, cwd);

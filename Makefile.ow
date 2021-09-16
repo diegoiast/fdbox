@@ -1,0 +1,123 @@
+CFLAGS=-zq -bt=dos -I. -Ilib -Idos -za99  -Ietc/ow/h
+CC=wcc
+LD=wcl
+
+OBJECTS=applets.o main.o help.o \
+	dos/beep.o \
+	dos/call.o \
+	dos/cd.o \
+	dos/cls.o \
+	dos/command.o \
+	dos/copymove.o \
+	dos/datetime.o \
+	dos/del.o \
+	dos/dir.o \
+	dos/echo.o \
+	dos/exit.o \
+	dos/for.o \
+	dos/goto.o \
+	dos/if.o \
+	dos/md.o \
+	dos/rem.o \
+	dos/path.o \
+	dos/prompt.o \
+	dos/reboot.o \
+	dos/set.o \
+	dos/shift.o \
+	dos/type.o \
+	dos/ver.o \
+	lib/applet.o \
+	lib/args.o \
+	lib/strextra.o \
+	lib/environ.o \
+	lib/tc202/DOS-GLOB.o
+
+TEST_OBJECTS = tests.o \
+	lib/applet.o \
+	lib/args.o \
+	lib/environ.o \
+	lib/strextra.o \
+
+.PHONY: clean all
+
+.c.o:
+	$(CC) -fo=$@ $(CFLAGS) $<
+
+all: tests fdbox
+
+clean:
+	rm -f *.o
+	rm -f dos\*.o
+	rm -f lib\*.o
+
+fdbox: $(OBJECTS)
+	$(LD) -lr $^ -fe=$@
+
+tests: $(TEST_OBJECTS)
+	$(LD) -lr $^ -fe=$@
+
+##################
+
+main.o: main.c
+
+tests.o: tests.c
+
+applets.o: applets.c
+
+help.o: help.c
+
+dos/beep.o: dos/beep.c
+
+dos/call.o: dos/call.c
+
+dos/cd.o: dos/cd.c
+
+dos/cls.o: dos/cls.c
+
+dos/command.o: dos/command.c
+
+dos/copymove.o: dos/copymove.c
+
+dos/datetime.o: dos/datetime.c
+
+dos/del.o: dos/del.c
+
+dos/dir.o: dos/dir.c
+
+dos/echo.o: dos/echo.c
+
+dos/exit.o: dos/exit.c
+
+dos/for.o: dos/for.c
+
+dos/goto.o: dos/goto.c
+
+dos/if.o: dos/if.c
+
+dos/md.o: dos/md.c
+
+dos/path.o: dos/path.c
+
+dos/prompt.o: dos/prompt.c
+
+dos/reboot.o: dos/reboot.c
+
+dos/rem.o: dos/rem.c
+
+dos/set.o: dos/set.c
+
+dos/shift.o: dos/shift.c
+
+dos/type.o: dos/type.c
+
+dos/reboot.o: dos/reboot.c
+
+help.o: help.c
+
+lib/applet.o: lib/applet.c
+
+lib/args.o: lib/args.c
+
+lib/environ.o: lib/environ.c
+
+lib/strextra.o: lib/strextra.c

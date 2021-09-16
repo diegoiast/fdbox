@@ -6,7 +6,9 @@ extern "C" {
 #endif
 
 #define MAX_PATH 254
+#ifndef ENAMETOOLONG 
 #define ENAMETOOLONG -1
+#endif
 
 /* Bits set in the FLAGS argument to `glob' */
 
@@ -47,7 +49,10 @@ void globfree(glob_t *pglob);
 
 /* these should not be here technically, they should be  in STAT.H */
 #define __S_ISTYPE(mode, mask) (((mode)&S_IFMT) == (mask))
+
+#ifndef S_ISDIR
 #define S_ISDIR(mode) __S_ISTYPE((mode), S_IFDIR)
+#endif
 
 #ifdef __cplusplus
 }

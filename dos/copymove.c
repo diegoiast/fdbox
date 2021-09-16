@@ -18,10 +18,14 @@ This file is part of fdbox
 For license - read license.txt
 */
 
-#ifdef __TURBOC__
+#if defined(__TURBOC__)
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#endif
+
+#if defined(__WATCOMC__)
+#include "lib/tc202/DOS-GLOB.H"
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined(__APPLE__)
@@ -305,7 +309,9 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         }
 
         if (config->copy_attributes) {
-#ifndef __MSDOS__
+#if defined(__MSDOS__) || defined(__WATCOMC__)
+                fprintf(stderr, "Warning: copying attributes on MSDOS is not supported yet\n");
+#else
                 struct stat source_attr;
                 struct utimbuf new_times;
                 int err;
@@ -323,8 +329,6 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                         fprintf(stderr, "Error: failed setting ownership on %s\n", to);
                         return errno;
                 }
-#else
-                fprintf(stderr, "Warning: copying attributes on MSDOS is not supported yet\n");
 #endif
         }
 

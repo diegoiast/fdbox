@@ -22,6 +22,10 @@ For license - read license.txt
 #include "lib/tc202/stdextra.h"
 #endif
 
+#if defined(__WATCOMC__)
+#include <strings.h>
+#endif
+
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
 #endif

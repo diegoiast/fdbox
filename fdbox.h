@@ -31,7 +31,8 @@
 #define ALL_FILES_GLOB "*"
 #endif
 
-#if defined(__WIN32__) || defined(__MSDOS__)
+/* There is an assumption that WatcomC will be used for DOS or Windows */
+#if defined(__WIN32__) || defined(__MSDOS__) || defined (__WATCOMC__)
 #define DIRECTORY_DELIMITER "\\"
 #define ARGUMENT_DELIMIER '/'
 #define ALL_FILES_GLOB "*.*"

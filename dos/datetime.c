@@ -29,7 +29,7 @@ For license - read license.txt
 #include <sys/time.h>
 #endif
 
-#ifdef __MSDOS__
+#ifdef __TURBOC__
 #include "lib/tc202/stdbool.h"
 #include <dos.h>
 #endif
