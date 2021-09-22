@@ -26,6 +26,9 @@ const char *str_bool(bool b);
 /* similar to tolower(), but works on a whole string. inline */
 char *str_to_lower(char *s);
 
+
+char *str_del_char(char *s, size_t index);
+
 /* java - string.startsWith() */
 bool str_is_prefix(const char *str, const char *pre);
 

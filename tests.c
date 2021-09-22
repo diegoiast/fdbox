@@ -311,6 +311,29 @@ bool test_str_prefix() {
         return ok;
 }
 
+bool test_str_del() {
+        bool ok = true;
+        char c[1000];
+
+        strcpy(c, "hello");
+        str_del_char(c, 0);
+        ok &= verify_string_equals("ello", c, "Deleting first char");
+
+        strcpy(c, "hello");
+        str_del_char(c, 0);
+        ok &= verify_string_equals("ello", c, "Deleting first char");
+
+        strcpy(c, "hello");
+        str_del_char(c, strlen(c) - 1);
+        ok &= verify_string_equals("hell", c, "Deleting last char");
+
+        strcpy(c, "hello");
+        str_del_char(c, 3);
+        ok &= verify_string_equals("helo", c, "Deleting some char");
+
+        return ok;
+}
+
 bool test_str_char_suffix() {
         bool ok = true;
 
@@ -398,6 +421,7 @@ bool test_strings() {
         bool ok = true;
         ok &= test_string_lower();
         ok &= test_str_prefix();
+        ok &= test_str_del();
         ok &= test_str_char_suffix();
         ok &= test_file_basename();
         ok &= test_file_extensions();

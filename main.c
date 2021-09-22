@@ -31,5 +31,8 @@ int main(int argc, char *argv[]) {
         if (config.verbose) {
                 return command_ver(argc - 1, ++argv);
         }
+        
+        setup_terminal();
+        atexit(restore_terminal);
         return command_command(argc - 1, ++argv);
 }

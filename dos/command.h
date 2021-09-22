@@ -12,4 +12,7 @@ const char *help_command();
 /* EXIT_FAILURE means exit was triggered */
 int command_execute_line(char *line);
 
+void setup_terminal();
+void restore_terminal();
+
 #endif //__command_h__

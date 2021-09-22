@@ -72,3 +72,8 @@ char *strsep(char **stringp, const char *delim) {
         return start;
 }
 #endif
+
+char *str_del_char(char *s, size_t index) {
+        memmove(s + index, s + index + 1, strlen(s) - index);
+        return s;
+}

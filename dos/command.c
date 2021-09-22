@@ -15,7 +15,6 @@ For license - read license.txt
 #include "lib/strextra.h"
 
 #include "dos/prompt.h"
-#include "fdbox.h"
 
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
@@ -24,16 +23,16 @@ For license - read license.txt
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
+#include <unistd.h>
+#include <termios.h>            
 #endif
 
 #ifdef __WIN32__
+#include <io.h>
+#include <conio.h>
 #include <stdbool.h>
+#include <windows.h>
 #endif
-
-/*
-This file is part of fdbox
-For license - read license.txt
-*/
 
 struct command_shell_config {
         struct command_config global;
@@ -44,11 +43,13 @@ static bool command_shell_config_parse(int argc, char *argv[], struct command_sh
 static void command_shell_config_print(const struct command_shell_config *config);
 static void command_shell_print_extended_help();
 
+size_t read_line(char line[], int max_size);
+
 /* TODO - I am unsure if this is the best way to tell the main loop
  * we should exit. For now it works
  */
 
-int command_execute_line_new(const char *line) {
+int command_execute_line(const char *line) {
         struct command_args args;
         struct applet *cmd;
         int code;
@@ -82,56 +83,13 @@ int command_execute_line_new(const char *line) {
                         fprintf(stderr, "Command failed (%d)\n", code);
                 }
         } else {
-                fprintf(stderr, "Command not found\n");
+                fprintf(stderr, "Command not found - [%s][%s]\n", args.argv[0], line);
                 errno = ENOENT;
         }
 
         command_args_free(&args);
         return EXIT_SUCCESS;
 }
-
-int command_execute_line_old(char *line) {
-        size_t c_argc;
-        char *c_argv[256];
-        bool parsed_ok;
-        struct applet *cmd;
-        int code;
-        extern struct applet commands[];
-
-        /* this function will not modify the args, so its marked `const
-         * but some commands (date/time) will modify the args instead of making copies
-         * this is OK for now */
-        parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
-        if (!parsed_ok) {
-                fprintf(stderr, "Command line parsing failed\n");
-                return EXIT_SUCCESS;
-        }
-
-        if (c_argc == 0) {
-                return EXIT_SUCCESS;
-        }
-
-        /* Special handling for exit, as it should break the main loop */
-        if (strcasecmp(c_argv[0], "exit") == 0) {
-                return EXIT_FAILURE;
-        }
-
-        cmd = find_applet(CASE_INSENSITVE, c_argv[0], commands);
-        if (cmd != NULL) {
-                code = cmd->handler(c_argc, c_argv);
-                errno = code;
-                if (code != EXIT_SUCCESS) {
-                        fprintf(stderr, "Command failed (%d)\n", code);
-                }
-        } else {
-                fprintf(stderr, "Command not found\n");
-                errno = ENOENT;
-        }
-
-        return EXIT_SUCCESS;
-}
-
-int command_execute_line(char *line) { return command_execute_line_new(line); }
 
 int command_command(int argc, char *argv[]) {
         char line[1024], *pos;
@@ -158,7 +116,7 @@ int command_command(int argc, char *argv[]) {
                 }
                 get_prompt(t, prompt, 256);
                 printf("%s", prompt);
-                fgets(line, 1024, stdin);
+                read_line(line, 1024);
 
                 if ((pos = strchr(line, '\n')) != NULL) {
                         *pos = '\0';
@@ -186,7 +144,6 @@ static bool command_shell_config_parse(int argc, char *argv[],
                 c2 = tolower(c1);
                 switch (c2) {
                 case ARG_PROCESSED:
-                        break;
                 case ARG_DONE:
                         break;
                 default:
@@ -206,4 +163,251 @@ static void command_shell_print_extended_help() {
         printf("   command {shell command} /l\n");
         printf("   Runs an interactive shell \n");
         printf("   TODO: properly implement the command.com swithces \n");
+}
+
+
+/* read line */
+bool is_interactive()
+{
+        return isatty(fileno(stdin));
+}
+
+int read_line_simple(char line[], int max_size) {
+        line[0] = 0;
+        fgets(line, max_size, stdin);
+        return strlen(line);
+}
+
+#define KEY_ARROW_LEFT      0xff4b
+#define KEY_ARROW_RIGHT     0xff4d
+#define KEY_ARROW_UP        0xff48
+#define KEY_ARROW_DOWN      0xff50
+#define KEY_HOME            0xff47
+#define KEY_END             0xff4f
+#define KEY_PGDOWN          0xff49
+#define KEY_PGUP            0xff51
+
+#if defined(__WIN32__)
+int get_char_win32() {
+        DWORD cc;
+        HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+
+        // console not found
+        if (h == NULL) {
+                return -1;
+        }
+
+        for (;;) {
+                INPUT_RECORD irec;
+                ReadConsoleInput(h, &irec, 1, &cc);
+
+                if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown) {
+                        if (irec.Event.KeyEvent.uChar.AsciiChar != 0) {
+                                return irec.Event.KeyEvent.uChar.AsciiChar;
+                        }
+                        else {
+                                switch (irec.Event.KeyEvent.wVirtualScanCode) {
+                                        case KEY_ARROW_LEFT & 0x00ff:
+                                                return KEY_ARROW_LEFT;
+                                        case KEY_ARROW_RIGHT & 0x00ff:
+                                                return KEY_ARROW_RIGHT;
+                                        case KEY_ARROW_UP & 0x00ff:
+                                                return KEY_ARROW_UP;
+                                        case KEY_ARROW_DOWN & 0x00ff:
+                                                return KEY_ARROW_DOWN;
+                                        case KEY_HOME & 0x00ff:
+                                                return KEY_HOME;
+                                        case KEY_END & 0x00ff:
+                                                return KEY_END;
+                                        case KEY_PGDOWN & 0x00ff:
+                                                return KEY_PGDOWN;
+                                        case KEY_PGUP & 0x00ff:
+                                                return KEY_PGUP;
+                                }
+                        }
+/*
+                //&& ! ((KEY_EVENT_RECORD&)irec.Event).wRepeatCount )
+                        printf("*** Pressed %d,%c  unicode=%x, scancode=%x, keycode=%x, flags=%x\n",
+                               irec.Event.KeyEvent.uChar.AsciiChar,
+                               irec.Event.KeyEvent.uChar.AsciiChar,
+                               irec.Event.KeyEvent.uChar.UnicodeChar,
+                               irec.Event.KeyEvent.wVirtualScanCode,
+                                irec.Event.KeyEvent.wVirtualKeyCode,
+                                irec.Event.KeyEvent.dwControlKeyState
+                        );
+                        return irec.Event.KeyEvent.uChar.AsciiChar;
+                        */
+                }
+        }
+        return -1;
+}
+#define get_char_impl get_char_win32
+
+#elif defined(_POSIX_C_SOURCE)
+int get_char_posix() {
+        int i = getchar();        
+        switch (i) {
+        case '\033':
+                i = getchar();
+                if (i == '[') {
+                        i = getchar();
+                        switch (i) {
+                        case 'A':
+                                return KEY_ARROW_UP;
+                        case 'B':
+                                return KEY_ARROW_DOWN;
+                        case 'C':
+                                return KEY_ARROW_RIGHT;
+                        case 'D':
+                                return KEY_ARROW_LEFT;
+                        }
+                }
+                return 0;
+        case '\177':
+                return '\b';
+        default:
+                return i;
+        }
+}
+#define get_char_impl get_char_posix
+
+#elif defined(__TURBOC__)
+
+int get_char_dos()
+{
+        int c = getch();
+        
+        /* extended ASCII FTW */
+        if (c == 0) {
+                c = getch();
+                switch (c) {
+                case KEY_ARROW_LEFT & 0x00ff:
+                        return KEY_ARROW_LEFT;
+                case KEY_ARROW_RIGHT & 0x00ff:
+                        return KEY_ARROW_RIGHT;
+                case KEY_ARROW_UP & 0x00ff:
+                        return KEY_ARROW_UP;
+                case KEY_ARROW_DOWN & 0x00ff:
+                        return KEY_ARROW_DOWN;
+                case KEY_HOME & 0x00ff:
+                        return KEY_HOME;
+                case KEY_END & 0x00ff:
+                        return KEY_END;
+                case KEY_PGDOWN & 0x00ff:
+                        return KEY_PGDOWN;
+                case KEY_PGUP & 0x00ff:
+                        return KEY_PGUP;
+                default: 
+                        return 0;
+                }
+        }
+        return c;
+}
+
+#define get_char_impl get_char_dos
+#endif
+
+
+void move_cursor_back(size_t n) {
+        int i;
+        for (i=0; i < n; i++) {
+                putchar('\b');
+        }        
+}
+
+int read_line_console(char *line, size_t max_size) {
+        size_t index = 0;
+        size_t size = 0;
+        
+        line[0] = 0;
+
+        while (index < max_size) {
+                int c = get_char_impl();
+
+                switch (c) {
+                case '\r':
+                case '\n':
+                        putchar('\n');
+                        line[size] = 0;
+                        return size;
+                case KEY_ARROW_LEFT:
+                        if (index > 0) {
+                                index --;
+                                putchar('\b');
+                        }
+                        break;
+                case KEY_ARROW_RIGHT: {
+                        char next = line[index];
+                        if (index < max_size  && next != '\0') {
+                                putchar(line[index]);
+                                index ++;
+                        }
+                        break;
+                }
+                case '\b': {
+                        size_t line_length, i;
+                        str_del_char(line, index-1);
+                        move_cursor_back(index);
+                        printf("%s ",line);                        
+                        line_length = strlen(line);
+                        move_cursor_back(line_length+1);
+                        index --;
+                        if (index > line_length) {
+                                index = line_length;
+                        }
+                        for (i = 0; i < index; i++) {
+                                putchar(line[i]);
+                        }
+                        fflush(stdout);
+                        break;
+                }
+                default:
+                        /* Don't pass arrows, we nuked non-ascii... which is another problem */
+                        if (c <= 0xff) {
+                                line[index] = (char)c;
+                                putchar(c);
+                                index++;
+                                if (index > size) {
+                                        size = index;
+                                }
+                                line[size] = 0;
+                        }
+                }
+        }
+        return size;
+}
+
+size_t read_line(char line[], int max_size) {
+        int l;
+        if (!is_interactive()) {
+                return read_line_simple(line, max_size);
+        }
+        l = read_line_console(line, max_size);
+        if (l < 0) {
+                l = read_line_simple(line, max_size);
+        }
+        return l;
+}
+
+/* https://stackoverflow.com/a/1798833 */
+void setup_terminal()
+{
+#ifdef _POSIX_C_SOURCE        
+        static struct termios oldt, newt;
+        tcgetattr( STDIN_FILENO, &oldt);
+        newt = oldt;        
+        newt.c_lflag &= ~(ICANON | ECHO);          
+        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+#endif
+}
+
+void restore_terminal()
+{
+#ifdef _POSIX_C_SOURCE        
+        static struct termios oldt, newt;
+        tcgetattr( STDIN_FILENO, &oldt);
+        newt = oldt;
+        newt.c_lflag |= (ICANON | ECHO);          
+        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+#endif        
 }
