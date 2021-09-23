@@ -330,6 +330,18 @@ int read_line_console(char *line, size_t max_size) {
                         putchar('\n');
                         line[size] = 0;
                         return size;
+                case KEY_HOME:
+                        move_cursor_back(index);
+                        index = 0;
+                        fflush(stdout);
+                        break;
+                case KEY_END:
+                        while (line[index] != '\0') {
+                                putch(line[index]);
+                                index++;
+                        }
+                        fflush(stdout);
+                        break;
                 case KEY_ARROW_LEFT:
                         if (index > 0) {
                                 index --;
