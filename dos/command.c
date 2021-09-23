@@ -337,7 +337,7 @@ int read_line_console(char *line, size_t max_size) {
                         break;
                 case KEY_END:
                         while (line[index] != '\0') {
-                                putch(line[index]);
+                                putchar(line[index]);
                                 index++;
                         }
                         fflush(stdout);
