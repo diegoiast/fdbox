@@ -21,7 +21,7 @@ For license - read license.txt
 #include "lib/tc202/stdextra.h"
 #endif
 
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <stdbool.h>
 #include <unistd.h>
 #include <termios.h>            
