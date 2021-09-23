@@ -243,7 +243,7 @@ int get_char_win32() {
 }
 #define get_char_impl get_char_win32
 
-#elif defined(_POSIX_C_SOURCE)
+#elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 int get_char_posix() {
         int i = getchar();        
         switch (i) {
@@ -305,6 +305,13 @@ int get_char_dos()
 }
 
 #define get_char_impl get_char_dos
+#else
+#error Undefined platform - we cannot read a line on a terminal
+TODO - it seems that this platform is not supported yet - you need to define a function
+"get_char_my_platform()" that reads a char without enter beeing pressed. Then
+
+define get_char_impl get_char_my_platform
+
 #endif
 
 
