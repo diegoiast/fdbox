@@ -260,6 +260,16 @@ int get_char_posix() {
                                 return KEY_ARROW_RIGHT;
                         case 'D':
                                 return KEY_ARROW_LEFT;
+                        case 'H':
+                                return KEY_HOME;
+                        case 'F':
+                                return KEY_END;
+                        case '6':
+                                return KEY_PGDOWN;
+                        case '5':
+                                return KEY_PGUP;
+                        default:
+                                printf("read escape code: %d\n", i);
                         }
                 }
                 return 0;
