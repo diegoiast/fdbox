@@ -362,10 +362,9 @@ bool test_str_ins() {
         str_ins_char(c, 5, '3', 2);
         ok &= verify_string_equals("1234", c, "insert a char in the middle (exact buffer size)");
         
-        char c2[3];
-        strcpy(c2, "13");
-        str_ins_char(c2, 3, '2', 1);
-        ok &= verify_string_equals("123", c2, "insert a char and the end (truncated)");
+        strcpy(c, "13");
+        str_ins_char(c, 3, '2', 1);
+        ok &= verify_string_equals("123", c, "insert a char and the end (truncated)");
         
         return ok;
 }
