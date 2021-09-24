@@ -326,7 +326,7 @@ define get_char_impl get_char_my_platform
 
 
 void move_cursor_back(size_t n) {
-        int i;
+        size_t i;
         for (i=0; i < n; i++) {
                 putchar('\b');
         }        
@@ -335,9 +335,9 @@ void move_cursor_back(size_t n) {
 int read_line_console(char *line, size_t max_size) {
         size_t index = 0;
         size_t size = 0;
+        bool override = false;
         
         line[0] = 0;
-
         while (index < max_size) {
                 int c = get_char_impl();
 
@@ -393,8 +393,16 @@ int read_line_console(char *line, size_t max_size) {
                 default:
                         /* Don't pass arrows, we nuked non-ascii... which is another problem */
                         if (c <= 0xff) {
-                                line[index] = (char)c;
-                                putchar(c);
+                                if (override) {
+                                        line[index] = (char)c;
+                                        putchar(c);
+                                } else {                                        
+                                        str_ins_char(line, max_size, c, index);
+                                        printf("%s", line + index);
+                                        size = strlen(line);
+                                        move_cursor_back(size - index -1);
+                                }
+                                        
                                 index++;
                                 if (index > size) {
                                         size = index;

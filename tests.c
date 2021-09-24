@@ -334,6 +334,42 @@ bool test_str_del() {
         return ok;
 }
 
+bool test_str_ins() {
+        bool ok = true;
+        char c[1000];
+
+        c[0] = 0;
+        str_ins_char(c, 1000, 'Y', 0);
+        ok &= verify_string_equals("Y", c, "insert a char to empty string");
+        
+        strcpy(c, "hello");
+        str_ins_char(c, 1000, '!', 5);
+        ok &= verify_string_equals("hello!", c, "insert a char at the end");
+
+        strcpy(c, "hello");
+        str_ins_char(c, 1000, '!', 0);
+        ok &= verify_string_equals("!hello", c, "insert a char at the beginnig");
+
+        strcpy(c, "hello");
+        str_ins_char(c, 1000, 'A', 1);
+        ok &= verify_string_equals("hAello", c, "insert in the middle");
+
+        strcpy(c, "hello");
+        str_ins_char(c, 6, '!', 10000);
+        ok &= verify_string_equals("hello", c, "insert an out of bound char - silently fail");
+
+        strcpy(c, "124");
+        str_ins_char(c, 5, '3', 2);
+        ok &= verify_string_equals("1234", c, "insert a char in the middle (exact buffer size)");
+        
+        char c2[3];
+        strcpy(c2, "13");
+        str_ins_char(c2, 3, '2', 1);
+        ok &= verify_string_equals("123", c2, "insert a char and the end (truncated)");
+        
+        return ok;
+}
+
 bool test_str_char_suffix() {
         bool ok = true;
 
@@ -422,6 +458,7 @@ bool test_strings() {
         ok &= test_string_lower();
         ok &= test_str_prefix();
         ok &= test_str_del();
+        ok &= test_str_ins();
         ok &= test_str_char_suffix();
         ok &= test_file_basename();
         ok &= test_file_extensions();

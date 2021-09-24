@@ -20,18 +20,22 @@ For license - read license.txt
 #include "lib/tc202/stdbool.h"
 #endif
 
-/* returns a string value, Java Bool.toString() */
+/* returns a string value, Java - Bool.toString() */
 const char *str_bool(bool b);
 
-/* similar to tolower(), but works on a whole string. inline */
+/* similar to tolower(), but works on a whole string. modifies input */
 char *str_to_lower(char *s);
 
-
+/* deletes a single char within a string, pushing everything after leftwise */
 char *str_del_char(char *s, size_t index);
+
+/* inserts a single char within a string, pushing everything after rightwise*/
+char *str_ins_char(char *s, size_t max_length, char c, size_t index);
 
 /* java - string.startsWith() */
 bool str_is_prefix(const char *str, const char *pre);
 
+/* java - string.endsWith() */
 bool str_ends_with(const char *str, char c);
 
 /* fnsplit, more or less, returing only the filename+ext, without path */
