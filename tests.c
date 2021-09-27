@@ -13,6 +13,7 @@
 typedef bool (*function_test)();
 
 bool test(const char *message, function_test unittest);
+bool test_str_list();
 bool test_args();
 bool test_args_split();
 bool test_applets();
@@ -29,6 +30,7 @@ int main(int argc, char *argv[]) {
         ok &= test("prompts", test_prompts);
         ok &= test("variables expansion", test_var_expand);
         ok &= test("argument split", test_args_split);
+        ok &= test_str_list();
         UNUSED(argc);
         UNUSED(argv);
         return ok ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -47,7 +49,7 @@ bool test(const char *message, function_test unittest) {
 // assert like functions.
 // TODO : if we convert this to a macro, we will have line numbers
 
-bool verify_ptr_equals(void *arg1, void *arg2, const char *message) {
+bool verify_ptr_equals(const void *arg1, const void *arg2, const char *message) {
         printf(" * Checking %s: ", message);
         if (arg1 == arg2) {
                 printf("OK\n");
@@ -463,6 +465,104 @@ bool test_strings() {
         ok &= test_file_extensions();
         return ok;
 }
+
+bool test_str_list() {
+        bool ok = true;
+        struct str_list list;
+        char *c1;
+        const char* c2;
+        
+        str_list_init(&list, 5);
+        c1 = str_list_pop(&list);
+        ok &= verify_ptr_equals(c1, NULL, "pop from empty list");
+        
+        str_list_push(&list, "aaa");
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "aaa", "push and pop");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_ptr_equals(c1, NULL, "pop after push");
+
+        str_list_push(&list, "bbb");
+        c2 = str_list_get(&list, 0);
+        ok &= verify_string_equals(c2, "bbb", "get from a single item list");
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "bbb", "pop after fetch");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_ptr_equals(c1, NULL, "pop after push, and get");
+        
+        str_list_push(&list, "111");
+        str_list_push(&list, "222");
+        str_list_push(&list, "333");
+        str_list_push(&list, "444");
+        c1 = str_list_pop(&list);
+        free(c1);
+        c1 = str_list_pop(&list);
+        free(c1);
+        c1 = str_list_pop(&list);
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "111", "pop after fetch");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_ptr_equals(c1, NULL, "pop after 4  pushes");
+        
+        str_list_push(&list, "111");
+        str_list_push(&list, "222");
+        str_list_push(&list, "333");
+        str_list_push(&list, "444");
+        str_list_push(&list, "555");
+
+        c2 = str_list_get(&list, 0);
+        ok &= verify_string_equals(c2, "555", "fetch from 1/5 list");
+        c2 = str_list_get(&list, 1);
+        ok &= verify_string_equals(c2, "444", "fetch from 2/5 list");
+        c2 = str_list_get(&list, 2);
+        ok &= verify_string_equals(c2, "333", "fetch from 3/5 list");
+        c2 = str_list_get(&list, 3);
+        ok &= verify_string_equals(c2, "222", "fetch from 4/5 list");
+        c2 = str_list_get(&list, 4);
+        ok &= verify_string_equals(c2, "111", "fetch from 5/5 list");
+        
+        str_list_push(&list, "666");
+        c2 = str_list_get(&list, 0);
+        ok &= verify_string_equals(c2, "666", "fetch from 6/5 list");
+        c2 = str_list_get(&list, 1);
+        ok &= verify_string_equals(c2, "555", "fetch from 6/5 list");
+        c2 = str_list_get(&list, 2);
+        ok &= verify_string_equals(c2, "444", "fetch from 6/5 list");
+        c2 = str_list_get(&list, 3);
+        ok &= verify_string_equals(c2, "333", "fetch from 6/5 list");
+        c2 = str_list_get(&list, 4);
+        ok &= verify_string_equals(c2, "222", "fetch from 6/5 list");
+        c2 = str_list_get(&list, 5);
+        ok &= verify_ptr_equals(c2, NULL, "fetch out of bounds");
+        
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "666", "pop from 6/5 list");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "555", "pop from 6/5 list");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "444", "pop from 6/5 list");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "333", "pop from 6/5 list");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_string_equals(c1, "222", "pop from 6/5 list");
+        free(c1);
+        c1 = str_list_pop(&list);
+        ok &= verify_ptr_equals(c1, NULL, "pop after 6/5 pushes");
+        free(c1);
+
+        str_list_free(&list);
+        
+        return ok;
+}
+
 
 bool test_prompt_letter(char l, char k) {
         bool ok = true;
