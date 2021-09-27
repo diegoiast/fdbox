@@ -22,8 +22,9 @@ add_executable(
   tests.c
   lib/applet.c
   lib/args.c
-  lib/strextra.c
   lib/environ.c
+  lib/readline.c
+  lib/strextra.c
   )
 target_include_directories(tests PUBLIC "${PROJECT_BINARY_DIR}"
                                         "${PROJECT_SOURCE_DIR}")
@@ -37,8 +38,9 @@ add_executable(
   help.c
   lib/applet.c
   lib/args.c
-  lib/strextra.c
   lib/environ.c
+  lib/strextra.c
+  lib/readline.c
   dos/beep.c
   dos/call.c
   dos/cd.c
