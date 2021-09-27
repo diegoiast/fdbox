@@ -1,3 +1,6 @@
+#ifndef READLINE_H
+#define READLINE_H
+
 #include <stddef.h>
 
 #define KEY_ARROW_LEFT      0x7f4b
@@ -18,3 +21,5 @@ int read_string(char *line, size_t max_size);
 
 void setup_terminal();
 void restore_terminal();
+
+#endif

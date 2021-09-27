@@ -4,6 +4,7 @@
 #include "help.h"
 #include "lib/applet.h"
 #include "lib/args.h"
+#include "lib/readline.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

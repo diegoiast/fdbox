@@ -138,9 +138,10 @@ char* str_list_pop(struct str_list *list) {
 }
 
 const char* str_list_get(struct str_list *list, size_t n) {
+        size_t index;
         if (n >= list->length) {
                 return NULL;;
         }
-        size_t index = (list->next + list->length - n - 1) % list->length;
+        index = (list->next + list->length - n - 1) % list->length;
         return list->items[index];
 }
