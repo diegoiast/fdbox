@@ -2,6 +2,19 @@
 #define READLINE_H
 
 #include <stddef.h>
+#include <stdlib.h>
+
+#ifdef __MSDOS__
+#include "lib/tc202/stdbool.h"
+#endif
+
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include <stdbool.h>
+#endif
+
+#ifdef __WIN32__
+#include <stdbool.h>
+#endif
 
 #define KEY_ARROW_LEFT      0x7f4b
 #define KEY_ARROW_RIGHT     0x7f4d
@@ -12,14 +25,36 @@
 #define KEY_PGDOWN          0x7f49
 #define KEY_PGUP            0x7f51
 
-void readline_init();
-void readline_deinit();
-
 /* moves the cursor to the left */
 void move_cursor_back(size_t n);
 
 /* read a single characrer, without enter */
 int read_char();
+
+/* old API - to be removed soon */
 int read_string(char *line, size_t max_size);
+
+struct readline_session {
+        char *line;
+        size_t max_size;
+        size_t current_size;
+        size_t index;
+        bool override;
+};
+
+void readline_init();
+void readline_deinit();
+
+void readline_session_init(struct readline_session *session);
+void readline_session_allocate(struct readline_session *session, size_t max_size);
+int readline(struct readline_session *session);
+
+size_t readline_delete_left(struct readline_session *session);
+size_t readline_replace(struct readline_session *session, size_t index, char c);
+size_t readline_insert(struct readline_session *session, size_t index, char c);
+void readline_move_home(struct readline_session *session);
+void readline_move_end(struct readline_session *session);
+void readline_move_left(struct readline_session *session);
+void readline_move_right(struct readline_session *session);
 
 #endif

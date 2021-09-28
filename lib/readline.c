@@ -35,37 +35,6 @@ For license - read license.txt
 #include <windows.h>
 #endif
 
-/* https://stackoverflow.com/a/1798833 */
-#ifdef _POSIX_C_SOURCE        
-static struct termios oldt;
-#endif
-
-void readline_init()
-{
-#ifdef _POSIX_C_SOURCE        
-        static struct termios newt;
-        tcgetattr( STDIN_FILENO, &oldt );
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);          
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
-#endif
-}
-
-void readline_deinit()
-{
-#ifdef _POSIX_C_SOURCE        
-        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
-#endif        
-}
-
-void move_cursor_back(size_t n) {
-        size_t i;
-        for (i=0; i < n; i++) {
-                putchar('\b');
-        }        
-}
-
-
 #if defined(__WIN32__)
 int read_char() {
         DWORD cc;
@@ -197,83 +166,180 @@ TODO - it seems that this platform is not supported yet - you need to define a f
 #endif
 
 int read_string(char *line, size_t max_size) {
-        size_t index = 0;
-        size_t size = 0;
-        bool override = false;
-        
-        line[0] = 0;
-        while (index < max_size) {
-                int c = read_char();
+        struct readline_session session;
+        readline_session_init(&session);
+        session.line = line;
+        session.max_size = max_size;
+        return readline(&session);
+}
 
+/* https://stackoverflow.com/a/1798833 */
+#ifdef _POSIX_C_SOURCE        
+static struct termios oldt;
+#endif
+
+void readline_init()
+{
+#ifdef _POSIX_C_SOURCE        
+        static struct termios newt;
+        tcgetattr( STDIN_FILENO, &oldt );
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO);          
+        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+#endif
+}
+
+void readline_deinit()
+{
+#ifdef _POSIX_C_SOURCE        
+        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+#endif        
+}
+
+void move_cursor_back(size_t n) {
+        size_t i;
+        for (i=0; i < n; i++) {
+                putchar('\b');
+        }        
+}
+
+void readline_session_init(struct readline_session *session)
+{
+        session->line = NULL;
+        session->max_size = 0;
+        session->current_size = 0;
+        session->index = 0;        
+        session->override = false;
+}
+
+void readline_session_allocate(struct readline_session *session, size_t max_size)
+{
+        readline_session_init(session);
+        session->line = malloc(max_size);
+        session->max_size = max_size;
+}
+
+int readline(struct readline_session *session)
+{
+        session->line[0] = 0;
+        while (session->index < session->max_size) {
+                int c = read_char();
                 switch (c) {
                 case '\r':
                 case '\n':
                         putchar('\n');
-                        line[size] = 0;
-                        return size;
+                        session->line[session->current_size] = 0;
+                        return session->current_size;
                 case KEY_HOME:
-                        move_cursor_back(index);
-                        index = 0;
-                        fflush(stdout);
+                        readline_move_home(session);
                         break;
                 case KEY_END:
-                        while (line[index] != '\0') {
-                                putchar(line[index]);
-                                index++;
-                        }
-                        fflush(stdout);
+                        readline_move_end(session);
                         break;
                 case KEY_ARROW_LEFT:
-                        if (index > 0) {
-                                index --;
-                                putchar('\b');
-                        }
+                        readline_move_left(session);
                         break;
-                case KEY_ARROW_RIGHT: {
-                        char next = line[index];
-                        if (index < max_size  && next != '\0') {
-                                putchar(line[index]);
-                                index ++;
-                        }
+                case KEY_ARROW_RIGHT: 
+                        readline_move_right(session);
                         break;
-                }
-                case '\b': {
-                        size_t line_length, i;
-                        str_del_char(line, index-1);
-                        move_cursor_back(index);
-                        printf("%s ",line);                        
-                        line_length = strlen(line);
-                        move_cursor_back(line_length+1);
-                        index --;
-                        if (index > line_length) {
-                                index = line_length;
-                        }
-                        for (i = 0; i < index; i++) {
-                                putchar(line[i]);
-                        }
-                        fflush(stdout);
+                case KEY_ARROW_UP:
                         break;
-                }
+                case KEY_ARROW_DOWN:
+                        break;
+                case '\b': 
+                        session->index = readline_delete_left(session);
+                        break;           
                 default:
-                        /* Don't pass arrows, we nuked non-ascii... which is another problem */
-                        if (c <= 0xff) {
-                                if (override) {
-                                        line[index] = (char)c;
+                        if (session->override) {
+                                session->current_size = readline_replace(session, session->index, c);
+                                /* we append only at the end, should we use readline_insert instead? */
+                                if (session->index == session->current_size) {
+                                        session->index ++;
+                                        session->current_size ++;
                                         putchar(c);
-                                } else {                                        
-                                        str_ins_char(line, max_size, c, index);
-                                        printf("%s", line + index);
-                                        size = strlen(line);
-                                        move_cursor_back(size - index -1);
                                 }
-                                        
-                                index++;
-                                if (index > size) {
-                                        size = index;
-                                }
-                                line[size] = 0;
+                        } else {
+                                session->current_size = readline_insert(session, session->index, c);
+                                session->index ++;
                         }
                 }
+        }        
+        return session->current_size;
+}
+
+size_t readline_delete_left(struct readline_session *session)
+{
+        size_t i;
+        str_del_char(session->line, session->index-1);
+        move_cursor_back(session->index);
+        printf("%s ", session->line);
+        session->current_size = strlen(session->line);
+        move_cursor_back(session->current_size +1);
+        session->index --;
+        if (session->index > session->current_size) {
+                session->index = session->current_size;
         }
-        return size;
+        for (i = 0; i < session->index; i++) {
+                putchar(session->line[i]);
+        }
+        fflush(stdout);
+        return session->index;
+}
+
+size_t readline_replace(struct readline_session *session, size_t index, char c)
+{
+        session->line[index] = c;
+        session->line[index+1] = '\0';
+        putchar(c);
+        putchar('\b');
+        fflush(stdout);
+        return session->current_size;
+}
+
+size_t readline_insert(struct readline_session *session, size_t index, char c)
+{
+        str_ins_char(session->line, session->max_size, c, index);
+        printf("%s", session->line + index);
+        session->current_size = strlen(session->line);
+        move_cursor_back(session->current_size - index -1);
+                
+        index++;
+        if (session->index > session->current_size) {
+                session->current_size = index;
+        }
+        session->line[session->current_size] = 0;
+        return session->current_size;
+}
+
+void readline_move_home(struct readline_session *session)
+{
+        move_cursor_back(session->index);
+        session->index = 0;
+        fflush(stdout);
+}
+
+void readline_move_end(struct readline_session *session)
+{
+        while (session->line[session->index] != '\0') {
+                putchar(session->line[session->index]);
+                session->index++;
+        }
+        fflush(stdout);        
+}
+
+void readline_move_left(struct readline_session *session)
+{
+        if (session->index > 0) {
+                session->index --;
+                putchar('\b');
+        }        
+}
+
+void readline_move_right(struct readline_session *session)
+{
+        char next = session->line[session->index];
+        if (session->index < session->max_size  && next != '\0') {
+                putchar(session->line[session->index]);
+                session->index ++;
+        }        
 }
