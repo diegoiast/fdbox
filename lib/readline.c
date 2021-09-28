@@ -228,7 +228,6 @@ int readline(struct readline_session *session)
                 case '\r':
                 case '\n':
                         putchar('\n');
-                        session->line[session->current_size] = 0;
                         return session->current_size;
                 case KEY_HOME:
                         readline_move_home(session);
@@ -252,12 +251,11 @@ int readline(struct readline_session *session)
                 default:
                         if (session->override) {
                                 session->current_size = readline_replace(session, session->index, c);
-                                /* we append only at the end, should we use readline_insert instead? */
+                                putchar(c);
                                 if (session->index == session->current_size) {
-                                        session->index ++;
                                         session->current_size ++;
-                                        putchar(c);
                                 }
+                                session->index ++;
                         } else {
                                 session->current_size = readline_insert(session, session->index, c);
                                 session->index ++;
@@ -289,7 +287,9 @@ size_t readline_delete_left(struct readline_session *session)
 size_t readline_replace(struct readline_session *session, size_t index, char c)
 {
         session->line[index] = c;
-        session->line[index+1] = '\0';
+        if (session->index == session->current_size) {
+                session->line[index+1] = '\0';                
+        }
         putchar(c);
         putchar('\b');
         fflush(stdout);
