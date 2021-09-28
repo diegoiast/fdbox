@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
                 return command_ver(argc - 1, ++argv);
         }
         
-        setup_terminal();
-        atexit(restore_terminal);
+        readline_init();
+        atexit(readline_deinit);
         return command_command(argc - 1, ++argv);
 }

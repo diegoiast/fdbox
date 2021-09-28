@@ -35,6 +35,29 @@ For license - read license.txt
 #include <windows.h>
 #endif
 
+/* https://stackoverflow.com/a/1798833 */
+#ifdef _POSIX_C_SOURCE        
+static struct termios oldt;
+#endif
+
+void readline_init()
+{
+#ifdef _POSIX_C_SOURCE        
+        static struct termios newt;
+        tcgetattr( STDIN_FILENO, &oldt );
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO);          
+        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+#endif
+}
+
+void readline_deinit()
+{
+#ifdef _POSIX_C_SOURCE        
+        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+#endif        
+}
+
 void move_cursor_back(size_t n) {
         size_t i;
         for (i=0; i < n; i++) {
@@ -253,27 +276,4 @@ int read_string(char *line, size_t max_size) {
                 }
         }
         return size;
-}
-
-/* https://stackoverflow.com/a/1798833 */
-#ifdef _POSIX_C_SOURCE        
-static struct termios oldt;
-#endif
-
-void setup_terminal()
-{
-#ifdef _POSIX_C_SOURCE        
-        static struct termios newt;
-        tcgetattr( STDIN_FILENO, &oldt );
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);          
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
-#endif
-}
-
-void restore_terminal()
-{
-#ifdef _POSIX_C_SOURCE        
-        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
-#endif        
 }

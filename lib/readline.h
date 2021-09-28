@@ -12,14 +12,14 @@
 #define KEY_PGDOWN          0x7f49
 #define KEY_PGUP            0x7f51
 
+void readline_init();
+void readline_deinit();
+
 /* moves the cursor to the left */
 void move_cursor_back(size_t n);
 
 /* read a single characrer, without enter */
 int read_char();
 int read_string(char *line, size_t max_size);
-
-void setup_terminal();
-void restore_terminal();
 
 #endif
