@@ -24,13 +24,13 @@ For license - read license.txt
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <stdbool.h>
+#include <termios.h>
 #include <unistd.h>
-#include <termios.h>            
 #endif
 
 #ifdef __WIN32__
-#include <io.h>
 #include <conio.h>
+#include <io.h>
 #include <stdbool.h>
 #include <windows.h>
 #endif
@@ -52,39 +52,38 @@ int read_char() {
                 if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown) {
                         if (irec.Event.KeyEvent.uChar.AsciiChar != 0) {
                                 return irec.Event.KeyEvent.uChar.AsciiChar;
-                        }
-                        else {
+                        } else {
                                 switch (irec.Event.KeyEvent.wVirtualScanCode) {
-                                        case KEY_ARROW_LEFT & 0x00ff:
-                                                return KEY_ARROW_LEFT;
-                                        case KEY_ARROW_RIGHT & 0x00ff:
-                                                return KEY_ARROW_RIGHT;
-                                        case KEY_ARROW_UP & 0x00ff:
-                                                return KEY_ARROW_UP;
-                                        case KEY_ARROW_DOWN & 0x00ff:
-                                                return KEY_ARROW_DOWN;
-                                        case KEY_HOME & 0x00ff:
-                                                return KEY_HOME;
-                                        case KEY_END & 0x00ff:
-                                                return KEY_END;
-                                        case KEY_PGDOWN & 0x00ff:
-                                                return KEY_PGDOWN;
-                                        case KEY_PGUP & 0x00ff:
-                                                return KEY_PGUP;
+                                case KEY_ARROW_LEFT & 0x00ff:
+                                        return KEY_ARROW_LEFT;
+                                case KEY_ARROW_RIGHT & 0x00ff:
+                                        return KEY_ARROW_RIGHT;
+                                case KEY_ARROW_UP & 0x00ff:
+                                        return KEY_ARROW_UP;
+                                case KEY_ARROW_DOWN & 0x00ff:
+                                        return KEY_ARROW_DOWN;
+                                case KEY_HOME & 0x00ff:
+                                        return KEY_HOME;
+                                case KEY_END & 0x00ff:
+                                        return KEY_END;
+                                case KEY_PGDOWN & 0x00ff:
+                                        return KEY_PGDOWN;
+                                case KEY_PGUP & 0x00ff:
+                                        return KEY_PGUP;
                                 }
                         }
-/*
-                //&& ! ((KEY_EVENT_RECORD&)irec.Event).wRepeatCount )
-                        printf("*** Pressed %d,%c  unicode=%x, scancode=%x, keycode=%x, flags=%x\n",
-                               irec.Event.KeyEvent.uChar.AsciiChar,
-                               irec.Event.KeyEvent.uChar.AsciiChar,
-                               irec.Event.KeyEvent.uChar.UnicodeChar,
-                               irec.Event.KeyEvent.wVirtualScanCode,
-                                irec.Event.KeyEvent.wVirtualKeyCode,
-                                irec.Event.KeyEvent.dwControlKeyState
-                        );
-                        return irec.Event.KeyEvent.uChar.AsciiChar;
-                        */
+                        /*
+                                        //&& ! ((KEY_EVENT_RECORD&)irec.Event).wRepeatCount )
+                                                printf("*** Pressed %d,%c  unicode=%x, scancode=%x,
+                           keycode=%x, flags=%x\n", irec.Event.KeyEvent.uChar.AsciiChar,
+                                                       irec.Event.KeyEvent.uChar.AsciiChar,
+                                                       irec.Event.KeyEvent.uChar.UnicodeChar,
+                                                       irec.Event.KeyEvent.wVirtualScanCode,
+                                                        irec.Event.KeyEvent.wVirtualKeyCode,
+                                                        irec.Event.KeyEvent.dwControlKeyState
+                                                );
+                                                return irec.Event.KeyEvent.uChar.AsciiChar;
+                                                */
                 }
         }
         return -1;
@@ -92,7 +91,7 @@ int read_char() {
 
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 int read_char() {
-        int i = getchar();        
+        int i = getchar();
         switch (i) {
         case '\033':
                 i = getchar();
@@ -129,10 +128,9 @@ int read_char() {
 #define get_char_impl get_char_posix
 
 #elif defined(__TURBOC__)
-int read_char()
-{
+int read_char() {
         int c = getch();
-        
+
         /* extended ASCII FTW */
         if (c == 0) {
                 c = getch();
@@ -153,7 +151,7 @@ int read_char()
                         return KEY_PGDOWN;
                 case KEY_PGUP & 0x00ff:
                         return KEY_PGUP;
-                default: 
+                default:
                         return 0;
                 }
         }
@@ -161,8 +159,8 @@ int read_char()
 }
 #else
 #error Undefined platform - we cannot read a line on a terminal
-TODO - it seems that this platform is not supported yet - you need to define a function
-"read_char()" that reads a char without enter beeing pressed.
+TODO - it seems that this platform is not supported yet -
+    you need to define a function "read_char()" that reads a char without enter beeing pressed.
 #endif
 
 struct str_list history;
@@ -179,57 +177,52 @@ int read_string(char *line, size_t max_size) {
 }
 
 /* https://stackoverflow.com/a/1798833 */
-#ifdef _POSIX_C_SOURCE        
+#ifdef _POSIX_C_SOURCE
 static struct termios oldt;
 #endif
 
-void readline_init()
-{
-#ifdef _POSIX_C_SOURCE        
+void readline_init() {
+#ifdef _POSIX_C_SOURCE
         static struct termios newt;
-        tcgetattr( STDIN_FILENO, &oldt );
+        tcgetattr(STDIN_FILENO, &oldt);
         newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);          
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+        newt.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 #endif
         str_list_init(&history, 10);
 }
 
-void readline_deinit()
-{
-#ifdef _POSIX_C_SOURCE        
-        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
-#endif        
+void readline_deinit() {
+#ifdef _POSIX_C_SOURCE
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+#endif
 }
 
 void move_cursor_back(size_t n) {
         size_t i;
-        for (i=0; i < n; i++) {
+        for (i = 0; i < n; i++) {
                 putchar('\b');
-        }        
+        }
 }
 
-void readline_session_init(struct readline_session *session)
-{
+void readline_session_init(struct readline_session *session) {
         session->line = NULL;
         session->max_size = 0;
         session->current_size = 0;
         session->current_history = 0;
-        session->index = 0;        
+        session->index = 0;
         session->override = false;
         session->free_memory = false;
 }
 
-void readline_session_allocate(struct readline_session *session, size_t max_size)
-{
+void readline_session_allocate(struct readline_session *session, size_t max_size) {
         readline_session_init(session);
         session->line = malloc(max_size);
         session->max_size = max_size;
         session->free_memory = true;
 }
 
-void readline_session_deinit(struct readline_session *session)
-{
+void readline_session_deinit(struct readline_session *session) {
         if (session->free_memory) {
                 free(session->line);
         }
@@ -237,33 +230,17 @@ void readline_session_deinit(struct readline_session *session)
 }
 
 static void save_history(struct readline_session *session) {
-        const char* last = str_list_peek(&history);
+        const char *last = str_list_peek(&history);
         bool should_save = session->current_size != 0 && session->line[0] != ' ';
         if (last != NULL) {
                 should_save &= strcmp(last, session->line) != 0;
         }
         if (should_save) {
                 str_list_push(&history, session->line);
-        }                                
+        }
 }
 
-void print_history(size_t current)
-{
-        size_t n = 0;
-        const char* h;
-        
-        h = readline_get_history(n);
-        while (h != NULL) {
-                printf("%3zu %s %s\n", n+1, h, n == current ? "(*)" : "");
-                n++;
-                h = readline_get_history(n);
-        }        
-        h = str_list_get(&history, current + 0);
-        printf("---[%s]\n", h != NULL ? h : "NULL");
-}
-
-int readline(struct readline_session *session)
-{
+int readline(struct readline_session *session) {
         session->line[0] = 0;
         while (session->index < session->max_size) {
                 int c = read_char();
@@ -271,7 +248,7 @@ int readline(struct readline_session *session)
                 case '\r':
                 case '\n': {
                         save_history(session);
-                        putchar('\n');                        
+                        putchar('\n');
                         return session->current_size;
                 }
                 case KEY_HOME:
@@ -283,7 +260,7 @@ int readline(struct readline_session *session)
                 case KEY_ARROW_LEFT:
                         readline_move_left(session);
                         break;
-                case KEY_ARROW_RIGHT: 
+                case KEY_ARROW_RIGHT:
                         readline_move_right(session);
                         break;
                 case KEY_ARROW_UP: {
@@ -297,41 +274,42 @@ int readline(struct readline_session *session)
                 }
                 case KEY_ARROW_DOWN:
                         if (session->current_history != 0) {
-                                const char *last = str_list_get(&history, session->current_history-1);
+                                const char *last =
+                                    str_list_get(&history, session->current_history - 1);
                                 if (last != NULL) {
                                         readline_set(session, last);
                                 }
                         }
                         break;
-                case '\b': 
+                case '\b':
                         session->index = readline_delete_left(session);
-                        break;           
+                        break;
                 default:
                         if (session->override) {
-                                session->current_size = readline_replace(session, session->index, c);
+                                session->current_size =
+                                    readline_replace(session, session->index, c);
                                 putchar(c);
                                 if (session->index == session->current_size) {
-                                        session->current_size ++;
+                                        session->current_size++;
                                 }
-                                session->index ++;
+                                session->index++;
                         } else {
                                 session->current_size = readline_insert(session, session->index, c);
-                                session->index ++;
+                                session->index++;
                         }
                 }
-        }        
+        }
         return session->current_size;
 }
 
-size_t readline_delete_left(struct readline_session *session)
-{
+size_t readline_delete_left(struct readline_session *session) {
         size_t i;
-        str_del_char(session->line, session->index-1);
+        str_del_char(session->line, session->index - 1);
         move_cursor_back(session->index);
         printf("%s ", session->line);
         session->current_size = strlen(session->line);
-        move_cursor_back(session->current_size +1);
-        session->index --;
+        move_cursor_back(session->current_size + 1);
+        session->index--;
         if (session->index > session->current_size) {
                 session->index = session->current_size;
         }
@@ -342,11 +320,10 @@ size_t readline_delete_left(struct readline_session *session)
         return session->index;
 }
 
-size_t readline_replace(struct readline_session *session, size_t index, char c)
-{
+size_t readline_replace(struct readline_session *session, size_t index, char c) {
         session->line[index] = c;
         if (session->index == session->current_size) {
-                session->line[index+1] = '\0';                
+                session->line[index + 1] = '\0';
         }
         putchar(c);
         putchar('\b');
@@ -358,8 +335,8 @@ size_t readline_insert(struct readline_session *session, size_t index, char c) {
         str_ins_char(session->line, session->max_size, c, index);
         printf("%s", session->line + index);
         session->current_size = strlen(session->line);
-        move_cursor_back(session->current_size - index -1);
-                
+        move_cursor_back(session->current_size - index - 1);
+
         index++;
         if (session->index > session->current_size) {
                 session->current_size = index;
@@ -371,7 +348,7 @@ size_t readline_insert(struct readline_session *session, size_t index, char c) {
 size_t readline_set(struct readline_session *session, const char *new_text) {
         size_t l;
         move_cursor_back(session->index);
-        for (l = 0; l < session->current_size; l++ ) {
+        for (l = 0; l < session->current_size; l++) {
                 putchar(' ');
         }
         move_cursor_back(session->current_size);
@@ -381,9 +358,8 @@ size_t readline_set(struct readline_session *session, const char *new_text) {
         session->current_history++;
         session->index = l - 1;
         printf("%s", session->line);
-        fflush(stdout);        
+        fflush(stdout);
 }
-
 
 void readline_move_home(struct readline_session *session) {
         move_cursor_back(session->index);
@@ -396,26 +372,22 @@ void readline_move_end(struct readline_session *session) {
                 putchar(session->line[session->index]);
                 session->index++;
         }
-        fflush(stdout);        
+        fflush(stdout);
 }
 
-void readline_move_left(struct readline_session *session)
-{
+void readline_move_left(struct readline_session *session) {
         if (session->index > 0) {
-                session->index --;
+                session->index--;
                 putchar('\b');
-        }        
+        }
 }
 
-void readline_move_right(struct readline_session *session)
-{
+void readline_move_right(struct readline_session *session) {
         char next = session->line[session->index];
-        if (session->index < session->max_size  && next != '\0') {
+        if (session->index < session->max_size && next != '\0') {
                 putchar(session->line[session->index]);
-                session->index ++;
-        }        
+                session->index++;
+        }
 }
 
-const char* readline_get_history(size_t i) {
-        return str_list_get(&history, i);
-}
+const char *readline_get_history(size_t i) { return str_list_get(&history, i); }

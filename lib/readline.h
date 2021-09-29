@@ -13,10 +13,11 @@
 #include <stdbool.h>
 #endif
 
+#include "lib/strextra.h"
 #include <stddef.h>
 #include <stdlib.h>
-#include "lib/strextra.h"
 
+/* clang-format off */
 #define KEY_ARROW_LEFT      0x7f4b
 #define KEY_ARROW_RIGHT     0x7f4d
 #define KEY_ARROW_UP        0x7f48
@@ -25,6 +26,7 @@
 #define KEY_END             0x7f4f
 #define KEY_PGDOWN          0x7f49
 #define KEY_PGUP            0x7f51
+/* clang-format on */
 
 /* moves the cursor to the left */
 void move_cursor_back(size_t n);
@@ -62,6 +64,6 @@ void readline_move_end(struct readline_session *session);
 void readline_move_left(struct readline_session *session);
 void readline_move_right(struct readline_session *session);
 
-const char* readline_get_history(size_t i);
+const char *readline_get_history(size_t i);
 
 #endif

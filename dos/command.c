@@ -12,8 +12,8 @@ For license - read license.txt
 #include "lib/applet.h"
 #include "lib/args.h"
 #include "lib/environ.h"
-#include "lib/strextra.h"
 #include "lib/readline.h"
+#include "lib/strextra.h"
 
 #include "dos/prompt.h"
 
@@ -28,8 +28,8 @@ For license - read license.txt
 #endif
 
 #ifdef __WIN32__
-#include <io.h>
 #include <conio.h>
+#include <io.h>
 #include <stdbool.h>
 #include <windows.h>
 #endif
@@ -165,19 +165,14 @@ static void command_shell_print_extended_help() {
         printf("   TODO: properly implement the command.com swithces \n");
 }
 
-
 /* read line */
-bool is_interactive()
-{
-        return isatty(fileno(stdin));
-}
+bool is_interactive() { return isatty(fileno(stdin)); }
 
 int read_line_simple(char line[], int max_size) {
         line[0] = 0;
         fgets(line, max_size, stdin);
         return strlen(line);
 }
-
 
 size_t read_line(char line[], int max_size) {
         int l;

@@ -52,14 +52,14 @@ char *strsep(char **stringp, const char *delim);
 struct str_list {
         size_t length;
         size_t next;
-        char** items;
+        char **items;
 };
 
 void str_list_init(struct str_list *list, size_t length);
 void str_list_free(struct str_list *list);
-void str_list_push(struct str_list *list, const char* s);
-char* str_list_pop(struct str_list *list);
-const char* str_list_peek(struct str_list *list);
-const char* str_list_get(struct str_list *list, size_t n);
+void str_list_push(struct str_list *list, const char *s);
+char *str_list_pop(struct str_list *list);
+const char *str_list_peek(struct str_list *list);
+const char *str_list_get(struct str_list *list, size_t n);
 
 #endif /* __STR_EXTRA__ */

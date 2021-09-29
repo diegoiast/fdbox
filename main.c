@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         if (config.verbose) {
                 return command_ver(argc - 1, ++argv);
         }
-        
+
         readline_init();
         atexit(readline_deinit);
         return command_command(argc - 1, ++argv);

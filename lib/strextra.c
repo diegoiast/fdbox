@@ -137,7 +137,7 @@ char *str_list_pop(struct str_list *list) {
         return c;
 }
 
-const char* str_list_peek(struct str_list *list) {        
+const char *str_list_peek(struct str_list *list) {
         size_t next = (list->next + list->length - 1) % list->length;
         const char *c = list->items[next];
         return c;

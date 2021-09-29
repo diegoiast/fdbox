@@ -343,7 +343,7 @@ bool test_str_ins() {
         c[0] = 0;
         str_ins_char(c, 1000, 'Y', 0);
         ok &= verify_string_equals("Y", c, "insert a char to empty string");
-        
+
         strcpy(c, "hello");
         str_ins_char(c, 1000, '!', 5);
         ok &= verify_string_equals("hello!", c, "insert a char at the end");
@@ -363,11 +363,11 @@ bool test_str_ins() {
         strcpy(c, "124");
         str_ins_char(c, 5, '3', 2);
         ok &= verify_string_equals("1234", c, "insert a char in the middle (exact buffer size)");
-        
+
         strcpy(c, "13");
         str_ins_char(c, 3, '2', 1);
         ok &= verify_string_equals("123", c, "insert a char and the end (truncated)");
-        
+
         return ok;
 }
 
@@ -470,12 +470,12 @@ bool test_str_list() {
         bool ok = true;
         struct str_list list;
         char *c1;
-        const char* c2;
-        
+        const char *c2;
+
         str_list_init(&list, 5);
         c1 = str_list_pop(&list);
         ok &= verify_ptr_equals(c1, NULL, "pop from empty list");
-        
+
         str_list_push(&list, "aaa");
         c1 = str_list_pop(&list);
         ok &= verify_string_equals(c1, "aaa", "push and pop");
@@ -491,7 +491,7 @@ bool test_str_list() {
         free(c1);
         c1 = str_list_pop(&list);
         ok &= verify_ptr_equals(c1, NULL, "pop after push, and get");
-        
+
         str_list_push(&list, "111");
         str_list_push(&list, "222");
         str_list_push(&list, "333");
@@ -507,7 +507,7 @@ bool test_str_list() {
         free(c1);
         c1 = str_list_pop(&list);
         ok &= verify_ptr_equals(c1, NULL, "pop after 4  pushes");
-        
+
         str_list_push(&list, "111");
         str_list_push(&list, "222");
         str_list_push(&list, "333");
@@ -524,7 +524,7 @@ bool test_str_list() {
         ok &= verify_string_equals(c2, "222", "fetch from 4/5 list");
         c2 = str_list_get(&list, 4);
         ok &= verify_string_equals(c2, "111", "fetch from 5/5 list");
-        
+
         str_list_push(&list, "666");
         c2 = str_list_get(&list, 0);
         ok &= verify_string_equals(c2, "666", "fetch from 6/5 list");
@@ -538,7 +538,7 @@ bool test_str_list() {
         ok &= verify_string_equals(c2, "222", "fetch from 6/5 list");
         c2 = str_list_get(&list, 5);
         ok &= verify_ptr_equals(c2, NULL, "fetch out of bounds");
-        
+
         c1 = str_list_pop(&list);
         ok &= verify_string_equals(c1, "666", "pop from 6/5 list");
         free(c1);
@@ -559,10 +559,9 @@ bool test_str_list() {
         free(c1);
 
         str_list_free(&list);
-        
+
         return ok;
 }
-
 
 bool test_prompt_letter(char l, char k) {
         bool ok = true;
