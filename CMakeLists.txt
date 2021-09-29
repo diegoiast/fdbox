@@ -9,7 +9,7 @@ cpmaddpackage(
   NAME
   Format.cmake
   VERSION
-  1.7.0
+  1.7.2
   GITHUB_REPOSITORY
   TheLartians/Format.cmake
   OPTIONS # set to yes skip cmake formatting
