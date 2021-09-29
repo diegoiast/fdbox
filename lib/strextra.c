@@ -24,13 +24,13 @@ char *str_ins_char(char *s, size_t max_length, char c, size_t index) {
         if (index >= max_length) {
                 return s;
         }
-        if (index == max_length-1) {
+        if (index == max_length - 1) {
                 s[index] = c;
                 return s;
         }
-        
+
         d = l - index + 1;
-        memmove(s+index+1, s + index, d);
+        memmove(s + index + 1, s + index, d);
         s[index] = c;
         return s;
 }
@@ -99,9 +99,9 @@ void str_list_init(struct str_list *list, size_t length) {
         size_t i;
         list->length = length;
         list->next = 0;
-        list->items = malloc(sizeof(char*) * length);
+        list->items = malloc(sizeof(char *) * length);
         for (i = 0; i < length; i++) {
-                list->items[i] = NULL; 
+                list->items[i] = NULL;
         }
 }
 
@@ -118,7 +118,7 @@ void str_list_free(struct str_list *list) {
         list->next = 0;
 }
 
-void str_list_push(struct str_list *list, const char* s) {
+void str_list_push(struct str_list *list, const char *s) {
         if (list->items[list->next] != NULL) {
                 free(list->items[list->next]);
         }
@@ -126,7 +126,7 @@ void str_list_push(struct str_list *list, const char* s) {
         list->next = (list->next + 1) % list->length;
 }
 
-char* str_list_pop(struct str_list *list) {
+char *str_list_pop(struct str_list *list) {
         size_t next = (list->next + list->length - 1) % list->length;
         char *c = list->items[next];
         if (c == NULL) {
@@ -137,10 +137,16 @@ char* str_list_pop(struct str_list *list) {
         return c;
 }
 
-const char* str_list_get(struct str_list *list, size_t n) {
+const char* str_list_peek(struct str_list *list) {        
+        size_t next = (list->next + list->length - 1) % list->length;
+        const char *c = list->items[next];
+        return c;
+}
+
+const char *str_list_get(struct str_list *list, size_t n) {
         size_t index;
         if (n >= list->length) {
-                return NULL;;
+                return NULL;
         }
         index = (list->next + list->length - n - 1) % list->length;
         return list->items[index];

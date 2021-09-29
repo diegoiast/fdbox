@@ -1,9 +1,6 @@
 #ifndef READLINE_H
 #define READLINE_H
 
-#include <stddef.h>
-#include <stdlib.h>
-
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
 #endif
@@ -15,6 +12,10 @@
 #ifdef __WIN32__
 #include <stdbool.h>
 #endif
+
+#include <stddef.h>
+#include <stdlib.h>
+#include "lib/strextra.h"
 
 #define KEY_ARROW_LEFT      0x7f4b
 #define KEY_ARROW_RIGHT     0x7f4d
@@ -38,8 +39,10 @@ struct readline_session {
         char *line;
         size_t max_size;
         size_t current_size;
+        size_t current_history;
         size_t index;
         bool override;
+        bool free_memory;
 };
 
 void readline_init();
@@ -47,14 +50,18 @@ void readline_deinit();
 
 void readline_session_init(struct readline_session *session);
 void readline_session_allocate(struct readline_session *session, size_t max_size);
+void readline_session_deinit(struct readline_session *session);
 int readline(struct readline_session *session);
 
 size_t readline_delete_left(struct readline_session *session);
 size_t readline_replace(struct readline_session *session, size_t index, char c);
 size_t readline_insert(struct readline_session *session, size_t index, char c);
+size_t readline_set(struct readline_session *session, const char *new_text);
 void readline_move_home(struct readline_session *session);
 void readline_move_end(struct readline_session *session);
 void readline_move_left(struct readline_session *session);
 void readline_move_right(struct readline_session *session);
+
+const char* readline_get_history(size_t i);
 
 #endif

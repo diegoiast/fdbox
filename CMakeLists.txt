@@ -54,6 +54,7 @@ add_executable(
   dos/exit.c
   dos/for.c
   dos/goto.c
+  dos/history.c
   dos/if.c
   dos/md.c
   dos/path.c

@@ -20,6 +20,7 @@
 #include "dos/exit.h"
 #include "dos/for.h"
 #include "dos/goto.h"
+#include "dos/history.h"
 #include "dos/if.h"
 #include "dos/md.h"
 #include "dos/path.h"
@@ -53,6 +54,7 @@ struct applet commands[] = {
         {help_exit, command_exit, "exit"},
         {help_for, command_for, "for"},
         {help_goto, command_goto, "goto"},
+        {help_history, command_history, "history"},
         {help_if, command_if, "if"},
         {help_md, command_md, "mkdir"},
         {help_move, command_move, "move"},

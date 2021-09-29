@@ -13,8 +13,8 @@ For license - read license.txt
 #include "lib/args.h"
 #include "lib/environ.h"
 #include "lib/readline.h"
-#include "lib/strextra.h"
 
+#include "dos/history.h"
 #include "dos/prompt.h"
 
 #ifdef __MSDOS__
@@ -165,12 +165,17 @@ TODO - it seems that this platform is not supported yet - you need to define a f
 "read_char()" that reads a char without enter beeing pressed.
 #endif
 
+struct str_list history;
+
 int read_string(char *line, size_t max_size) {
+        int l;
         struct readline_session session;
         readline_session_init(&session);
         session.line = line;
         session.max_size = max_size;
-        return readline(&session);
+        l = readline(&session);
+        readline_session_deinit(&session);
+        return l;
 }
 
 /* https://stackoverflow.com/a/1798833 */
@@ -187,6 +192,7 @@ void readline_init()
         newt.c_lflag &= ~(ICANON | ECHO);          
         tcsetattr( STDIN_FILENO, TCSANOW, &newt);
 #endif
+        str_list_init(&history, 10);
 }
 
 void readline_deinit()
@@ -208,8 +214,10 @@ void readline_session_init(struct readline_session *session)
         session->line = NULL;
         session->max_size = 0;
         session->current_size = 0;
+        session->current_history = 0;
         session->index = 0;        
         session->override = false;
+        session->free_memory = false;
 }
 
 void readline_session_allocate(struct readline_session *session, size_t max_size)
@@ -217,6 +225,41 @@ void readline_session_allocate(struct readline_session *session, size_t max_size
         readline_session_init(session);
         session->line = malloc(max_size);
         session->max_size = max_size;
+        session->free_memory = true;
+}
+
+void readline_session_deinit(struct readline_session *session)
+{
+        if (session->free_memory) {
+                free(session->line);
+        }
+        readline_session_init(session);
+}
+
+static void save_history(struct readline_session *session) {
+        const char* last = str_list_peek(&history);
+        bool should_save = session->current_size != 0 && session->line[0] != ' ';
+        if (last != NULL) {
+                should_save &= strcmp(last, session->line) != 0;
+        }
+        if (should_save) {
+                str_list_push(&history, session->line);
+        }                                
+}
+
+void print_history(size_t current)
+{
+        size_t n = 0;
+        const char* h;
+        
+        h = readline_get_history(n);
+        while (h != NULL) {
+                printf("%3zu %s %s\n", n+1, h, n == current ? "(*)" : "");
+                n++;
+                h = readline_get_history(n);
+        }        
+        h = str_list_get(&history, current + 0);
+        printf("---[%s]\n", h != NULL ? h : "NULL");
 }
 
 int readline(struct readline_session *session)
@@ -226,9 +269,11 @@ int readline(struct readline_session *session)
                 int c = read_char();
                 switch (c) {
                 case '\r':
-                case '\n':
-                        putchar('\n');
+                case '\n': {
+                        save_history(session);
+                        putchar('\n');                        
                         return session->current_size;
+                }
                 case KEY_HOME:
                         readline_move_home(session);
                         break;
@@ -241,9 +286,22 @@ int readline(struct readline_session *session)
                 case KEY_ARROW_RIGHT: 
                         readline_move_right(session);
                         break;
-                case KEY_ARROW_UP:
+                case KEY_ARROW_UP: {
+                        const char *last;
+                        save_history(session);
+                        last = str_list_get(&history, session->current_history + 0);
+                        if (last != NULL) {
+                                readline_set(session, last);
+                        }
                         break;
+                }
                 case KEY_ARROW_DOWN:
+                        if (session->current_history != 0) {
+                                const char *last = str_list_get(&history, session->current_history-1);
+                                if (last != NULL) {
+                                        readline_set(session, last);
+                                }
+                        }
                         break;
                 case '\b': 
                         session->index = readline_delete_left(session);
@@ -296,8 +354,7 @@ size_t readline_replace(struct readline_session *session, size_t index, char c)
         return session->current_size;
 }
 
-size_t readline_insert(struct readline_session *session, size_t index, char c)
-{
+size_t readline_insert(struct readline_session *session, size_t index, char c) {
         str_ins_char(session->line, session->max_size, c, index);
         printf("%s", session->line + index);
         session->current_size = strlen(session->line);
@@ -311,15 +368,30 @@ size_t readline_insert(struct readline_session *session, size_t index, char c)
         return session->current_size;
 }
 
-void readline_move_home(struct readline_session *session)
-{
+size_t readline_set(struct readline_session *session, const char *new_text) {
+        size_t l;
+        move_cursor_back(session->index);
+        for (l = 0; l < session->current_size; l++ ) {
+                putchar(' ');
+        }
+        move_cursor_back(session->current_size);
+        l = strlen(new_text) + 1;
+        memcpy(session->line, new_text, l);
+        session->current_size = l;
+        session->current_history++;
+        session->index = l - 1;
+        printf("%s", session->line);
+        fflush(stdout);        
+}
+
+
+void readline_move_home(struct readline_session *session) {
         move_cursor_back(session->index);
         session->index = 0;
         fflush(stdout);
 }
 
-void readline_move_end(struct readline_session *session)
-{
+void readline_move_end(struct readline_session *session) {
         while (session->line[session->index] != '\0') {
                 putchar(session->line[session->index]);
                 session->index++;
@@ -342,4 +414,8 @@ void readline_move_right(struct readline_session *session)
                 putchar(session->line[session->index]);
                 session->index ++;
         }        
+}
+
+const char* readline_get_history(size_t i) {
+        return str_list_get(&history, i);
 }
