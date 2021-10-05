@@ -177,12 +177,12 @@ int read_string(char *line, size_t max_size) {
 }
 
 /* https://stackoverflow.com/a/1798833 */
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 static struct termios oldt;
 #endif
 
 void readline_init() {
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
         static struct termios newt;
         tcgetattr(STDIN_FILENO, &oldt);
         newt = oldt;
@@ -359,6 +359,7 @@ size_t readline_set(struct readline_session *session, const char *new_text) {
         session->index = l - 1;
         printf("%s", session->line);
         fflush(stdout);
+        return l;
 }
 
 void readline_move_home(struct readline_session *session) {
