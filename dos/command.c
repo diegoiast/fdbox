@@ -1,3 +1,5 @@
+
+
 /*
 This file is part of fdbox
 For license - read license.txt
@@ -43,7 +45,7 @@ static bool command_shell_config_parse(int argc, char *argv[], struct command_sh
 static void command_shell_config_print(const struct command_shell_config *config);
 static void command_shell_print_extended_help();
 
-size_t read_line(char line[], int max_size);
+int read_line(char line[], int max_size);
 
 /* TODO - I am unsure if this is the best way to tell the main loop
  * we should exit. For now it works
@@ -108,6 +110,7 @@ int command_command(int argc, char *argv[]) {
         do {
                 char prompt[256];
                 const char *t;
+                int l;
 
                 t = getenv("PROMPT");
                 if (t == NULL) {
@@ -116,8 +119,13 @@ int command_command(int argc, char *argv[]) {
                 }
                 get_prompt(t, prompt, 256);
                 printf("%s", prompt);
-                read_line(line, 1024);
+                l = read_line(line, 1024);
 
+                printf("%d bytes\n", l);
+                if (l < 0) {
+                    return EXIT_FAILURE;
+                }
+                
                 if ((pos = strchr(line, '\n')) != NULL) {
                         *pos = '\0';
                 }
@@ -174,7 +182,7 @@ int read_line_simple(char line[], int max_size) {
         return strlen(line);
 }
 
-size_t read_line(char line[], int max_size) {
+int read_line(char line[], int max_size) {
         int l;
         if (!is_interactive()) {
                 return read_line_simple(line, max_size);

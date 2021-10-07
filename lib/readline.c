@@ -92,9 +92,11 @@ int read_char() {
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 int read_char() {
         int i = getchar();
+        printf("%d ", i);
         switch (i) {
         case '\033':
                 i = getchar();
+                printf("[%d] ", i);
                 if (i == '[') {
                         i = getchar();
                         switch (i) {
@@ -284,6 +286,10 @@ int readline(struct readline_session *session) {
                 case '\b':
                         session->index = readline_delete_left(session);
                         break;
+                case 4:
+                        session->current_size = 0;
+                        session->line[0] = 0;
+                        return -1;
                 default:
                         if (session->override) {
                                 session->current_size =
