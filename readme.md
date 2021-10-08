@@ -72,7 +72,7 @@ The program compiles also as a native Linux executable
  | Up/Down: history    | WIP       | saves history when you browser, also fails randomly |
  | Backspace           | supported | |
  | Del                 | no        | |
- | control+d : EOF     | no        |
+ | control+d : EOF     | supported |
  | control+c : cancel  | no        | de facto - clear line |
  | control+l : cls     | no        |         |
  | TAB                 | no        | |

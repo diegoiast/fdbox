@@ -92,11 +92,9 @@ int read_char() {
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 int read_char() {
         int i = getchar();
-        printf("%d ", i);
         switch (i) {
         case '\033':
                 i = getchar();
-                printf("[%d] ", i);
                 if (i == '[') {
                         i = getchar();
                         switch (i) {

@@ -120,8 +120,6 @@ int command_command(int argc, char *argv[]) {
                 get_prompt(t, prompt, 256);
                 printf("%s", prompt);
                 l = read_line(line, 1024);
-
-                printf("%d bytes\n", l);
                 if (l < 0) {
                     return EXIT_FAILURE;
                 }
@@ -188,8 +186,5 @@ int read_line(char line[], int max_size) {
                 return read_line_simple(line, max_size);
         }
         l = read_string(line, max_size);
-        if (l < 0) {
-                l = read_line_simple(line, max_size);
-        }
         return l;
 }
