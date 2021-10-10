@@ -16,6 +16,7 @@ For license - read license.txt
 
 #include "dos/history.h"
 #include "dos/prompt.h"
+#include "fdbox.h"
 
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
@@ -23,6 +24,7 @@ For license - read license.txt
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include <signal.h>
 #include <stdbool.h>
 #include <termios.h>
 #include <unistd.h>
@@ -92,6 +94,7 @@ int read_char() {
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 int read_char() {
         int i = getchar();
+        printf("[%d]", i);
         switch (i) {
         case '\033':
                 i = getchar();
@@ -168,17 +171,31 @@ struct str_list history;
 int read_string(char *line, size_t max_size) {
         int l;
         struct readline_session session;
+        readline_init();
         readline_session_init(&session);
         session.line = line;
         session.max_size = max_size;
         l = readline(&session);
         readline_session_deinit(&session);
+        readline_deinit();
         return l;
 }
+
+static char last_pressed = 0;
+static char now_pressed = 0;
+static bool initialized = false;
 
 /* https://stackoverflow.com/a/1798833 */
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 static struct termios oldt;
+
+void catch_sigint(int dummy) {
+        if (last_pressed != 0 && last_pressed == now_pressed) {
+                printf("ABORT!!!");
+                abort();
+        }
+        UNUSED(dummy);
+}
 #endif
 
 void readline_init() {
@@ -188,14 +205,21 @@ void readline_init() {
         newt = oldt;
         newt.c_lflag &= ~(ICANON | ECHO);
         tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+        signal(SIGINT, catch_sigint);
 #endif
         str_list_init(&history, 10);
+        initialized = true;
 }
 
 void readline_deinit() {
+        if (!initialized) {
+                return;
+        }
 #ifdef _POSIX_C_SOURCE
         tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        signal(SIGINT, SIG_DFL);
 #endif
+        initialized = false;
 }
 
 void move_cursor_back(size_t n) {
@@ -244,6 +268,9 @@ int readline(struct readline_session *session) {
         session->line[0] = 0;
         while (session->index < session->max_size) {
                 int c = read_char();
+                last_pressed = now_pressed;
+                now_pressed = c;
+
                 switch (c) {
                 case '\r':
                 case '\n': {
@@ -284,6 +311,10 @@ int readline(struct readline_session *session) {
                 case '\b':
                         session->index = readline_delete_left(session);
                         break;
+                case 3:
+                        readline_set(session, "");
+                        putchar('\n');
+                        return 0;
                 case 4:
                         session->current_size = 0;
                         session->line[0] = 0;

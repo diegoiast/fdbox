@@ -121,9 +121,9 @@ int command_command(int argc, char *argv[]) {
                 printf("%s", prompt);
                 l = read_line(line, 1024);
                 if (l < 0) {
-                    return EXIT_FAILURE;
+                        return EXIT_FAILURE;
                 }
-                
+
                 if ((pos = strchr(line, '\n')) != NULL) {
                         *pos = '\0';
                 }
