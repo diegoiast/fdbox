@@ -27,6 +27,7 @@
 #define KEY_PGDOWN          0x7f49
 #define KEY_PGUP            0x7f51
 #define KEY_BACKSPACE       '\b'
+#define KEY_INS             0x00f8
 #define KEY_DEL             0x00ff
 /* clang-format on */
 
@@ -41,6 +42,10 @@ int read_string(char *line, size_t max_size);
 
 /* clear screen */
 void clear_screen();
+
+void set_cursor_block();
+
+void set_cursor_underline();
 
 struct readline_session {
         char *line;

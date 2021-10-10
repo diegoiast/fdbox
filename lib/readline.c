@@ -110,6 +110,8 @@ int read_char() {
                                 return KEY_HOME;
                         case 'F':
                                 return KEY_END;
+                        case '2':
+                                return KEY_INS;
                         case '3':
                                 return KEY_DEL;
                         case '5':
@@ -132,10 +134,12 @@ int read_char() {
 #elif defined(__TURBOC__)
 int read_char() {
         int c = getch();
+        printf("[%d]", c);
 
         /* extended ASCII FTW */
         if (c == 0) {
                 c = getch();
+                printf("[%d]", c);
                 switch (c) {
                 case KEY_ARROW_LEFT & 0x00ff:
                         return KEY_ARROW_LEFT;
@@ -153,6 +157,8 @@ int read_char() {
                         return KEY_PGDOWN;
                 case KEY_PGUP & 0x00ff:
                         return KEY_PGUP;
+                case 83:
+                        return KEY_DEL;
                 default:
                         return 0;
                 }
@@ -171,6 +177,7 @@ int read_string(char *line, size_t max_size) {
         int l;
         struct readline_session session;
         readline_session_init(&session);
+        set_cursor_block();
         session.line = line;
         session.max_size = max_size;
         l = readline(&session);
@@ -189,6 +196,31 @@ void clear_screen()
 #else
         please implement clean screen
 #endif        
+}
+
+
+void set_cursor_block()
+{
+#if defined(_POSIX_C_SOURCE) 
+        printf("\e[1 q");
+#elif defined(__APPLE__)
+#elif defined(WIN32)
+#elif defined(__MSDOS__)
+#else
+        please implement set cursor_block
+#endif                
+}
+
+void set_cursor_underline()
+{
+#if defined(_POSIX_C_SOURCE) 
+        printf("\e[3 q");
+#elif defined(__APPLE__)
+#elif defined(WIN32)
+#elif defined(__MSDOS__)
+#else
+        please implement set cursor_block
+#endif                
 }
 
 /* https://stackoverflow.com/a/1798833 */
@@ -349,7 +381,16 @@ size_t readline_delete_left(struct readline_session *session) {
 
 size_t readline_delete_right(struct readline_session *session)
 {
-        return session->index;        
+        size_t i;
+        str_del_char(session->line, session->index);
+        move_cursor_back(session->index);
+        printf("%s ", session->line);
+        session->current_size = strlen(session->line);
+        for (i = 0; i < session->index; i++) {
+                putchar(session->line[i]);
+        }
+        fflush(stdout);
+        return session->index;
 }
 
 size_t readline_replace(struct readline_session *session, size_t index, char c) {
