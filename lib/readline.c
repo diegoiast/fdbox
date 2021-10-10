@@ -110,10 +110,12 @@ int read_char() {
                                 return KEY_HOME;
                         case 'F':
                                 return KEY_END;
-                        case '6':
-                                return KEY_PGDOWN;
+                        case '3':
+                                return KEY_DEL;
                         case '5':
                                 return KEY_PGUP;
+                        case '6':
+                                return KEY_PGDOWN;
                         default:
                                 printf("read escape code: %d\n", i);
                         }
@@ -174,6 +176,19 @@ int read_string(char *line, size_t max_size) {
         l = readline(&session);
         readline_session_deinit(&session);
         return l;
+}
+
+void clear_screen()
+{
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+        printf("\e[1;1H\e[2J");
+#elif defined(WIN32)
+        printf("\e[1;1H\e[2J");
+#elif defined(__MSDOS__)
+        clrscr();
+#else
+        please implement clean screen
+#endif        
 }
 
 /* https://stackoverflow.com/a/1798833 */
@@ -281,13 +296,21 @@ int readline(struct readline_session *session) {
                                 }
                         }
                         break;
-                case '\b':
+                case KEY_BACKSPACE:
                         session->index = readline_delete_left(session);
                         break;
+                case KEY_DEL:
+                        session->index = readline_delete_right(session);
+                        break;                        
                 case 4:
                         session->current_size = 0;
                         session->line[0] = 0;
                         return -1;
+                case 12:
+                        session->current_size = 0;
+                        session->line[0] = 0;
+                        clear_screen();                        
+                        return 0;
                 default:
                         if (session->override) {
                                 session->current_size =
@@ -322,6 +345,11 @@ size_t readline_delete_left(struct readline_session *session) {
         }
         fflush(stdout);
         return session->index;
+}
+
+size_t readline_delete_right(struct readline_session *session)
+{
+        return session->index;        
 }
 
 size_t readline_replace(struct readline_session *session, size_t index, char c) {

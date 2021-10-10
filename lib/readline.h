@@ -26,6 +26,8 @@
 #define KEY_END             0x7f4f
 #define KEY_PGDOWN          0x7f49
 #define KEY_PGUP            0x7f51
+#define KEY_BACKSPACE       '\b'
+#define KEY_DEL             0x00ff
 /* clang-format on */
 
 /* moves the cursor to the left */
@@ -36,6 +38,9 @@ int read_char();
 
 /* old API - to be removed soon */
 int read_string(char *line, size_t max_size);
+
+/* clear screen */
+void clear_screen();
 
 struct readline_session {
         char *line;
@@ -56,6 +61,7 @@ void readline_session_deinit(struct readline_session *session);
 int readline(struct readline_session *session);
 
 size_t readline_delete_left(struct readline_session *session);
+size_t readline_delete_right(struct readline_session *session);
 size_t readline_replace(struct readline_session *session, size_t index, char c);
 size_t readline_insert(struct readline_session *session, size_t index, char c);
 size_t readline_set(struct readline_session *session, const char *new_text);

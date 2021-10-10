@@ -74,7 +74,7 @@ The program compiles also as a native Linux executable
  | Del                 | no        | |
  | control+d : EOF     | supported |
  | control+c : cancel  | no        | de facto - clear line |
- | control+l : cls     | no        |         |
+ | control+l : cls     | yes       |         |
  | TAB                 | no        | |
  | insert/override     | WIP       | I have API, not implemented on edit|
  | esc                 | ????       | Fix breaks on Linux/OSX ? |          
