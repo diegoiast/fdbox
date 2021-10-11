@@ -111,7 +111,12 @@ int read_char() {
                         case 'F':
                                 return KEY_END;
                         case '2':
-                                return KEY_INS;
+                                i = getchar();
+                                if (i == 126) {
+                                        return KEY_INS;
+                                } else {
+                                        return 0;
+                                }
                         case '3':
                                 return KEY_DEL;
                         case '5':
@@ -333,7 +338,15 @@ int readline(struct readline_session *session) {
                         break;
                 case KEY_DEL:
                         session->index = readline_delete_right(session);
-                        break;                        
+                        break;
+                case KEY_INS:
+                        session->override = ! session->override;
+                        if (session->override) {
+                                set_cursor_underline();
+                        } else {
+                                set_cursor_underline();
+                        }
+                        break;
                 case 4:
                         session->current_size = 0;
                         session->line[0] = 0;
