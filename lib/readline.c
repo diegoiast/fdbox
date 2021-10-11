@@ -17,9 +17,10 @@ For license - read license.txt
 #include "dos/history.h"
 #include "dos/prompt.h"
 
-#ifdef __MSDOS__
+#ifdef __TURBOC__
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#include "dos.h"
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
@@ -139,12 +140,10 @@ int read_char() {
 #elif defined(__TURBOC__)
 int read_char() {
         int c = getch();
-        printf("[%d]", c);
 
         /* extended ASCII FTW */
         if (c == 0) {
                 c = getch();
-                printf("[%d]", c);
                 switch (c) {
                 case KEY_ARROW_LEFT & 0x00ff:
                         return KEY_ARROW_LEFT;
@@ -162,6 +161,8 @@ int read_char() {
                         return KEY_PGDOWN;
                 case KEY_PGUP & 0x00ff:
                         return KEY_PGUP;
+                case 82:
+                        return KEY_INS;
                 case 83:
                         return KEY_DEL;
                 default:
@@ -182,7 +183,7 @@ int read_string(char *line, size_t max_size) {
         int l;
         struct readline_session session;
         readline_session_init(&session);
-        set_cursor_block();
+        set_cursor_insert();
         session.line = line;
         session.max_size = max_size;
         l = readline(&session);
@@ -204,25 +205,41 @@ void clear_screen()
 }
 
 
-void set_cursor_block()
+void set_cursor_insert()
 {
 #if defined(_POSIX_C_SOURCE) 
         printf("\e[1 q");
 #elif defined(__APPLE__)
 #elif defined(WIN32)
 #elif defined(__MSDOS__)
+        union REGS xr;
+        xr.h.ah = 1;
+        xr.h.ch = 6;
+        xr.h.cl = 7;
+        int86(0x10, &xr, &xr); 
 #else
         please implement set cursor_block
 #endif                
 }
 
-void set_cursor_underline()
+void set_cursor_override()
 {
 #if defined(_POSIX_C_SOURCE) 
         printf("\e[3 q");
 #elif defined(__APPLE__)
 #elif defined(WIN32)
+        https://stackoverflow.com/a/30126700
 #elif defined(__MSDOS__)
+        /*
+        https://jbwyatt.com/253/emu/8086_bios_and_dos_interrupts.html
+        http://computer-programming-forum.com/29-pascal/7b38c5f9b15dfae6.htm
+        http://computer-programming-forum.com/47-c-language/43c194b3ed78f2e2.htm
+        */
+        union REGS xr;
+        xr.h.ah = 1;
+        xr.h.ch = 0;
+        xr.h.cl = 7;
+        int86(0x10, &xr, &xr); 
 #else
         please implement set cursor_block
 #endif                
@@ -342,9 +359,9 @@ int readline(struct readline_session *session) {
                 case KEY_INS:
                         session->override = ! session->override;
                         if (session->override) {
-                                set_cursor_underline();
+                                set_cursor_override();
                         } else {
-                                set_cursor_underline();
+                                set_cursor_insert();
                         }
                         break;
                 case 4:

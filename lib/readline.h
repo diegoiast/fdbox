@@ -43,9 +43,9 @@ int read_string(char *line, size_t max_size);
 /* clear screen */
 void clear_screen();
 
-void set_cursor_block();
+void set_cursor_insert();
 
-void set_cursor_underline();
+void set_cursor_override();
 
 struct readline_session {
         char *line;
