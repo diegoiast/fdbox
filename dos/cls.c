@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "dos/cls.h"
-#include "lib/readline.h"
 #include "fdbox.h"
+#include "lib/readline.h"
 
 /*
 This file is part of fdbox
