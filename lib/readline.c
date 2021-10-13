@@ -18,9 +18,9 @@ For license - read license.txt
 #include "dos/prompt.h"
 
 #ifdef __TURBOC__
+#include "dos.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
-#include "dos.h"
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
@@ -191,8 +191,7 @@ int read_string(char *line, size_t max_size) {
         return l;
 }
 
-void clear_screen()
-{
+void clear_screen() {
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
         printf("\e[1;1H\e[2J");
 #elif defined(WIN32)
@@ -201,13 +200,11 @@ void clear_screen()
         clrscr();
 #else
         please implement clean screen
-#endif        
+#endif
 }
 
-
-void set_cursor_insert()
-{
-#if defined(_POSIX_C_SOURCE) 
+void set_cursor_insert() {
+#if defined(_POSIX_C_SOURCE)
         printf("\e[1 q");
 #elif defined(__APPLE__)
 #elif defined(WIN32)
@@ -216,19 +213,20 @@ void set_cursor_insert()
         xr.h.ah = 1;
         xr.h.ch = 6;
         xr.h.cl = 7;
-        int86(0x10, &xr, &xr); 
+        int86(0x10, &xr, &xr);
 #else
         please implement set cursor_block
-#endif                
+#endif
 }
 
-void set_cursor_override()
-{
-#if defined(_POSIX_C_SOURCE) 
+void set_cursor_override() {
+#if defined(_POSIX_C_SOURCE)
         printf("\e[3 q");
 #elif defined(__APPLE__)
+        // unsupported on apple, ok by me
 #elif defined(WIN32)
-        https://stackoverflow.com/a/30126700
+//        https://stackoverflow.com/a/30126700
+// https://stackoverflow.com/questions/69561521/change-carrets-shape-on-windows-terminal
 #elif defined(__MSDOS__)
         /*
         https://jbwyatt.com/253/emu/8086_bios_and_dos_interrupts.html
@@ -239,10 +237,10 @@ void set_cursor_override()
         xr.h.ah = 1;
         xr.h.ch = 0;
         xr.h.cl = 7;
-        int86(0x10, &xr, &xr); 
+        int86(0x10, &xr, &xr);
 #else
         please implement set cursor_block
-#endif                
+#endif
 }
 
 /* https://stackoverflow.com/a/1798833 */
@@ -357,7 +355,7 @@ int readline(struct readline_session *session) {
                         session->index = readline_delete_right(session);
                         break;
                 case KEY_INS:
-                        session->override = ! session->override;
+                        session->override = !session->override;
                         if (session->override) {
                                 set_cursor_override();
                         } else {
@@ -371,7 +369,7 @@ int readline(struct readline_session *session) {
                 case 12:
                         session->current_size = 0;
                         session->line[0] = 0;
-                        clear_screen();                        
+                        clear_screen();
                         return 0;
                 default:
                         if (session->override) {
@@ -409,8 +407,7 @@ size_t readline_delete_left(struct readline_session *session) {
         return session->index;
 }
 
-size_t readline_delete_right(struct readline_session *session)
-{
+size_t readline_delete_right(struct readline_session *session) {
         size_t i;
         str_del_char(session->line, session->index);
         move_cursor_back(session->index);
