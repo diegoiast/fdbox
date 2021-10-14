@@ -208,6 +208,14 @@ void set_cursor_insert() {
         printf("\e[1 q");
 #elif defined(__APPLE__)
 #elif defined(WIN32)
+        HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+        CONSOLE_CURSOR_INFO cursorInfo;
+
+        GetConsoleCursorInfo(out, &cursorInfo);
+        cursorInfo.bVisible = true;
+        cursorInfo.dwSize = 100;
+        SetConsoleCursorInfo(out, &cursorInfo);
 #elif defined(__MSDOS__)
         union REGS xr;
         xr.h.ah = 1;
@@ -225,8 +233,15 @@ void set_cursor_override() {
 #elif defined(__APPLE__)
         // unsupported on apple, ok by me
 #elif defined(WIN32)
-//        https://stackoverflow.com/a/30126700
-// https://stackoverflow.com/questions/69561521/change-carrets-shape-on-windows-terminal
+        // https://stackoverflow.com/a/30126700
+        HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+        CONSOLE_CURSOR_INFO cursorInfo;
+
+        GetConsoleCursorInfo(out, &cursorInfo);
+        cursorInfo.bVisible = true;
+        cursorInfo.dwSize = 10;
+        SetConsoleCursorInfo(out, &cursorInfo);
 #elif defined(__MSDOS__)
         /*
         https://jbwyatt.com/253/emu/8086_bios_and_dos_interrupts.html
