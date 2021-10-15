@@ -72,7 +72,7 @@ internal readline code (history, editor etc).
  | Key                 | status    | comment |
  | ------------------- | --------- | ------- |
  | Left/right/home/end | *done*    |         |
- | Up/Down: history    | WIP       | saves history when you browser, also fails randomly |
+ | Up/Down: history    | WIP       | fails randomly |
  | Backspace           | *done*    | |
  | Del                 | no        | |
  | control+a : HOME    | *done*    |

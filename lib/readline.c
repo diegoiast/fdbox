@@ -315,7 +315,7 @@ void readline_session_deinit(struct readline_session *session) {
 }
 
 static void save_history(struct readline_session *session) {
-        const char *last = str_list_peek(&history);
+        const char *last = str_list_get(&history, session->current_history);
         bool should_save = session->current_size != 0 && session->line[0] != ' ';
         if (last != NULL) {
                 should_save &= strcmp(last, session->line) != 0;
