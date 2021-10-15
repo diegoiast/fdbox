@@ -5,8 +5,9 @@ lib/applet.c
 lib/args.c (lib/args.h)
 lib/tc202/dos-glob.c (lib/tc202/dos-glob.h)
 lib/tc202/stdextra.c (lib/tc202/stdextra.h)
-lib/strextra.c (lib/strextra.h)
 lib/environ.c (lib/environ.h)
+lib/readline.c (lib/readline.h)
+lib/strextra.c (lib/strextra.h)
 dos/beep.c
 dos/call.c
 dos/cd.c
@@ -20,6 +21,7 @@ dos/echo.c
 dos/exit.c
 dos/for.c
 dos/goto.c
+dos/history.c (dos/history.h)
 dos/if.c
 dos/md.c (dos/md.h)
 dos/path.c

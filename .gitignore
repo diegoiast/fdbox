@@ -10,3 +10,6 @@ TESTS.EXE
 
 # DJGGPP's makefile is a mess :)
 *.O
+
+# cmake builds
+cmake-build-*

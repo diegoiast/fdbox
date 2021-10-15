@@ -9,7 +9,7 @@ cpmaddpackage(
   NAME
   Format.cmake
   VERSION
-  1.7.0
+  1.7.2
   GITHUB_REPOSITORY
   TheLartians/Format.cmake
   OPTIONS # set to yes skip cmake formatting
@@ -22,8 +22,9 @@ add_executable(
   tests.c
   lib/applet.c
   lib/args.c
-  lib/strextra.c
   lib/environ.c
+  lib/readline.c
+  lib/strextra.c
   )
 target_include_directories(tests PUBLIC "${PROJECT_BINARY_DIR}"
                                         "${PROJECT_SOURCE_DIR}")
@@ -37,8 +38,9 @@ add_executable(
   help.c
   lib/applet.c
   lib/args.c
-  lib/strextra.c
   lib/environ.c
+  lib/strextra.c
+  lib/readline.c
   dos/beep.c
   dos/call.c
   dos/cd.c
@@ -52,6 +54,7 @@ add_executable(
   dos/exit.c
   dos/for.c
   dos/goto.c
+  dos/history.c
   dos/if.c
   dos/md.c
   dos/path.c
