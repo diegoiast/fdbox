@@ -71,6 +71,9 @@ int read_char() {
                                         return KEY_PGDOWN;
                                 case KEY_PGUP & 0x00ff:
                                         return KEY_PGUP;
+                                case VK_INSERT:
+                                case 82:
+                                        return KEY_INS;
                                 }
                         }
                         /*
