@@ -58,16 +58,39 @@ The program compiles also as a native Linux executable
 | `md`/`mkdir` |  *done*  |  |
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
 | `type`       |  *done*  | Bonus: support also line numbers printing |
-| `command`    | WIP | This is the main interactive shell. Works only on internal commands for now, no editing support |
+| `command`    | WIP | See bellow |
 | `prompt`     |  *done*  | |
 | `set`        |  *done*  | Does not handle quoting properly due to internal library issues |
 | `rem`        |  *done*  | |
 | `type`       |  *done*  | As a bonus, also prints line numbers |
 | `ver`        |  *done*  | |
 
+Major project worked on is interactive shell. The main task right now is the 
+internal readline code (history, editor etc).
+
+## Command line editor status:
+ | Key                 | status    | comment |
+ | ------------------- | --------- | ------- |
+ | Left/right/home/end | *done*    |         |
+ | Up/Down: history    | WIP       | fails randomly |
+ | Backspace           | *done*    | |
+ | Del                 | no        | |
+ | control+a : HOME    | *done*    |
+ | control+b : word left| no       |  |
+ | control+c : cancel  | WIP       | de facto - clear line, fails on Posix |
+ | control+d : EOF     | *done*    |
+ | control+e : END     | *done*    |
+ | control+f : word right| no       |  |
+ | control+l : cls     | *done*    |         |
+ | TAB                 | no        | |
+ | insert/override     | WIP       | I have API, not implemented on edit|
+ | esc                 | ????      | Fix breaks on Linux/OSX ? |          
+ | insert              | *done*    | Toggle insert/override mode   |
+ | control+arrors      | no        | move to next/prev word    |
+
 ## Compiler support
  1. Linux: Clang/GCC - this is the main development environment. Supported.
- 2. Windows10: MinGW/TCM (9) - this is the main development environment. Supported.
+ 2. Windows10: MinGW/TCM (9,10) - this is the main development environment. Supported.
  3. DOS: TC 2.02 - this is the main development environment. Supported.
     > __BUG__:
     >
@@ -79,6 +102,7 @@ The program compiles also as a native Linux executable
     my code. Might be a compiler bug.
  5. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
     which contains the work needed to make this project compile with that compiler.
+ 6. OSX: Works, not main target but actively developed (similar code path as Linux)
 
 ## Building
 
@@ -184,6 +208,15 @@ I am redirected to the full code of the program in drive D:. The project contain
 a TurboC project file - so typing `tc` will bring up the IDE with the project ready
 to hack.
 
+Linux requirements:
+```
+apt install 7z wget dosbox
+```
+
+OSX requirements:
+```
+brew install p7zip wget dosbox
+```
 
 TODO: If you save a file under DOS, DosBox will rename it to capital letters. I am
 unsure how to automatically do this.
