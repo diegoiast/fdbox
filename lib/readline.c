@@ -336,9 +336,11 @@ int readline(struct readline_session *session) {
                         putchar('\n');
                         return session->current_size;
                 }
+                case 1: /* control +a */
                 case KEY_HOME:
                         readline_move_home(session);
                         break;
+                case 5: /* control +a */
                 case KEY_END:
                         readline_move_end(session);
                         break;

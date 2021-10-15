@@ -65,19 +65,28 @@ The program compiles also as a native Linux executable
 | `type`       |  *done*  | As a bonus, also prints line numbers |
 | `ver`        |  *done*  | |
 
+Major project worked on is interactive shell. The main task right now is the 
+internal readline code (history, editor etc).
+
 ## Command line editor status:
  | Key                 | status    | comment |
  | ------------------- | --------- | ------- |
- | Left/right/home/end | supported |         |
+ | Left/right/home/end | *done*    |         |
  | Up/Down: history    | WIP       | saves history when you browser, also fails randomly |
- | Backspace           | supported | |
+ | Backspace           | *done*    | |
  | Del                 | no        | |
- | control+d : EOF     | supported |
- | control+c : cancel  | no        | de facto - clear line |
- | control+l : cls     | yes       |         |
+ | control+a : HOME    | *done*    |
+ | control+b : word left| no       |  |
+ | control+c : cancel  | WIP       | de facto - clear line, fails on Posix |
+ | control+d : EOF     | *done*    |
+ | control+e : END     | *done*    |
+ | control+f : word right| no       |  |
+ | control+l : cls     | *done*    |         |
  | TAB                 | no        | |
  | insert/override     | WIP       | I have API, not implemented on edit|
- | esc                 | ????       | Fix breaks on Linux/OSX ? |          
+ | esc                 | ????      | Fix breaks on Linux/OSX ? |          
+ | insert              | *done*    | Toggle insert/override mode   |
+ | control+arrors      | no        | move to next/prev word    |
 
 ## Compiler support
  1. Linux: Clang/GCC - this is the main development environment. Supported.
