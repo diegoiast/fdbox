@@ -94,7 +94,7 @@ int command_beep(int argc, char *argv[]) {
 const char *help_beep() {
 #if defined(__unix__) || defined(__APPLE__)
         return "Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with DOS)";
-#elif defined(WIN32) || defined(__MSDOS__)
+#elif defined(WIN32) || defined(__MSDOS__) || defined(__WATCOMC__)
         return "Makes sound for a specified length in milliseconds";
 #endif
 }

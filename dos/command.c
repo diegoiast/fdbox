@@ -26,6 +26,7 @@ For license - read license.txt
 
 #if defined(__WATCOMC__)
 #include <strings.h>
+#include <io.h>
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
