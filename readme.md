@@ -98,11 +98,12 @@ internal readline code (history, editor etc).
           not reporting this to the app. Results in garbage in the screen when
 	  > `dir ` on a directory with lots of files (~80 on my tests, but it depends
 	  > on memory available).
- 4. DOS: DJGPP - I am haing problems in runtime. Seems like `tolower()` is breaking
+ 4. DOS/OpenWatcoom (WIP): we have a CI building it. The generated binary crashes on startup.
+ 5. OSX: Works, not main target but actively developed (similar code path as Linux)
+ 6. DOS: DJGPP - I am haing problems in runtime. Seems like `tolower()` is breaking
     my code. Might be a compiler bug.
- 5. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
+ 7. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
     which contains the work needed to make this project compile with that compiler.
- 6. OSX: Works, not main target but actively developed (similar code path as Linux)
 
 ## Building
 
