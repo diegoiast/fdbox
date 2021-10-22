@@ -22,8 +22,8 @@ jobs:
         run : |
           find
           ./build-ow.sh
-          mkdir owdos
-          mv fdbox.exe owdos
+          mkdir -p b/owdos
+          mv '${{ github.workspace }}/fdbox.exe' '${{ runner.workspace }}/b/owdos'
 
  job:
     name: ${{ matrix.os }}-hosted-basic
