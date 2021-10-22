@@ -25,6 +25,11 @@ jobs:
           mkdir -p ../b/owdos/
           #mv '${{ runner.workspace }}/fdbox.exe' '${{ runner.workspace }}/b/owdos'
           mv ../fdbox.exe ../b/owdos/
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: fdbox-build-${{ steps.vars.outputs.sha_short }}
+          path: '${{ runner.workspace }}/b/'
 
  job:
     name: ${{ matrix.os }}-hosted-basic
