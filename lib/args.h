@@ -8,7 +8,7 @@ For license - read license.txt
 
 #include <stdlib.h>
 
-#if defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined (__WATCOMC__)
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__WATCOMC__)
 #include <stdbool.h>
 #endif
 

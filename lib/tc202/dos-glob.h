@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #define MAX_PATH 254
-#ifndef ENAMETOOLONG 
+#ifndef ENAMETOOLONG
 #define ENAMETOOLONG -1
 #endif
 

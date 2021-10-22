@@ -1,4 +1,3 @@
-#include <dir.h>
 #include <dos.h>
 #include <errno.h>
 #include <stdio.h>
@@ -6,6 +5,23 @@
 #include <string.h>
 
 #include "lib/tc202/dos-glob.h"
+
+#if defined(__TURBOC__)
+#include <dir.h>
+
+#elif defined(__WATCOMC__)
+
+#include <stdlib.h>
+
+#define findfirst _dos_findfirst
+#define findnext _dos_findnext
+
+#define FA_RDONLY _A_RDONLY
+#define FA_HIDDEN _A_HIDDEN
+#define FA_SYSTEM _A_SYSTEM
+#define FA_DIREC _A_SUBDIR
+#endif
+
 #define ATTRIBUTES FA_RDONLY | FA_HIDDEN | FA_SYSTEM | FA_DIREC
 
 struct file_entry {
@@ -42,8 +58,12 @@ int glob(const char *pattern, int flags, int (*errfunc)(const char *epath, int e
         int err = 0, err2;
         size_t len;
         unsigned entries = 0;
-        struct ffblk ff;
 
+#if defined(__WATCOMC__)
+        struct find_t ff;
+#else
+        struct ffblk ff;
+#endif
         /*
             if (!pattern || flags != (flags & GLOB_FLAGS) || unused || !pglob)
             {
@@ -63,7 +83,11 @@ int glob(const char *pattern, int flags, int (*errfunc)(const char *epath, int e
                 len--;
         path[len] = 0;
 
+#if defined(__WATCOMC__)
+        err = _dos_findfirst(pattern, ATTRIBUTES, &ff);
+#else
         err = findfirst(pattern, &ff, ATTRIBUTES);
+#endif
         if (err != 0) {
                 if (flags & GLOB_NOCHECK) {
                         err = insert("", pattern, &head);
@@ -71,7 +95,13 @@ int glob(const char *pattern, int flags, int (*errfunc)(const char *epath, int e
                 }
         } else {
                 do {
-                        err2 = insert(path, ff.ff_name, &head);
+#if defined(__WATCOMC__)
+                        const char *file_name = ff.name;
+#else
+                        const char *file_name = ff.ff_name;
+#endif
+
+                        err2 = insert(path, file_name, &head);
                         entries++;
                         err = findnext(&ff);
                 } while (!err && !err2);

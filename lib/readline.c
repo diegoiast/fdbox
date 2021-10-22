@@ -23,20 +23,28 @@ For license - read license.txt
 #include "lib/tc202/stdextra.h"
 #endif
 
+#if defined(__WATCOMC__)
+#include <conio.h>
+#include <i86.h>
+
+// this is needed for clrscr() re-implementation
+#include <graph.h>
+
+void clrscr() { _clearscreen(_GCLEARSCREEN); }
+#endif
+
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <stdbool.h>
 #include <termios.h>
 #include <unistd.h>
 #endif
 
-#ifdef __WIN32__
+#if defined(__WIN32__)
 #include <conio.h>
 #include <io.h>
 #include <stdbool.h>
 #include <windows.h>
-#endif
 
-#if defined(__WIN32__)
 int read_char() {
         DWORD cc;
         HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
@@ -140,7 +148,7 @@ int read_char() {
 }
 #define get_char_impl get_char_posix
 
-#elif defined(__TURBOC__)
+#elif defined(__TURBOC__) || (defined(__WATCOMC__))
 int read_char() {
         int c = getch();
 
@@ -199,7 +207,7 @@ void clear_screen() {
         printf("\e[1;1H\e[2J");
 #elif defined(WIN32)
         printf("\e[1;1H\e[2J");
-#elif defined(__MSDOS__)
+#elif defined(__MSDOS__) || defined(__WATCOMC__)
         clrscr();
 #else
         please implement clean screen
@@ -219,7 +227,7 @@ void set_cursor_insert() {
         cursorInfo.bVisible = true;
         cursorInfo.dwSize = 100;
         SetConsoleCursorInfo(out, &cursorInfo);
-#elif defined(__MSDOS__)
+#elif defined(__MSDOS__) || defined(__WATCOMC__)
         union REGS xr;
         xr.h.ah = 1;
         xr.h.ch = 6;
@@ -245,7 +253,7 @@ void set_cursor_override() {
         cursorInfo.bVisible = true;
         cursorInfo.dwSize = 10;
         SetConsoleCursorInfo(out, &cursorInfo);
-#elif defined(__MSDOS__)
+#elif defined(__MSDOS__) || defined(__WATCOMC__)
         /*
         https://jbwyatt.com/253/emu/8086_bios_and_dos_interrupts.html
         http://computer-programming-forum.com/29-pascal/7b38c5f9b15dfae6.htm
