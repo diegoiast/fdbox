@@ -14,7 +14,7 @@ For license - read license.txt
 */
 
 #if defined(__TURBOC__) || defined(__WATCOMC__)
-#include "lib/tc202/DOS-GLOB.H"
+#include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdextra.h"
 #include <sys/stat.h>
 #endif
