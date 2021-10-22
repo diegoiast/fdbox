@@ -10,12 +10,12 @@
 #include <unistd.h>
 #endif
 
-#if defined (__TURBOC__)
+#if defined(__TURBOC__)
 #include <dir.h>
 #endif
 
 #if defined(__WATCOMC__)
-#include <direct.h> 
+#include <direct.h>
 #endif
 
 #ifdef WIN32

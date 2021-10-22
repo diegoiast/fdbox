@@ -34,9 +34,9 @@ For license - read license.txt
 #endif
 
 #if defined(__WATCOMC__)
+#include "lib/tc202/DOS-GLOB.H"
 #include <strings.h>
 #include <sys/stat.h>
-#include "lib/tc202/DOS-GLOB.H"
 #endif
 
 static bool if_file_exists(const char *path);
