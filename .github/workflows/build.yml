@@ -40,7 +40,7 @@ jobs:
         run : sudo apt install clang-tidy
 
       - name: Confiure + build (CMake+Ninja)
-        uses: lukka/run-cmake@9
+        uses: lukka/run-cmake@3.4
         id: runcmake
         with:
           cmakeGenerator: 'Ninja'
