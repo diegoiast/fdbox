@@ -20,8 +20,8 @@ jobs:
       - name: Build with ow
         working-directory: '${{ github.workspace }}/etc'
         run : |
-          find
           ./build-ow.sh
+          find
           mkdir -p b/owdos/
           #mv '${{ runner.workspace }}/fdbox.exe' '${{ runner.workspace }}/b/owdos'
           mv fdbox.exe b/owdos/
