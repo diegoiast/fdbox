@@ -9,7 +9,23 @@ on:
        - github-actions
 
 jobs:
-  job:
+ job1: 
+    name: OpenWatcom-DOS
+    runs-on: ubuntu-latest 
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Build with ow
+        working-directory: '${{ github.workspace }}/etc'
+        run : |
+          find
+          ./build-ow.sh
+          mkdir owdos
+          mv fdbox.exe owdos
+
+ job:
     name: ${{ matrix.os }}-hosted-basic
     runs-on: ${{ matrix.os }}
     strategy:
