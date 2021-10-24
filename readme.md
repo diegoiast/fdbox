@@ -25,6 +25,7 @@ The program compiles also as a native Linux executable
 
 Yes this code compiles on DOS 8086 16bit, Windows 8086 32bit and Linux amd64 and OSX64/ARM!. I see no reasons why should it fail
 to compile on other platforms/OS.
+
 ## Status
 
  * Only DOS commands are supported. Unix commands might follow.
@@ -42,6 +43,12 @@ to compile on other platforms/OS.
    this can be another implementation detail.
  * Contains a bash shell script to generate the development enviroment
    for DOS+DosBOX
+
+See also: 
+
+ * [coding.md](coding.md)
+ * [building.md](building.md)
+ * [readme.txt](readme.txt)
 
 ## TODO
 * Command (main interactive shell) does not support batch files. See https://github.com/elcuco/fdbox/tree/batch-files-support branch.
@@ -128,14 +135,6 @@ internal readline code (history, editor etc).
     my code. Might be a compiler bug.
  7. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
     which contains the work needed to make this project compile with that compiler.
-
-
-## See also
-
-Coding standard code-standard.md
-readme.txt
-
-
 
 ## Why?
 Because.
