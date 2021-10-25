@@ -3,7 +3,7 @@
 set -e
 set -x
 
-wget -nc https://github.com/open-watcom/open-watcom-v2/releases/download/Current-build/ow-snapshot.tar.gz
+wget -nc --quiet https://github.com/open-watcom/open-watcom-v2/releases/download/Current-build/ow-snapshot.tar.gz
 
 mkdir -p ow
 tar -C ow -xf ow-snapshot.tar.gz

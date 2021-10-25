@@ -18,12 +18,14 @@ jobs:
           submodules: true
 
       - name: Build with ow
-        working-directory: '${{ github.workspace }}/etc'
+        working-directory: '${{ github.workspace }}'
         run : |
+          cd etc
           ./build-ow.sh
-          mkdir -p '../b/owdos'
-          mv ../fdbox.exe ../b/owdos/
-          mv ../tests.exe ../b/owdos/
+          cd ..
+          mkdir -p 'b/owdos'
+          mv src/fdbox.exe b/owdos/
+          mv src/tests.exe b/owdos/
           tree '${{ runner.workspace }}/b'
       - name: Set outputs
         id: vars
