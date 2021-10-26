@@ -4,7 +4,7 @@ A new command interpreter for FreeDOS. Code will contain usable utilities
 borrowed from Unix and maintain (basic) compatibility with 
 MSDOS 6.22 `command.com`, while (sometimes) improving. 
 
-![Build status](https://github.com/elcuco/fdbox/actions/workflows/build.yml/badge.svg)
+[![Build status](https://github.com/elcuco/fdbox/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Nklya/test-actions/actions?query=workflow%3Atest)
 
 <p align="center">
 <img src="fdbox-dosbox.png" />
