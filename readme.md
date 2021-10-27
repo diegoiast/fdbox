@@ -32,15 +32,14 @@ to compile on other platforms/OS.
  * Code compiles using clang/GCC (Windows+Linux+OSX), TCC (DOS), OpenWatcom2/snapshot (DOS).   
  * Github actions compiles all the code for Linux, Windows, MSDOS and OSX, 
    the worlflow also runs the test on all platforms. (tests do not run on MSDOS yet).
- * Currently I am using LibC's functions - so I am limited to
+ * Currently code uses LibC's functions - so it is limited to
    standard C code support for localization.
  * All commands support multiple arguments (like Unix shells), unlike DOS
    which you cannot do `del /r file1.txt *.bat /f`, and arguments can come
    even after file names (not only at the begining of the command).
  * Some commands share the same code (`copy`+`move`, `date`+`time`)
  * Interactive shell is beeing worked on. I want to have 4DOS command  
-   completion, or bash/zsh. I like what the SerenityOS guys are doing -
-   this can be another implementation detail.
+   completion, or bash/zsh. 
  * Contains a bash shell script to generate the development enviroment
    for DOS+DosBOX
 
@@ -56,7 +55,7 @@ See also:
 * Command does not support "|"
 * Command does not support executing external commands
 * `TurboC` does need a proper makefile.
-* Make OW build a Windows binary
+* Make OW build a Windows binary (as well)
 * OW build is done by using gnu-make and not ow-make
 * Setup CI/CD to compile a DJGPP cross compilation
 * Setup CI/CD to run dosemu in console mode, and compile using TC
@@ -77,23 +76,24 @@ See also:
 | command      | status | remark        |
 |------------- | ------ | -----------   |
 | `beep`       |  *done*  | needs to be tested on DOS/Windows, on unix it just beeps              |
+| `call`       |  not yet |  |
 | `cd`         |  *done*  |  |
 | `cls`        |  *done*  |  |
 | `copy`       |  WIP     | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
+| `command`    | WIP | See bellow |
 | `date`/`time`|  WIP     | Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
 | `del`        |  *done*  | Prompt might need more testing |
 | `dir`        |  WIP     |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
 | `echo`       |  *done*  |  |
 | `if`         |  *done*  |  |
-| `for`        |  ???     |  |
+| `for`        |  not yet |  |
 | `md`/`mkdir` |  *done*  |  |
 | `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
-| `type`       |  *done*  | Bonus: support also line numbers printing |
-| `command`    | WIP | See bellow |
-| `prompt`     |  *done*  | |
-| `set`        |  *done*  | Does not handle quoting properly due to internal library issues |
+| `prompt`     |  *done*  | |internal library issues |
 | `rem`        |  *done*  | |
-| `type`       |  *done*  | As a bonus, also prints line numbers |
+| `set`        |  *done*  | |
+| `type`       |  *done*  | Bonus: support also line numbers printing |
+| `type`       |  *done*  | As a bonus, can also print line numbers |
 | `ver`        |  *done*  | |
 
 Major project worked on is interactive shell. The main task right now is the 
@@ -105,19 +105,19 @@ internal readline code (history, editor etc).
  | Left/right/home/end | *done*    |         |
  | Up/Down: history    | WIP       | fails randomly |
  | Backspace           | *done*    | |
- | Del                 | no        | |
+ | Del                 | not yet   | |
  | control+a : HOME    | *done*    |
- | control+b : word left| no       |  |
+ | control+b : word left| not yet  |  |
  | control+c : cancel  | WIP       | de facto - clear line, fails on Posix |
  | control+d : EOF     | *done*    |
  | control+e : END     | *done*    |
- | control+f : word right| no       |  |
+ | control+f : word right| not yet |  |
  | control+l : cls     | *done*    |         |
- | TAB                 | no        | |
- | insert/override     | WIP       | I have API, not implemented on edit|
+ | TAB                 | not yet   | |
+ | insert/override     | done      | Cursor shape not supported on OXS |
  | esc                 | ????      | Fix breaks on Linux/OSX ? |          
  | insert              | *done*    | Toggle insert/override mode   |
- | control+arrors      | no        | move to next/prev word    |
+ | control+arrors      | not yet   | move to next/prev word    |
 
 ## Compiler support
  1. Linux: Clang/GCC - this is the main development environment. Supported.
@@ -130,9 +130,9 @@ internal readline code (history, editor etc).
 	  > `dir ` on a directory with lots of files (~80 on my tests, but it depends
 	  > on memory available).
  4. DOS/OpenWatcoom (WIP): we have a CI building it. The generated binary crashes on startup.
- 5. OSX: Works, not main target but actively developed (similar code path as Linux)
+ 5. OSX: Works (similar code path as Linux)
  6. DOS: DJGPP - I am having problems in runtime. Seems like `tolower()` is breaking
-    my code. Might be a compiler bug.
+    my code. Might be a compiler bug. Interactive shell segfaults.
  7. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
     which contains the work needed to make this project compile with that compiler.
 
