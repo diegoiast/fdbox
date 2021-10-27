@@ -1,4 +1,8 @@
-CFLAGS=-I. -Ilib -Idos -O2
+# This makefile is for OpenWatcom (this is GNU-Makefile)
+
+CFLAGS=-zq -bt=dos -d0 -2 -I. -Ilib -Idos -za99  -Ietc/ow/h -sg
+CC=wcc
+LD=wcl
 
 OBJECTS=applets.o main.o help.o \
 	dos/beep.o \
@@ -14,6 +18,7 @@ OBJECTS=applets.o main.o help.o \
 	dos/exit.o \
 	dos/for.o \
 	dos/goto.o \
+	dos/history.o \
 	dos/if.o \
 	dos/md.o \
 	dos/rem.o \
@@ -28,21 +33,32 @@ OBJECTS=applets.o main.o help.o \
 	lib/args.o \
 	lib/strextra.o \
 	lib/environ.o \
+	lib/readline.o \
+	lib/tc202/dos-glob.o
+
+TEST_OBJECTS = tests.o \
+	lib/applet.o \
+	lib/args.o \
+	lib/environ.o \
+	lib/strextra.o \
 
 .PHONY: clean all
 
-all: fdbox tests
+.c.o:
+	$(CC) -fo=$@ $(CFLAGS) $<
+
+all: tests fdbox
 
 clean:
-	del *.o
-	del dos\*.o
-	del lib\*.o
+	rm -f *.o
+	rm -f dos\*.o
+	rm -f lib\*.o
 
 fdbox: $(OBJECTS)
-	$(CC) $(OBJECTS) -o fdbox.exe
+	$(LD) -lr $^ -fe=$@
 
-tests: tests.o lib/applet.o lib/args.o lib/strextra.o lib/environ.o
-	$(CC) tests.o lib/applet.o lib/args.o lib/strextra.o lib/environ.o -o tests.exe
+tests: $(TEST_OBJECTS)
+	$(LD) -lr $^ -fe=$@
 
 ##################
 
@@ -80,6 +96,8 @@ dos/for.o: dos/for.c
 
 dos/goto.o: dos/goto.c
 
+dos/history.o: dos/history.c
+
 dos/if.o: dos/if.c
 
 dos/md.o: dos/md.c
@@ -109,3 +127,7 @@ lib/args.o: lib/args.c
 lib/environ.o: lib/environ.c
 
 lib/strextra.o: lib/strextra.c
+
+lib/readline.o: lib/readline.c
+
+lib/tc202/dos-glob.o: lib/tc202/dos-glob.c

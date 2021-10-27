@@ -9,22 +9,25 @@ on:
        - github-actions
 
 jobs:
- build-dos: 
+  build-dos: 
     name: openwatcom-dos
     runs-on: ubuntu-latest 
     steps:
       - uses: actions/checkout@v1
         with:
           submodules: true
-
       - name: Build with ow
-        working-directory: '${{ github.workspace }}/etc'
+        working-directory: '${{ github.workspace }}'
         run : |
+          cd etc
           ./build-ow.sh
-          mkdir -p '../b/owdos'
-          mv ../fdbox.exe ../b/owdos/
-          mv ../tests.exe ../b/owdos/
-          tree '${{ runner.workspace }}/b'
+          cd ..
+          mkdir -p b/owdos
+          mkdir -p a/owdos
+          cp src/fdbox.exe b/owdos/
+          cp src/tests.exe b/owdos/
+          cp src/fdbox.exe a/owdos/
+          cp src/tests.exe a/owdos/
       - name: Set outputs
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
@@ -33,8 +36,13 @@ jobs:
         with:
           name: fdbox-build-${{ steps.vars.outputs.sha_short }}
           path: '${{ github.workspace }}/b/'
+      - name: Archive docs
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: fdbox-release-${{ steps.vars.outputs.sha_short }}
+          path: '${{ github.workspace }}/a/'
 
- build-cmake:
+  build-cmake:
     name: ${{ matrix.os }}-hosted-basic
     runs-on: ${{ matrix.os }}
     strategy:
@@ -48,22 +56,17 @@ jobs:
             triplet: x64-linux
           - os: macos-latest
             triplet: x64-osx
-
     steps:
       - uses: actions/checkout@v1
         with:
           submodules: true
-
       - uses: lukka/get-cmake@latest
-      
       - name: Set outputs
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
       - name: Install clang-tidy
         if: matrix.os == 'ubuntu-latest'
         run : sudo apt install clang-tidy
-
       - name: Confiure + build (CMake+Ninja)
         uses: lukka/run-cmake@v3.4
         id: runcmake
@@ -73,19 +76,49 @@ jobs:
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
           buildWithCMakeArgs: '-- -v'
           buildDirectory: '${{ runner.workspace }}/b/${{ runner.os }}'
-
       - name: Run clang format
         if: matrix.os == 'ubuntu-latest'
         run : |
           ninja -C '${{ runner.workspace }}/b/${{ runner.os }}' clang-format 
           echo ninja -C '${{ runner.workspace }}/b/${{ runner.os }}' check-clang-format
-
+      - name: Create release package
+        working-directory: '${{ github.workspace }}'
+        run : |
+          mkdir -p '${{ github.workspace }}/a/${{ runner.os }}'
+          cp ${{ runner.workspace }}/b/${{ runner.os }}/fdbox* '${{ github.workspace }}/a/${{ runner.os }}/'
+          cp ${{ runner.workspace }}/b/${{ runner.os }}/tests* '${{ github.workspace }}/a/${{ runner.os }}/'
       - name: Run tests
         run : '${{ runner.workspace }}/b/${{ runner.os }}/tests'
-
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2.2.4
         with:
           name: fdbox-build-${{ steps.vars.outputs.sha_short }}
           path: '${{ runner.workspace }}/b/'
+      - name: Archive docs
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: fdbox-release-${{ steps.vars.outputs.sha_short }}
+          path: '${{ github.workspace }}/a/'
 
+  package-docs:
+    name: package documentation
+    runs-on: ubuntu-latest
+    needs: build-cmake
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Copy documentation
+        working-directory: '${{ github.workspace }}'
+        run : |
+          mkdir -p a/
+          cp readme.txt a/
+          cp license.txt a/
+      - name: Set outputs
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      - name: Archive docs
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: fdbox-release-${{ steps.vars.outputs.sha_short }}
+          path: '${{ github.workspace }}/a/'

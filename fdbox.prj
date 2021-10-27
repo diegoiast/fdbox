@@ -1,34 +1,34 @@
-main.c
-applets.c
-help.c (help.h)
-lib/applet.c
-lib/args.c (lib/args.h)
-lib/tc202/dos-glob.c (lib/tc202/dos-glob.h)
-lib/tc202/stdextra.c (lib/tc202/stdextra.h)
-lib/environ.c (lib/environ.h)
-lib/readline.c (lib/readline.h)
-lib/strextra.c (lib/strextra.h)
-dos/beep.c
-dos/call.c
-dos/cd.c
-dos/cls.c
-dos/copymove.c (dos/copymove.h)
-dos/command.c (dos/command.h)
-dos/datetime.c (dos/datetime.h)
-dos/del.c (dos/del.h)
-dos/dir.c (dos/cmd_dir.h)
-dos/echo.c
-dos/exit.c
-dos/for.c
-dos/goto.c
-dos/history.c (dos/history.h)
-dos/if.c
-dos/md.c (dos/md.h)
-dos/path.c
-dos/prompt.c
-dos/reboot.c
-dos/rem.c
-dos/set.c
-dos/shift.c
-dos/type.c
-dos/ver.c
+src/main.c
+src/applets.c
+src/help.c (src/help.h)
+src/lib/applet.c
+src/lib/args.c (src/lib/args.h)
+src/lib/tc202/dos-glob.c (src/lib/tc202/dos-glob.h)
+src/lib/tc202/stdextra.c (src/lib/tc202/stdextra.h)
+src/lib/environ.c (src/lib/environ.h)
+src/lib/readline.c (src/lib/readline.h)
+src/lib/strextra.c (src/lib/strextra.h)
+src/dos/beep.c (src/dos/beep.h)
+src/dos/call.c (src/dos/call.h)
+src/dos/cd.c (src/dos/)
+src/dos/cls.c (src/cls.h)
+src/dos/copymove.c (src/dos/copymove.h)
+src/dos/command.c (src/dos/command.h)
+src/dos/datetime.c (src/dos/datetime.h)
+src/dos/del.c (src/dos/del.h)
+src/dos/dir.c (src/dos/cmd_dir.h)
+src/dos/echo.c (src/dos/echo.h)
+src/dos/exit.c (src/dos/exit.h)
+src/dos/for.c (src/dos/for.h)
+src/dos/goto.c (src/dos/goto.h)
+src/dos/history.c (dos/history.h)
+src/dos/if.c (src/dos/if.c)
+src/dos/md.c (src/dos/md.h)
+src/dos/path.c (src/dos/path.h)
+src/dos/prompt.c (src/dos/prompt.h)
+src/dos/reboot.c (src/dos/reboot.h)
+src/dos/rem.c (src/dos/rem.h)
+src/dos/set.c (src/dos/set.h)
+src/dos/shift.c (src/dos/shift.h)
+src/dos/type.c (src/dos/type.h)
+src/dos/ver.c (src/dos/ver.h)
