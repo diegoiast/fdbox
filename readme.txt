@@ -19,3 +19,5 @@ For more information visit (and full source):
 https://github.com/elcuco/fdbox
 
 (and yes, it feels weird to write HTTPS urls for a DOS project)
+
+Diego Iastrubni - diegoiast@gmail.com
