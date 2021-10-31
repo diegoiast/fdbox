@@ -22,11 +22,13 @@ For license - read license.txt
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#include <process.h>
 #endif
 
 #if defined(__WATCOMC__)
-#include <strings.h>
 #include <io.h>
+#include <process.h>
+#include <strings.h>
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
@@ -37,8 +39,31 @@ For license - read license.txt
 #ifdef __WIN32__
 #include <conio.h>
 #include <io.h>
+#include <process.h>
 #include <stdbool.h>
 #include <windows.h>
+#endif
+
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+
+#define P_WAIT 0    /* child runs separately, parent waits until exit */
+#define P_NOWAIT 1  /* both concurrent -- not implemented */
+#define P_OVERLAY 2 /* child replaces parent, parent no longer exists */
+
+int spawnvp(int mode, char *path, char *argv[]) {
+        pid_t child_pid;
+        child_pid = fork();
+        if (child_pid != 0) {
+                int status;
+                waitpid(child_pid, &status, 0);
+                return status;
+        } else {
+                execvp(path, argv);
+                fprintf(stderr, "an error occurred in execvp\n");
+                abort();
+        }
+        return 0;
+}
 #endif
 
 struct command_shell_config {
@@ -90,8 +115,13 @@ int command_execute_line(const char *line) {
                         fprintf(stderr, "Command failed (%d)\n", code);
                 }
         } else {
-                fprintf(stderr, "Command not found - [%s][%s]\n", args.argv[0], line);
-                errno = ENOENT;
+                int err;
+                readline_deinit();
+                err = spawnvp(P_WAIT, args.argv[0], args.argv);
+                readline_init();
+                if (err != 0) {
+                        fprintf(stderr, "Command not found - %d \n", err);
+                }
         }
 
         command_args_free(&args);
