@@ -5,8 +5,8 @@ name: Build and test fdbox
 on:
   push:
     braches:
-       - main
-       - github-actions
+      - main
+      - github-actions
 
 jobs:
   build-dos: 
