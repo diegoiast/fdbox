@@ -30,7 +30,7 @@ jobs:
           cp src/tests.exe a/owdos/
       - name: Set outputs
         id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "::set-output name=sha_short::$(git describe --tags)"
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2.2.4
         with:
@@ -63,7 +63,7 @@ jobs:
       - uses: lukka/get-cmake@latest
       - name: Set outputs
         id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "::set-output name=sha_short::$(git describe --tags)"
       - name: Install clang-tidy
         if: matrix.os == 'ubuntu-latest'
         run : sudo apt install clang-tidy
@@ -116,7 +116,7 @@ jobs:
           cp license.txt a/
       - name: Set outputs
         id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "::set-output name=sha_short::$(git describe --tags)"
       - name: Archive docs
         uses: actions/upload-artifact@v2.2.4
         with:
