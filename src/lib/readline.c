@@ -202,11 +202,51 @@ int read_string(char *line, size_t max_size) {
         return l;
 }
 
+#if defined(WIN32)
+// https://docs.microsoft.com/en-us/windows/console/clearing-the-screen
+void cls_win32(HANDLE hConsole) {
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        SMALL_RECT scrollRect;
+        COORD scrollTarget;
+        CHAR_INFO fill;
+
+        // Get the number of character cells in the current buffer.
+        if (!GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+                return;
+        }
+
+        // Scroll the rectangle of the entire buffer.
+        scrollRect.Left = 0;
+        scrollRect.Top = 0;
+        scrollRect.Right = csbi.dwSize.X;
+        scrollRect.Bottom = csbi.dwSize.Y;
+
+        // Scroll it upwards off the top of the buffer with a magnitude of the entire height.
+        scrollTarget.X = 0;
+        scrollTarget.Y = (SHORT)(0 - csbi.dwSize.Y);
+
+        // Fill with empty spaces with the buffer's default text attribute.
+        fill.Char.UnicodeChar = TEXT(' ');
+        fill.Attributes = csbi.wAttributes;
+
+        // Do the scroll
+        ScrollConsoleScreenBuffer(hConsole, &scrollRect, NULL, scrollTarget, &fill);
+
+        // Move the cursor to the top left corner too.
+        csbi.dwCursorPosition.X = 0;
+        csbi.dwCursorPosition.Y = 0;
+
+        SetConsoleCursorPosition(hConsole, csbi.dwCursorPosition);
+}
+#endif
+
 void clear_screen() {
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
         printf("\e[1;1H\e[2J");
 #elif defined(WIN32)
-        printf("\e[1;1H\e[2J");
+        HANDLE hStdout;
+        hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+        cls_win32(hStdout);
 #elif defined(__MSDOS__) || defined(__WATCOMC__)
         clrscr();
 #else
