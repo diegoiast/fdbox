@@ -6,27 +6,27 @@ MSDOS 6.22 `command.com`, while (sometimes) improving.
 
 [![Build status](https://github.com/elcuco/fdbox/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/elcuco/fdbox/actions/workflows/build.yml) ![License](https://img.shields.io/github/license/elcuco/fdbox.svg)
 
-<img src="https://img.shields.io/github/languages/top/elcuco/fdbox.svg"/>
-<img src="https://img.shields.io/github/repo-size/elcuco/fdbox.svg"/>
-<img src="https://img.shields.io/github/commit-activity/y/elcuco/fdbox"/>
+<img src="https://img.shields.io/github/languages/top/elcuco/fdbox.svg" alt="Languages"/>
+<img src="https://img.shields.io/github/repo-size/elcuco/fdbox.svg" alt="Repository size"/>
+<img src="https://img.shields.io/github/commit-activity/y/elcuco/fdbox" alt="Activity"/>
 
 <p align="center">
-<img src="fdbox-dosbox.png" />
+<img src="fdbox-dosbox.png" alt="DOSBox" />
 </p>
 
 The program compiles also as a native Linux executable
 <p align="center">
-<img src="fdbox-linux.png" />
+<img src="fdbox-linux.png" alt="Linux"/>
 </p>
 
 .. and Windows as well 
 <p align="center">
-<img src="fdbox-win10.png" />
+<img src="fdbox-win10.png" alt="Windows"/>
 </p>
 
 .. and Apple silicon as well 
 <p align="center">
-<img src="fdbox-osx-apple-silicon.png" />
+<img src="fdbox-osx-apple-silicon.png" alt="OSX"/>
 </p>
 
 Yes this code compiles on DOS 8086 16bit, Windows 8086 32bit and Linux amd64 and OSX64/ARM!. I see no reasons why should it fail
@@ -79,51 +79,51 @@ See also:
 * see also implementation tables bellow
 
 ## Implementation status of commands
-| command      | status | remark        |
-|------------- | ------ | -----------   |
-| `beep`       |  *done*  | needs to be tested on DOS/Windows, on unix it just beeps              |
-| `call`       |  not yet |  |
-| `cd`         |  *done*  |  |
-| `cls`        |  *done*  |  |
-| `copy`       |  WIP     | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
-| `command`    | WIP | See bellow |
-| `date`/`time`|  WIP     | Missing AM/PM support <br> Not supported on windows (only DOS/Linux) |
-| `del`        |  *done*  | Prompt might need more testing |
-| `dir`        |  WIP     |  `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage|
-| `echo`       |  *done*  |  |
-| `if`         |  *done*  |  |
-| `for`        |  not yet |  |
-| `md`/`mkdir` |  *done*  |  |
-| `move`/`rename`/`ren` |  *done*  | All thes command are aliases, hardcoded |
-| `prompt`     |  *done*  | |internal library issues |
-| `rem`        |  *done*  | |
-| `set`        |  *done*  | |
-| `type`       |  *done*  | Bonus: support also line numbers printing |
-| `type`       |  *done*  | As a bonus, can also print line numbers |
-| `ver`        |  *done*  | |
+| command               | status  | remark                                                                                                                                                                                              |
+|-----------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `beep`                | *done*  | needs to be tested on DOS/Windows, on unix it just beeps                                                                                                                                            |
+| `call`                | not yet |                                                                                                                                                                                                     |
+| `cd`                  | *done*  |                                                                                                                                                                                                     |
+| `cls`                 | *done*  |                                                                                                                                                                                                     |
+| `copy`                | WIP     | All copies are binaries. By design. <br> Recursive copy not implemented yet <br> Copy globs, and several files - not implemented yet <br> Append files (copy file1+file2 file3) not implemented yet |
+| `command`             | WIP     | See bellow                                                                                                                                                                                          |
+| `date`/`time`         | WIP     | Missing AM/PM support <br> Not supported on windows (only DOS/Linux)                                                                                                                                |
+| `del`                 | *done*  | Prompt might need more testing                                                                                                                                                                      |
+| `dir`                 | WIP     | `/o?` order is funky. <br> `/p` - pausing is not implemented <br> Missing disk usage                                                                                                                |
+| `echo`                | *done*  |                                                                                                                                                                                                     |
+| `if`                  | *done*  |                                                                                                                                                                                                     |
+| `for`                 | not yet |                                                                                                                                                                                                     |
+| `md`/`mkdir`          | *done*  |                                                                                                                                                                                                     |
+| `move`/`rename`/`ren` | *done*  | All thes command are aliases, hardcoded                                                                                                                                                             |
+| `prompt`              | *done*  | internal library issues                                                                                                                                                                             |
+| `rem`                 | *done*  |                                                                                                                                                                                                     |
+| `set`                 | *done*  |                                                                                                                                                                                                     |
+| `type`                | *done*  | Bonus: support also line numbers printing                                                                                                                                                           |
+| `type`                | *done*  | As a bonus, can also print line numbers                                                                                                                                                             |
+| `ver`                 | *done*  |                                                                                                                                                                                                     |
 
 Major project worked on is interactive shell. The main task right now is the 
 internal readline code (history, editor etc).
 
 ## Command line editor status:
- | Key                 | status    | comment |
- | ------------------- | --------- | ------- |
- | Left/right/home/end | *done*    |         |
- | Up/Down: history    | WIP       | fails randomly |
- | Backspace           | *done*    | |
- | Del                 | not yet   | |
- | control+a : HOME    | *done*    |
- | control+b : word left| not yet  |  |
- | control+c : cancel  | WIP       | de facto - clear line, fails on Posix |
- | control+d : EOF     | *done*    |
- | control+e : END     | *done*    |
- | control+f : word right| not yet |  |
- | control+l : cls     | *done*    |         |
- | TAB                 | not yet   | |
- | insert/override     | done      | Cursor shape not supported on OXS |
- | esc                 | ????      | Fix breaks on Linux/OSX ? |          
- | insert              | *done*    | Toggle insert/override mode   |
- | control+arrors      | not yet   | move to next/prev word    |
+| Key                    | status  | remark                                |
+|------------------------|---------|---------------------------------------|
+| Left/right/home/end    | *done*  |                                       |
+ | Up/Down: history       | WIP     | fails randomly                        |
+ | Backspace              | *done*  |                                       |
+ | Del                    | not yet |                                       |
+ | control+a : HOME       | *done*  |                                       |
+ | control+b : word left  | not yet |                                       |
+ | control+c : cancel     | WIP     | de facto - clear line, fails on Posix |
+ | control+d : EOF        | *done*  |                                       |
+ | control+e : END        | *done*  |                                       |
+ | control+f : word right | not yet |                                       |
+ | control+l : cls        | *done*  |                                       |
+ | TAB                    | not yet |                                       |
+ | insert/override        | done    | Cursor shape not supported on OXS     |
+ | esc                    | ????    | Fix breaks on Linux/OSX ?             |          
+ | insert                 | *done*  | Toggle insert/override mode           |
+ | control+arrors         | not yet | move to next/prev word                |
 
 ## Compiler support
  1. Linux: Clang/GCC - this is the main development environment. Supported.
