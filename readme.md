@@ -59,7 +59,6 @@ See also:
 * Command (main interactive shell) does not support batch files. See https://github.com/elcuco/fdbox/tree/batch-files-support branch.
 * Command does not support redirection
 * Command does not support "|"
-* Command does not support executing external commands
 * `TurboC` does need a proper makefile.
 * Make OW build a Windows binary (as well)
 * OW build is done by using gnu-make and not ow-make
