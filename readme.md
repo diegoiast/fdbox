@@ -37,17 +37,17 @@ to compile on other platforms/OS.
  * Only DOS commands are supported. Unix commands might follow.
  * Code compiles using clang/GCC (Windows+Linux+OSX), TCC (DOS), OpenWatcom2/snapshot (DOS).   
  * Github actions compiles all the code for Linux, Windows, MSDOS and OSX, 
-   the worlflow also runs the test on all platforms. (tests do not run on MSDOS yet).
- * Currently code uses LibC's functions - so it is limited to
+   the workflow also runs the test on all platforms. (tests do not run on MSDOS yet).
+ * Currently, code uses LibC's functions - so it is limited to
    standard C code support for localization.
  * All commands support multiple arguments (like Unix shells), unlike DOS
    which you cannot do `del /r file1.txt *.bat /f`, and arguments can come
-   even after file names (not only at the begining of the command).
+   even after file names (not only at the beginning of the command).
  * Some commands share the same code (`copy`+`move`, `date`+`time`)
- * Interactive shell is beeing worked on. I want to have 4DOS command  
+ * Interactive shell is being worked on. I want to have 4DOS command  
    completion, or bash/zsh. 
- * Contains a bash shell script to generate the development enviroment
-   for DOS+DosBOX
+ * Contains a bash shell script to generate the development environment
+   for DOS+DosBOX.
 
 See also: 
 
@@ -70,7 +70,7 @@ See also:
    and auto generate the `applets.c` file. Not against the idea.
 * There are commands that are available on Unix and DOS, but differ 
    in syntax  unsure how to handle.
-* MSDOS: Using XMS swapping wold be good, using SPWNO would be epic (http://www.cs.cmu.edu/%7Eralf/files.html)
+* MSDOS: Using XMS swapping would be good, using SPWNO would be epic (http://www.cs.cmu.edu/%7Eralf/files.html)
 * Platform specific APIs (`&` on Windows/Linux to run a program in 
   background for example).
 * On Linux we can print escape sequences to make files on `dir`
@@ -93,7 +93,7 @@ See also:
 | `if`                  | *done*  |                                                                                                                                                                                                     |
 | `for`                 | not yet |                                                                                                                                                                                                     |
 | `md`/`mkdir`          | *done*  |                                                                                                                                                                                                     |
-| `move`/`rename`/`ren` | *done*  | All thes command are aliases, hardcoded                                                                                                                                                             |
+| `move`/`rename`/`ren` | *done*  | All these command are aliases, hardcoded                                                                                                                                                            |
 | `prompt`              | *done*  | internal library issues                                                                                                                                                                             |
 | `rem`                 | *done*  |                                                                                                                                                                                                     |
 | `set`                 | *done*  |                                                                                                                                                                                                     |
@@ -122,7 +122,7 @@ internal readline code (history, editor etc).
  | insert/override        | done    | Cursor shape not supported on OXS     |
  | esc                    | ????    | Fix breaks on Linux/OSX ?             |          
  | insert                 | *done*  | Toggle insert/override mode           |
- | control+arrors         | not yet | move to next/prev word                |
+ | control+arrows         | not yet | move to next/prev word                |
 
 ## Compiler support
  1. Linux: Clang/GCC - this is the main development environment. Supported.
@@ -130,15 +130,15 @@ internal readline code (history, editor etc).
  3. DOS: TC 2.02 - this is the main development environment. Supported.
     > __BUG__:
     >
-    > `glob()` functionlaity tends to allocate too much >memory, and the code is faulty,
-          not reporting this to the app. Results in garbage in the screen when
-	  > `dir ` on a directory with lots of files (~80 on my tests, but it depends
-	  > on memory available).
- 4. DOS/OpenWatcoom (WIP): we have a CI building it. The generated binary crashes on startup.
+    > `glob()` functionlaity tends to allocate too much >memory, and the code is faulty, 
+    > not reporting this to the app. Results in garbage in the screen when
+    > `dir ` on a directory with lots of files (~80 on my tests, but it depends
+    > on memory available).
+ 4. DOS/OpenWatcom (WIP): we have a CI building it. The generated binary crashes on startup.
  5. OSX: Works (similar code path as Linux)
  6. DOS: DJGPP - I am having problems in runtime. Seems like `tolower()` is breaking
     my code. Might be a compiler bug. Interactive shell segfaults.
- 7. DOS: PacificC - Its not a high priority, but we have a working branch called `pacific-c-support`
+ 7. DOS: PacificC - It's not a high priority, but we have a working branch called `pacific-c-support`
     which contains the work needed to make this project compile with that compiler.
 
 ## Why?
@@ -165,7 +165,7 @@ as I might re-license code, and want new implementations for those old ideas).
 I created a Linux shell script which will populate a "C:" drive for development.
 Just execute it, and it will download all the compilers, and create an AUTOEXEC.BAT.
 
-Then in DosBox config, edited the start up files (usually at the end) to this:
+Then in DosBox config, edited the start-up files (usually at the end) to this:
 
 
     mount c /home/diego/fdbox/etc/dosbox
@@ -173,7 +173,7 @@ Then in DosBox config, edited the start up files (usually at the end) to this:
     C:\AUTOEXEC.BAT
     d:
 
-Then, each time I start dosbox, I have in the path all the compilers I need and
+Then, each time I start dosbox, I have in the path all the compilers I need, and
 I am redirected to the full code of the program in drive D:. The project contains
 a TurboC project file - so typing `tc` will bring up the IDE with the project ready
 to hack.
