@@ -35,7 +35,8 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <dirent.h>
 #include <fcntl.h>
-#include <glob.h>
+//#include <glob.h>
+#include "lib/serenityos/serenity-glob.h"
 #include <stdbool.h>
 #include <sys/stat.h>
 #endif
@@ -63,7 +64,7 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
  ***************************************************************************/
 
 #define SORT_NAME 0x01
-#define SORT_EXTENTION 0x02
+#define SORT_EXTENSION 0x02
 #define SORT_DIRS 0x04
 #define SORT_DATE 0x08
 #define SORT_SIZE 0x10
@@ -163,7 +164,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         memset(files, 0, sizeof(files));
         for (i = 0; i < files2->count; i++) {
                 glob_t globbuf = {0};
-                glob(files2->file[i], GLOB_DOOFFS | GLOB_NOSORT, NULL, &globbuf);
+                serenity_glob(files2->file[i], GLOB_DOOFFS | GLOB_NOSORT, NULL, &globbuf);
                 for (j = 0; j != globbuf.gl_pathc; j++) {
                         const char *file_name = globbuf.gl_pathv[j];
                         requested_count++;
@@ -176,7 +177,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                                 file_count++;
                         }
                 }
-                globfree(&globbuf);
+                serenity_globfree(&globbuf);
         }
 
         /* and sort if needed */
@@ -310,7 +311,7 @@ static void dir_config_print(struct dir_config *config) {
         if (flag_test(config->sort_order, SORT_NAME)) {
                 printf("name ");
         }
-        if (flag_test(config->sort_order, SORT_EXTENTION)) {
+        if (flag_test(config->sort_order, SORT_EXTENSION)) {
                 printf("extension ");
         }
         if (flag_test(config->sort_order, SORT_DIRS)) {
@@ -383,7 +384,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                                 flag_set(&config->sort_order, SORT_NAME, true);
                                 break;
                         case 'e':
-                                flag_set(&config->sort_order, SORT_EXTENTION, true);
+                                flag_set(&config->sort_order, SORT_EXTENSION, true);
                                 break;
                         case 'g':
                                 flag_set(&config->sort_order, SORT_DIRS, true);
@@ -498,7 +499,7 @@ static int dir_file_comperator(const void *a, const void *b) {
                         order -= 2;
                 }
         }
-        if (flag_test(dir_file_order, SORT_EXTENTION)) {
+        if (flag_test(dir_file_order, SORT_EXTENSION)) {
                 const char *ext1, *ext2;
                 int v;
                 ext1 = file_get_extension(file1->file_name);

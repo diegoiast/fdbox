@@ -40,6 +40,7 @@ add_executable(
   src/lib/environ.c
   src/lib/strextra.c
   src/lib/readline.c
+  src/lib/serenityos/serenity-glob.c
   src/dos/beep.c
   src/dos/call.c
   src/dos/cd.c
@@ -67,7 +68,7 @@ add_executable(
   src/unix/cal.c
   src/unix/head.c
   src/unix/hexdump.c
-  src/unix/tail.c)
+  src/unix/tail.c src/lib/serenityos/serenity-glob.c src/lib/serenityos/serenity-glob.h)
 
 if(WIN32)
   target_sources(fdbox PRIVATE
