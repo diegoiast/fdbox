@@ -130,7 +130,7 @@ internal readline code (history, editor etc).
  3. DOS: TC 2.02 - this is the main development environment. Supported.
     > __BUG__:
     >
-    > `glob()` functionlaity tends to allocate too much >memory, and the code is faulty, 
+    > `glob()` functionality tends to allocate too much >memory, and the code is faulty, 
     > not reporting this to the app. Results in garbage in the screen when
     > `dir ` on a directory with lots of files (~80 on my tests, but it depends
     > on memory available).
@@ -178,7 +178,7 @@ I am redirected to the full code of the program in drive D:. The project contain
 a TurboC project file - so typing `tc` will bring up the IDE with the project ready
 to hack.
 
-Linux requirements:
+Linux's requirements (on Ubuntu I found that I need `p7zip-full` instead of `7z`:
 ```
 apt install 7z wget dosbox
 ```
