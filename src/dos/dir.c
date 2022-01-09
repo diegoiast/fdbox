@@ -163,7 +163,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         memset(files, 0, sizeof(files));
         for (i = 0; i < files2->count; i++) {
                 glob_t globbuf = {0};
-                glob(files2->file[i], GLOB_DOOFFS, NULL, &globbuf);
+                glob(files2->file[i], GLOB_DOOFFS | GLOB_NOSORT, NULL, &globbuf);
                 for (j = 0; j != globbuf.gl_pathc; j++) {
                         const char *file_name = globbuf.gl_pathv[j];
                         requested_count++;

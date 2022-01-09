@@ -115,7 +115,11 @@ int glob(const char *pattern, int flags, int (*errfunc)(const char *epath, int e
                         pglob->gl_pathv[entries] = NULL;
                         for (; head; head = head->next, entries--)
                                 pglob->gl_pathv[entries - 1] = (char *)head;
-                        qsort(pglob->gl_pathv, pglob->gl_pathc, sizeof(char *), entry_comparer);
+
+                        if ((flags & GLOB_NOCHECK) == 0 ) {
+                                qsort(pglob->gl_pathv, pglob->gl_pathc, sizeof(char *),
+                                      entry_comparer);
+                        }
                 } else {
                         pglob->gl_pathc = 0;
                         err = ENOMEM;
