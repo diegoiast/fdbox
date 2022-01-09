@@ -62,7 +62,7 @@ const char *file_base_name(const char *file_name) {
 }
 
 /* lets assume extensions are 3 letters only for now */
-const char *file_get_extesnsion(const char *fname) {
+const char *file_get_extension(const char *fname) {
         const char *p = fname;
         while (*p) {
                 p++;

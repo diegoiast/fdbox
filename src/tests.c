@@ -436,19 +436,19 @@ bool test_file_extensions() {
         bool ok = true;
 
         strcpy(str, "file.txt");
-        c = file_get_extesnsion(str);
+        c = file_get_extension(str);
         ok &= verify_string_equals(c, "txt", "getting normal 8.3 extention");
 
         strcpy(str, "/var/lib/file.txt");
-        c = file_get_extesnsion(str);
+        c = file_get_extension(str);
         ok &= verify_string_equals(c, "txt", "getting normal 8.3 extention + path");
 
         strcpy(str, "/var/lib/file.text");
-        c = file_get_extesnsion(str);
+        c = file_get_extension(str);
         ok &= verify_string_equals(c, "text", "getting normal long extention + path");
 
         strcpy(str, "/var/lib/file.txt.text.file.blabla");
-        c = file_get_extesnsion(str);
+        c = file_get_extension(str);
         ok &= verify_string_equals(c, "blabla", "getting very long extention + path");
 
         return ok;

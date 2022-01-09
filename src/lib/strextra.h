@@ -42,7 +42,7 @@ bool str_ends_with(const char *str, char c);
 const char *file_base_name(const char *file_name);
 
 /* returns the last tip of the file name */
-const char *file_get_extesnsion(const char *fname);
+const char *file_get_extension(const char *fname);
 
 #if defined(__WIN32__)
 /* This function is available on Linux, but now on Windows */
