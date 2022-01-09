@@ -61,6 +61,25 @@ const char *file_base_name(const char *file_name) {
         return c;
 }
 
+char *file_get_dir(const char *file_name) {
+        char *c, *d;
+        int length;
+
+        c = strrchr(file_name, '/');
+        if (c == NULL) {
+                c = strrchr(file_name, '\\');
+        }
+        if (c == NULL) {
+                return NULL;
+        }
+
+        length = c - file_name;
+        d = malloc(length + 1);
+        strncpy(d, file_name, length);
+        d[length+1] = 0;
+        return d;
+}
+
 /* lets assume extensions are 3 letters only for now */
 const char *file_get_extension(const char *fname) {
         const char *p = fname;

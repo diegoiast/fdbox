@@ -38,11 +38,15 @@ bool str_is_prefix(const char *str, const char *pre);
 /* java - string.endsWith() */
 bool str_ends_with(const char *str, char c);
 
-/* fnsplit, more or less, returing only the filename+ext, without path */
+/* fnsplit(), more or less, returning only the filename+ext, without path */
 const char *file_base_name(const char *file_name);
 
 /* returns the last tip of the file name */
 const char *file_get_extension(const char *fname);
+
+/* returns the directory of this file, NOT THAT THIS IS AN ALLOCATED STRING
+ * it's up to the caller to free the memory */
+char *file_get_dir(const char *file_name);
 
 #if defined(__WIN32__)
 /* This function is available on Linux, but now on Windows */

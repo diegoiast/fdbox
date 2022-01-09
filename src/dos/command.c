@@ -34,6 +34,8 @@ For license - read license.txt
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <stdbool.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #endif
 
 #ifdef __WIN32__
