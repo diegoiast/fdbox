@@ -501,8 +501,8 @@ static int dir_file_comperator(const void *a, const void *b) {
         if (flag_test(dir_file_order, SORT_EXTENTION)) {
                 const char *ext1, *ext2;
                 int v;
-                ext1 = file_get_extesnsion(file1->file_name);
-                ext2 = file_get_extesnsion(file2->file_name);
+                ext1 = file_get_extension(file1->file_name);
+                ext2 = file_get_extension(file2->file_name);
                 v = strcasecmp(ext1, ext2);
                 if (v > 0) {
                         order += 2;
