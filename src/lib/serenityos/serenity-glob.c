@@ -41,8 +41,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
-#include <fnmatch.h>
+#include <errno.h>
 
 #include "lib/strextra.h"
 #include "serenity-glob.h"
@@ -130,7 +129,11 @@ int serenity_glob(const char *pattern, int flags, void *unused, glob_t *pglob) {
         glob_pattern = file_base_name(pattern);
         dir = file_get_dir(pattern);
 
-        // TODO dir, glob_pattern
+        if (!pattern /*|| flags != (flags & GLOB_FLAGS)*/ || unused || !pglob) {
+                errno = EINVAL;
+                return EINVAL;
+        }
+
         rc = glob_inside_dir(dir, glob_pattern, &files);
         if (rc != 0) {
                 list_free(&files, 1);
@@ -153,6 +156,10 @@ int serenity_glob(const char *pattern, int flags, void *unused, glob_t *pglob) {
 
         return rc;
 }
+
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__serenity__)
+#include <dirent.h>
+#include <fnmatch.h>
 
 /* https://bitbucket.org/szx/glob/src/master/glob_posix.cpp */
 int glob_inside_dir(const char *dir_name, const char *pattern, struct linked_file_list* list)
@@ -188,6 +195,56 @@ int glob_inside_dir(const char *dir_name, const char *pattern, struct linked_fil
 
         return closedir(dir);
 }
+#elif defined(WIN32)
+#define WIN32_LEAN_AND_MEAN 1
+#include <windows.h>
+
+int glob_inside_dir(const char *dir_name, const char *pattern, struct linked_file_list* list)
+{
+        struct dirent *entry;
+
+        if (dir_name == NULL) {
+                dir_name = ".";
+        }
+        if (pattern == NULL) {
+                pattern = "*";
+        }
+
+        WIN32_FIND_DATAA finddata;
+        HANDLE hFindfile = FindFirstFileA(pattern, &finddata);
+        bool failed = true;
+
+        if  (hFindfile != INVALID_HANDLE_VALUE) {
+                do {
+                        list_push_front(list, finddata.cFileName);
+#if 0
+                        if (S_ISDIR(entry->d_type)) {
+                                next = glob_inside_dir(entry->d_name, pattern, NULL, NULL)
+                        }
+#endif
+                } while (FindNextFileA(hFindfile, &finddata));
+                failed = !FindClose(hFindfile);
+        }
+
+        if (failed) {
+                return GLOB_ABORTED;
+        }
+        return 0;
+}
+#elif defined(__TURBOC__)  || defined(__WATCOMC__)
+int glob_inside_dir(const char *dir_name, const char *pattern, struct linked_file_list* list)
+{
+        struct dirent *entry;
+1
+        if (dir_name == NULL) {
+                dir_name = ".";
+        }
+        if (pattern == NULL) {
+                pattern = "*";
+        }
+        return GLOB_ABORTED;
+}
+#endif
 
 void serenity_globfree(glob_t *pglob)
 {

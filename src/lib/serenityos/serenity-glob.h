@@ -71,7 +71,10 @@
 #define GLOB_NOMATCH 3
 #define GLOB_NOSYS 4
 
+/* under Windows, this is already defined */
+#ifndef MAX_PATH
 #define MAX_PATH 256
+#endif
 
 typedef struct glob_t {
         unsigned gl_pathc;
