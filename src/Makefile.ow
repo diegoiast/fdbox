@@ -47,7 +47,7 @@ TEST_OBJECTS = tests.o \
 .c.o:
 	$(CC) -fo=$@ $(CFLAGS) $<
 
-all: fdbox
+all: fdbox tests
 
 clean:
 	rm -f *.o
