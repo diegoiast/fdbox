@@ -12,7 +12,7 @@
 extern struct applet commands[];
 
 int main(int argc, char *argv[]) {
-        struct applet *cmd = find_applet(CASE_INSENSITVE, argv[1], commands);
+        struct applet *cmd = find_applet(CASE_INSENSITIVE, argv[1], commands);
         struct command_config config;
 
         if (cmd != NULL) {

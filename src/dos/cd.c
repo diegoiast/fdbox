@@ -1,7 +1,5 @@
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined(__APPLE__)
 #include <limits.h>
@@ -29,7 +27,6 @@
 #endif
 
 #include "dos/cd.h"
-#include "fdbox.h"
 
 /*
 This file is part of fdbox
@@ -44,6 +41,9 @@ int command_cd(int argc, char *argv[]) {
                 getcwd(cwd, 128);
 #elif defined(__WIN32__)
                 DWORD err = GetCurrentDirectory(128, cwd);
+                if (err != 0) {
+                        return EXIT_FAILURE;
+                }
 #else
 #error platform not supported yet
 #endif

@@ -64,7 +64,7 @@ void hexDump(char *desc, void *addr, int len) {
         printf("  %s\n", buff);
 }
 
-void print_agrs(int argc, char *argv[]) {
+void print_args(int argc, char *argv[]) {
         int i;
         if (argc == 0) {
                 printf("No args\n");
@@ -175,7 +175,7 @@ bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t
 }
 
 bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_line_size) {
-        size_t i = 0, l = 0;
+        size_t i, l = 0;
 
         line[0] = 0;
         for (i = 0; i < argc; i++) {
@@ -186,7 +186,7 @@ bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_
                 strncat(line, argv[i], max_line_size);
                 strncat(line, " ", max_line_size);
                 l += k;
-        };
+        }
         return true;
 }
 

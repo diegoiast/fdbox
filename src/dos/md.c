@@ -21,7 +21,6 @@ For license - read license.txt
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <utime.h>
 #endif
 

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "dos/reboot.h"
-#include "fdbox.h"
 
 /*
 This file is part of fdbox

@@ -2,6 +2,7 @@
 #define STD_EXTRA
 
 #include <stddef.h>
+#include "fdbox.h"
 
 #if defined(__TURBOC__)
 /* This came in C99, as we do not have it - emulate it lamely */

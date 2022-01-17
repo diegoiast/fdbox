@@ -109,7 +109,7 @@ int command_execute_line(const char *line) {
                 return EXIT_FAILURE;
         }
 
-        cmd = find_applet(CASE_INSENSITVE, args.argv[0], commands);
+        cmd = find_applet(CASE_INSENSITIVE, args.argv[0], commands);
         if (cmd != NULL) {
                 code = cmd->handler(args.argc, args.argv);
                 errno = code;

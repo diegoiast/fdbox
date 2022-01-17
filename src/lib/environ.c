@@ -169,7 +169,6 @@ char *get_prompt(const char *prompt, char prompt_string[], size_t prompt_str_len
 void expand_string(const char *src, char *dest, size_t dest_length) {
         char var_name[100], *var_p = NULL;
         char *var_value;
-        size_t var_len;
         char *dest_p = dest;
         size_t dest_written = 0;
 
@@ -181,8 +180,8 @@ void expand_string(const char *src, char *dest, size_t dest_length) {
                                 /* we start a new variable */
                                 var_p = var_name;
                                 *var_p = 0;
-                                var_len = 0;
                         } else {
+                                size_t var_len;
                                 /* we end a variable */
                                 *var_p = 0;
                                 if (var_name[0] != '\0') {

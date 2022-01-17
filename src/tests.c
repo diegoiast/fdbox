@@ -270,13 +270,13 @@ bool test_applets() {
         bool ok = true;
         struct applet *c;
 
-        c = find_applet(CASE_INSENSITVE, "applet1", commands);
+        c = find_applet(CASE_INSENSITIVE, "applet1", commands);
         ok &= verify_ptr_equals(c->handler, applet1, "applet 1 available");
-        c = find_applet(CASE_SENSITVE, "applet2", commands);
+        c = find_applet(CASE_SENSITIVE, "applet2", commands);
         ok &= verify_ptr_equals(c->handler, applet2, "applet 2 available");
-        c = find_applet(CASE_INSENSITVE, "applet3", commands);
+        c = find_applet(CASE_INSENSITIVE, "applet3", commands);
         ok &= verify_ptr_equals(c, NULL, "applet 3 un-available");
-        c = find_applet(CASE_INSENSITVE, "ApPleT2", commands);
+        c = find_applet(CASE_INSENSITIVE, "ApPleT2", commands);
         ok &= verify_ptr_equals(c->handler, applet2, "applet 2 (ApPleT2) found (case insensitive)");
         return ok;
 }
