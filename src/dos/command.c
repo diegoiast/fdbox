@@ -95,7 +95,7 @@ int command_execute_line(const char *line) {
 
         if (command_args_split(line, &args)) {
                 fprintf(stderr, "Command line parsing failed\n");
-                return EXIT_SUCCESS;
+                return EXIT_FAILURE;
         }
 
         if (args.argc == 0) {
