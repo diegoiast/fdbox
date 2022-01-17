@@ -145,7 +145,6 @@ int command_command(int argc, char *argv[]) {
         }
 
         do {
-                char prompt[256];
                 const char *t;
                 int l;
 
@@ -154,8 +153,8 @@ int command_command(int argc, char *argv[]) {
                         command_prompt(1, NULL);
                         t = getenv("PROMPT");
                 }
-                get_prompt(t, prompt, 256);
-                printf("%s", prompt);
+                get_prompt(t, line, 256);
+                printf("%s", line);
                 l = read_line(line, 1024);
                 if (l < 0) {
                         return EXIT_FAILURE;
