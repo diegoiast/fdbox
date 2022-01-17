@@ -34,7 +34,7 @@ OBJECTS=applets.o main.o help.o \
 	lib/strextra.o \
 	lib/environ.o \
 	lib/readline.o \
-	lib/tc202/dos-glob.o
+	lib/sglob.o
 
 TEST_OBJECTS = tests.o \
 	lib/applet.o \
