@@ -4,7 +4,6 @@ For license - read license.txt
 */
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -22,19 +21,19 @@ For license - read license.txt
 
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
-#include "lib/win32/win32-glob.h"
+#include "lib/sglob.h"
 #include <stdbool.h>
 #endif
 
 #if defined(__TURBOC__)
-#include "lib/tc202/dos-glob.h"
+#include "lib/sglob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #include <sys/stat.h>
 #endif
 
 #if defined(__WATCOMC__)
-#include "lib/tc202/dos-glob.h"
+#include "lib/sglob.h"
 #include <strings.h>
 #include <sys/stat.h>
 #endif

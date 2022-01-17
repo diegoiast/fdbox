@@ -14,14 +14,11 @@ For license - read license.txt
 */
 
 #ifdef __MSDOS__
-#include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
-#include <sys/stat.h>
 #endif
 
 #ifdef _POSIX_C_SOURCE
-#include <glob.h>
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -30,10 +27,8 @@ For license - read license.txt
 
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
-#include "lib/win32/win32-glob.h"
 #include <stdbool.h>
 #include <unistd.h>
-#include <utime.h>
 #endif
 
 struct mkdir_config {
