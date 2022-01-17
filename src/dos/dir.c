@@ -36,14 +36,14 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include <dirent.h>
 #include <fcntl.h>
 //#include <glob.h>
-#include "lib/serenityos/serenity-glob.h"
+#include "lib/sglob.h"
 #include <stdbool.h>
 #include <sys/stat.h>
 #endif
 
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
-#include "lib/serenityos/serenity-glob.h"
+#include "lib/sglob.h"
 #endif
 
 #if defined(__TURBOC__)
