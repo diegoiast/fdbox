@@ -47,16 +47,19 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #endif
 
 #if defined(__TURBOC__)
-#include "lib/tc202/dos-glob.h"
+
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#include "lib/sglob.h"
+
 #include <sys/stat.h>
 #endif
 
 #if defined(__WATCOMC__)
-#include "lib/tc202/dos-glob.h"
 #include <strings.h>
 #include <sys/stat.h>
+
+#include "lib/sglob.h"
 #endif
 
 /***************************************************************************

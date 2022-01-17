@@ -48,7 +48,9 @@ int glob(const char *pattern, int flags, int (*errfunc)(const char *epath, int e
 void globfree(glob_t *pglob);
 
 /* these should not be here technically, they should be  in STAT.H */
+#ifndef __S_ISTYPE
 #define __S_ISTYPE(mode, mask) (((mode)&S_IFMT) == (mask))
+#endif
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) __S_ISTYPE((mode), S_IFDIR)

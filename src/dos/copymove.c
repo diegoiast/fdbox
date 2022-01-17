@@ -19,13 +19,13 @@ For license - read license.txt
 */
 
 #if defined(__TURBOC__)
-#include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#include "lib/sglob.h"
 #endif
 
 #if defined(__WATCOMC__)
-#include "lib/tc202/dos-glob.h"
+#include "lib/sglob.h"
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined(__APPLE__)
@@ -36,11 +36,11 @@ For license - read license.txt
 #endif
 
 #ifdef __WIN32__
-#include "lib/win32/dirent.h"
-#include "lib/win32/win32-glob.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <utime.h>
+#include "lib/win32/dirent.h"
+#include "lib/sglob.h"
 #endif
 
 struct copy_config {

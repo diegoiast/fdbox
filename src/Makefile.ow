@@ -29,12 +29,12 @@ OBJECTS=applets.o main.o help.o \
 	dos/shift.o \
 	dos/type.o \
 	dos/ver.o \
+	lib/sglob.o \
 	lib/applet.o \
 	lib/args.o \
 	lib/strextra.o \
 	lib/environ.o \
 	lib/readline.o \
-	lib/sglob.o
 
 TEST_OBJECTS = tests.o \
 	lib/applet.o \
@@ -47,7 +47,7 @@ TEST_OBJECTS = tests.o \
 .c.o:
 	$(CC) -fo=$@ $(CFLAGS) $<
 
-all: tests fdbox
+all: fdbox
 
 clean:
 	rm -f *.o

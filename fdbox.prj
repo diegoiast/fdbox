@@ -3,7 +3,6 @@ src/applets.c
 src/help.c (src/help.h)
 src/lib/applet.c
 src/lib/args.c (src/lib/args.h)
-src/lib/tc202/dos-glob.c (src/lib/tc202/dos-glob.h)
 src/lib/tc202/stdextra.c (src/lib/tc202/stdextra.h)
 src/lib/environ.c (src/lib/environ.h)
 src/lib/readline.c (src/lib/readline.h)

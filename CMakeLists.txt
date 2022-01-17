@@ -73,8 +73,6 @@ add_executable(
 
 if(WIN32)
   target_sources(fdbox PRIVATE
-      src/lib/win32/win32-glob.c
-      src/lib/win32/win32-glob.h
       src/lib/tc202/stdextra.c
     )
 

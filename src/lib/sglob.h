@@ -42,8 +42,8 @@
  * the code fdbox. This code is licensed more permissive on purpose.
  */
 
-#ifndef GLOB_H
-#define GLOB_H 1
+#ifndef SERENITY_GLOB_H
+#define SERENITY_GLOB_H 1
 
 #define GLOB_FLAGS (GLOB_NOCHECK)
 
@@ -87,4 +87,15 @@ typedef struct glob_t {
 int serenity_glob(const char *pattern, int flags, void *unused, glob_t *pglob);
 void serenity_globfree(glob_t *pglob);
 
+/* these should not be here technically, they should be  in STAT.H */
+#define __S_ISTYPE(mode, mask) (((mode)&S_IFMT) == (mask))
+
+#ifndef S_ISDIR
+#define S_ISDIR(mode) __S_ISTYPE((mode), S_IFDIR)
+#endif
+
+#define glob serenity_glob
+#define globfree serenity_globfree
+
+/* SERENITY_GLOB_H */
 #endif
