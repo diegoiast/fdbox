@@ -16,7 +16,10 @@ For license - read license.txt
 #endif
 
 int command_set(int argc, char *argv[]) {
+        /* msdos and windows have this in stdlib.h */
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
         extern char **environ;
+#endif
         char **s = environ;
         int r;
         const char *name = argv[1];
