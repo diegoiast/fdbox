@@ -29,7 +29,11 @@ OBJECTS=applets.o main.o help.o \
 	lib/applet.o \
 	lib/args.o \
 	lib/strextra.o \
+	lib/sglob.o \
+	lib/readline.o \
 	lib/environ.o \
+	dos/history.o \
+
 
 .PHONY: clean all
 
@@ -111,3 +115,9 @@ lib/args.o: lib/args.c
 lib/environ.o: lib/environ.c
 
 lib/strextra.o: lib/strextra.c
+
+lib/sglob.o: lib/sglob.c
+
+lib/readline.o: lib/readline.c
+
+dos/history.o: dos/history.c
