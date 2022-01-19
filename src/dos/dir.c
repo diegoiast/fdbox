@@ -33,10 +33,9 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "lib/strextra.h"
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include "lib/sglob.h"
 #include <dirent.h>
 #include <fcntl.h>
-//#include <glob.h>
-#include "lib/sglob.h"
 #include <stdbool.h>
 #include <sys/stat.h>
 #endif
@@ -47,18 +46,15 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #endif
 
 #if defined(__TURBOC__)
-
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
 #include "lib/sglob.h"
-
 #include <sys/stat.h>
 #endif
 
 #if defined(__WATCOMC__)
 #include <strings.h>
 #include <sys/stat.h>
-
 #include "lib/sglob.h"
 #endif
 
@@ -72,8 +68,12 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #define SORT_DATE 0x08
 #define SORT_SIZE 0x10
 
-#define MAX_DIR_FILES 128
+#if defined(__WATCOMC__)
+/* under watcom C - 256 files need 30k stack... still investigating... */
+#define MAX_DIR_ENTRY_FILES 256
+#else
 #define MAX_DIR_ENTRY_FILES 1024
+#endif
 
 struct dir_config {
         bool show_help;

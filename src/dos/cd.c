@@ -37,7 +37,7 @@ int command_cd(int argc, char *argv[]) {
         const char *path = argv[1];
         if (argc == 1) {
                 char cwd[128];
-#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__) || defined(__WATCOMC__)
+#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__) || defined(__WATCOMC__) || defined(_POSIX_C_SOURCE)
                 getcwd(cwd, 128);
 #elif defined(__WIN32__)
                 DWORD err = GetCurrentDirectory(128, cwd);

@@ -20,7 +20,7 @@ For license - read license.txt
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
-#include <glob.h>
+#include "lib/sglob.h"
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>

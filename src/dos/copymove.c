@@ -29,7 +29,7 @@ For license - read license.txt
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__DJGPP__) || defined(__APPLE__)
-#include <glob.h>
+#include "lib/sglob.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <utime.h>
