@@ -49,6 +49,10 @@
 #include "lib/strextra.h"
 #include "sglob.h"
 
+#if !defined(__serenity__)
+#define HAS_FNSTAT
+#endif
+
 /*
 #define GLOB_DEFAULT_FLAGS (FNM_CASEFOLD | FNM_NOESCAPE | FNM_PERIOD)
  */
@@ -135,6 +139,7 @@ int serenity_glob(const char *pattern, int flags, void *unused, glob_t *pglob) {
         glob_pattern = file_base_name(pattern);
         dir = file_get_dir(pattern);
 
+        /* TODO: should we test for flags? I see something weird here */
         if (!pattern /*|| flags != (flags & GLOB_FLAGS)*/ || unused || !pglob) {
                 errno = EINVAL;
                 return EINVAL;
@@ -164,9 +169,163 @@ int serenity_glob(const char *pattern, int flags, void *unused, glob_t *pglob) {
         return rc;
 }
 
-#if defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__serenity__)
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <dirent.h>
+#include <stdio.h>
+
+#if defined(HAS_FNSTAT)
+/* Most code here is borrowed from dash. The following code is licensed under
+   BSD license.
+https://github.com/tklauser/dash/blob/afe0e0152e4dc12d84be3c02d6d62b0456d68580/src/expand.c
+*/
+
 #include <fnmatch.h>
+#else
+#include <ctype.h>
+#define fnmatch(a, b, c) pmatch((a), (b))
+
+char *prefix(const char *string, const char *pfx)
+{
+        while (*pfx) {
+                if (*pfx++ != *string++)
+                        return 0;
+        }
+        return (char *) string;
+}
+
+int ccmatch(const char *p, int chr, const char **r)
+{
+        static const struct class {
+                char name[10];
+                int (*fn)(int);
+        } classes[] = {
+            { .name = ":alnum:]", .fn = isalnum },
+            { .name = ":cntrl:]", .fn = iscntrl },
+            { .name = ":lower:]", .fn = islower },
+            { .name = ":space:]", .fn = isspace },
+            { .name = ":alpha:]", .fn = isalpha },
+            { .name = ":digit:]", .fn = isdigit },
+            { .name = ":print:]", .fn = isprint },
+            { .name = ":upper:]", .fn = isupper },
+            { .name = ":blank:]", .fn = isblank },
+            { .name = ":graph:]", .fn = isgraph },
+            { .name = ":punct:]", .fn = ispunct },
+            { .name = ":xdigit:]", .fn = isxdigit },
+        };
+        const struct class *class, *end;
+
+        end = classes + sizeof(classes) / sizeof(classes[0]);
+        for (class = classes; class < end; class++) {
+                const char *q;
+
+                q = prefix(p, class->name);
+                if (!q)
+                        continue;
+                *r = q;
+                return class->fn(chr);
+        }
+
+        *r = 0;
+        return 0;
+}
+
+int pmatch(const char *pattern, const char *string)
+{
+        const char *p, *q;
+        char c;
+
+        p = pattern;
+        q = string;
+        for (;;) {
+                switch (c = *p++) {
+                case '\0':
+                        goto breakloop;
+                case '\\':
+                        if (*p) {
+                                c = *p++;
+                        }
+                        goto dft;
+                case '?':
+                        if (*q++ == '\0')
+                                return 0;
+                        break;
+                case '*':
+                        c = *p;
+                        while (c == '*')
+                                c = *++p;
+                        if (c != '\\' && c != '?' && c != '*' && c != '[') {
+                                while (*q != c) {
+                                        if (*q == '\0')
+                                                return 0;
+                                        q++;
+                                }
+                        }
+                        do {
+                                if (pmatch(p, q))
+                                        return 1;
+                        } while (*q++ != '\0');
+                        return 0;
+                case '[': {
+                        const char *startp;
+                        int invert, found;
+                        char chr;
+
+                        startp = p;
+                        invert = 0;
+                        if (*p == '!') {
+                                invert++;
+                                p++;
+                        }
+                        found = 0;
+                        chr = *q;
+                        if (chr == '\0')
+                                return 0;
+                        c = *p++;
+                        do {
+                                if (!c) {
+                                        p = startp;
+                                        c = '[';
+                                        goto dft;
+                                }
+                                if (c == '[') {
+                                        const char *r;
+
+                                        found |= !!ccmatch(p, chr, &r);
+                                        if (r) {
+                                                p = r;
+                                                continue;
+                                        }
+                                } else if (c == '\\')
+                                        c = *p++;
+                                if (*p == '-' && p[1] != ']') {
+                                        p++;
+                                        if (*p == '\\')
+                                                p++;
+                                        if (chr >= c && chr <= *p)
+                                                found = 1;
+                                        p++;
+                                } else {
+                                        if (chr == c)
+                                                found = 1;
+                                }
+                        } while ((c = *p++) != ']');
+                        if (found == invert)
+                                return 0;
+                        q++;
+                        break;
+                }
+                dft:	        default:
+                        if (*q++ != c)
+                                return 0;
+                        break;
+                }
+        }
+breakloop:
+        if (*q != '\0')
+                return 0;
+        return 1;
+}
+#endif
 
 /* https://bitbucket.org/szx/glob/src/master/glob_posix.cpp */
 int glob_inside_dir(const char *dir_name, const char *pattern, struct linked_file_list* list)
