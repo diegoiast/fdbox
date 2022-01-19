@@ -155,6 +155,7 @@ int command_command(int argc, char *argv[]) {
                 }
                 get_prompt(t, line, 256);
                 printf("%s", line);
+                fflush(stdout);
                 l = read_line(line, 1024);
                 if (l < 0) {
                         return EXIT_FAILURE;
