@@ -30,7 +30,6 @@ For license - read license.txt
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
-#include <sys/stat.h>
 #endif
 
 #if defined(__WATCOMC__)

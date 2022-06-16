@@ -27,6 +27,7 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include <string.h>
 #include <time.h>
 
+#include <sys/stat.h>
 #include "dos/cmd_dir.h"
 #include "fdbox.h"
 #include "lib/args.h"
@@ -37,7 +38,6 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include <fcntl.h>
 #include <glob.h>
 #include <stdbool.h>
-#include <sys/stat.h>
 #endif
 
 #ifdef __WIN32__
@@ -49,7 +49,6 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
-#include <sys/stat.h>
 #endif
 
 #if defined(__WATCOMC__)

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "dos/md.h"
 #include "fdbox.h"
@@ -17,13 +18,11 @@ For license - read license.txt
 #include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
-#include <sys/stat.h>
 #endif
 
 #ifdef _POSIX_C_SOURCE
 #include <glob.h>
 #include <stdbool.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
 #endif
