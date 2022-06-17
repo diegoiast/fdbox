@@ -3,10 +3,10 @@
 set -e
 set -x
 
-wget -nc --quiet https://github.com/open-watcom/open-watcom-v2/releases/download/Current-build/ow-snapshot.tar.gz
+wget -nc --quiet https://github.com/open-watcom/open-watcom-v2/releases/download/Current-build/ow-snapshot.tar.xz
 
 mkdir -p ow
-tar -C ow -xf ow-snapshot.tar.gz
+tar -C ow -xf ow-snapshot.tar.xz
 
 export WATCOM=$(pwd)/ow
 export PATH=$WATCOM/binl:$PATH
