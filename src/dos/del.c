@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <sys/stat.h>
 #include "dos/del.h"
 #include "fdbox.h"
 #include "lib/args.h"
@@ -20,8 +21,7 @@ For license - read license.txt
 #endif
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
-#include "lib/sglob.h"
-#include <sys/stat.h>
+#include <glob.h>
 #include <unistd.h>
 #include <utime.h>
 #endif

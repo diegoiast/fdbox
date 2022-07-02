@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "dos/md.h"
 #include "fdbox.h"
@@ -21,6 +22,7 @@ For license - read license.txt
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <utime.h>
 #endif
 
