@@ -103,12 +103,6 @@ const char *file_get_extension(const char *fname) {
         return p;
 }
 
-bool file_exists(const char *path) {
-        struct stat path_stat;
-        int rc = stat(path, &path_stat);
-        return rc == 0;
-}
-
 #if defined(__WIN32__)
 /* happily borrowed from https://stackoverflow.com/a/8514474 */
 char *strsep(char **stringp, const char *delim) {
