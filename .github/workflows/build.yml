@@ -71,7 +71,7 @@ jobs:
         id: runcmake
         run: |
           cmake -S ${{ github.workspace }} -B ${{ runner.workspace }}/b/${{ runner.os }} -G Ninja
-          cmake --build ${{ github.workspace }}
+          cmake --build ${{ runner.workspace }}/b/${{ runner.os }}
       - name: Run clang format
         if: matrix.os == 'ubuntu-latest'
         run : |
