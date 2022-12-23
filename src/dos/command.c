@@ -23,6 +23,7 @@ For license - read license.txt
 #include "lib/tc202/stdextra.h"
 #include <io.h>
 #include <process.h>
+#include <io.h>
 #endif
 
 #if defined(__WATCOMC__)
@@ -173,6 +174,86 @@ int command_execute_line(const char *line) {
         }
 
         command_args_free(&args);
+        return EXIT_SUCCESS;
+}
+
+int command_execute_line_old(char *line) {
+        size_t c_argc;
+        char *c_argv[256];
+        const char* command_name;
+        bool parsed_ok;
+        bool is_silent = false; /* TODO use global state from echo! */
+        struct applet *cmd;
+        int code;
+        extern struct applet commands[];
+        bool is_interactive = isatty(fileno(stdin));
+
+        /* this function will not modify the args, so its marked `const
+         * but some commands (date/time) will modify the args instead of making copies
+         * this is OK for now */
+        parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
+        if (!parsed_ok) {
+                fprintf(stderr, "Command line parsing failed\n");
+                return EXIT_SUCCESS;
+        }
+
+        if (c_argc == 0) {
+                return EXIT_SUCCESS;
+        }
+
+        command_name = c_argv[0];
+        if (*command_name == '@') {
+                is_silent = !is_silent;
+                command_name = command_name+1;
+        }
+
+        /* Special handling for exit, as it should break the main loop */
+
+        if (strcasecmp(command_name, "exit") == 0) {
+                if (is_interactive) {
+                        printf("interactive shell, not exit, just redirecting stdin back\n");
+                        if ((freopen("", "r", stdin) == NULL)) {
+                            fprintf(stderr, "Error reopening stdin\n");
+                            abort();
+                        }
+                }
+                else {
+                        printf("exit shell!\n");
+                        return EXIT_SUCCESS;
+                }
+        }
+
+        cmd = find_applet(CASE_INSENSITVE, c_argv[0], commands);
+        /* ok, this fails, since we modify the original line, this will get fixed soon */
+        if (!is_silent && !is_interactive) {
+                puts(line);
+        }
+       if (cmd != NULL) {
+                code = cmd->handler(c_argc, c_argv);
+                errno = code;
+                if (code != EXIT_SUCCESS) {
+                        fprintf(stderr, "Command failed (%d)\n", code);
+                }
+        } else {
+                /* is it a batch file ? */
+                char *batch_file_path = find_batch_in_path(command_name);
+                bool ok = false;
+
+                if (batch_file_path != NULL) {
+                        if (freopen(batch_file_path, "r", stdin)) {
+                                ok = true;
+                        }
+                } else {
+                        /* execvp */
+                }
+
+                if (!ok) {
+                        fprintf(stderr, "Command not found\n");
+                        errno = ENOENT;
+                }
+                free(batch_file_path);
+                errno = ENOENT;
+        }
         return EXIT_SUCCESS;
 }
 
