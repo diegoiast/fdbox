@@ -6,6 +6,7 @@ For license - read license.txt
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "dos/command.h"
 #include "dos/if.h"
@@ -16,7 +17,6 @@ For license - read license.txt
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include "lib/sglob.h"
 #include <stdbool.h>
-#include <sys/stat.h>
 #endif
 
 #ifdef __WIN32__
@@ -34,7 +34,6 @@ For license - read license.txt
 #if defined(__WATCOMC__)
 #include "lib/sglob.h"
 #include <strings.h>
-#include <sys/stat.h>
 #endif
 
 static bool if_file_exists(const char *path);

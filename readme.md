@@ -164,6 +164,7 @@ as I might re-license code, and want new implementations for those old ideas).
 
 I created a Linux shell script which will populate a "C:" drive for development.
 Just execute it, and it will download all the compilers, and create an AUTOEXEC.BAT.
+Do this inside the `etc` directory.
 
 Then in DosBox config, edited the start-up files (usually at the end) to this:
 
@@ -178,6 +179,9 @@ I am redirected to the full code of the program in drive D:. The project contain
 a TurboC project file - so typing `tc` will bring up the IDE with the project ready
 to hack.
 
+Similar setup can be done from the GUI of DOSBOX-X, it just needs more clicks.
+
+
 Linux's requirements (on Ubuntu I found that I need `p7zip-full` instead of `7z`:
 ```
 apt install 7z wget dosbox
@@ -187,6 +191,10 @@ OSX requirements:
 ```
 brew install p7zip wget dosbox
 ```
+
+Windows:
+ * Download [7zip](https://www.7-zip.org/download.html), the script will only look in default location
+ * You can run this script from Github's bash (use official git for windows install)
 
 TODO: If you save a file under DOS, DosBox will rename it to capital letters. I am
 unsure how to automatically do this.
