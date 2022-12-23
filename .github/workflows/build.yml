@@ -70,8 +70,8 @@ jobs:
       - name: Confiure + build (CMake+Ninja)
         id: runcmake
         run: |
-          cmake -S ${{ runner.workspace }} -B ${{ runner.workspace }}/b/${{ runner.os }} -GNinja
-          cmake --build ${{ runner.workspace }}
+          cmake -S ${{ github.workspace }} -B ${{ runner.workspace }}/b/${{ runner.os }} -G Ninja
+          cmake --build ${{ github.workspace }}
       - name: Run clang format
         if: matrix.os == 'ubuntu-latest'
         run : |
