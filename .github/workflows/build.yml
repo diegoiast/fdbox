@@ -30,7 +30,6 @@ jobs:
           cp src/tests.exe a/owdos/
       - name: Set outputs
         id: vars
-        #run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         run: echo "{sha_short}={$(git rev-parse --short HEAD)}" >> $GITHUB_STATE
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3.1.1
@@ -49,14 +48,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-22.04, macos-12, windows-2022]
         include:
           - os: windows-2022
             triplet: x64-windows
           - os: ubuntu-22.04
             triplet: x64-linux
-          - os: macos-latest
-            triplet: x64-12
+          - os: macos-12
+            triplet: x64-osx
     steps:
       - uses: actions/checkout@v1
         with:
@@ -64,7 +63,6 @@ jobs:
       - uses: lukka/get-cmake@latest
       - name: Set outputs
         id: vars
-        #run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         run: echo "{sha_short}={$(git rev-parse --short HEAD)}" >> $GITHUB_STATE
       - name: Install clang-tidy
         if: matrix.os == 'ubuntu-latest'
@@ -114,7 +112,6 @@ jobs:
           cp license.txt a/
       - name: Set outputs
         id: vars
-        #run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         run: echo "{sha_short}={$(git rev-parse --short HEAD)}" >> $GITHUB_STATE
       - name: Archive docs
         uses: actions/upload-artifact@v3.1.1
