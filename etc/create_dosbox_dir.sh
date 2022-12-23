@@ -129,7 +129,8 @@ mv $MAIN/ndn_3_00_0005_d32 $MAIN/NDN
 mv $MAIN/SAMPLES/          $MAIN/TC/SAMPLES
 mv $MAIN/AnimatorAKA       $MAIN/AAT
 
-mv $MAIN/FREEDOS/bin/*     $MAIN/FREEDOS/BIN/
+set +e
+mv $MAIN/FREEDOS/bin/*     $MAIN/FREEDOS/BIN/  || true
 rm -fr $MAIN/FREEDOS/bin/
 mv $MAIN/FREEDOS/doc/*     $MAIN/FREEDOS/DOC/
 rm -fr $MAIN/FREEDOS/doc/

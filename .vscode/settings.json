@@ -1,6 +1,12 @@
 {
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "dirent.h": "c",
+        "win32-glob.h": "c",
+        "dos-glob.h": "c",
+        "stdextra.h": "c",
+        "DOS-GLOB.H": "cpp",
+        "stat.h": "c"
     }
 }

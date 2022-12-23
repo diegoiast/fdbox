@@ -1,4 +1,4 @@
-*.o
+#*.o
 etc/zip
 etc/dosbox
 build
@@ -10,3 +10,10 @@ TESTS.EXE
 
 # DJGGPP's makefile is a mess :)
 *.O
+
+# cmake builds
+cmake-build-*
+
+# openwatcom build/download
+etc/ow
+etc/ow-snapshot.tar.gz
