@@ -14,6 +14,7 @@ For license - read license.txt
 #include "fdbox.h"
 #include "lib/environ.h"
 #include "lib/strextra.h"
+#include "lib/args.h"
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <glob.h>
