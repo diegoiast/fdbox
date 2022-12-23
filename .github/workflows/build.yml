@@ -68,14 +68,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run : sudo apt install clang-tidy
       - name: Confiure + build (CMake+Ninja)
-        uses: lukka/run-cmake@v3.4
         id: runcmake
-        with:
-          cmakeGenerator: 'Ninja'
-          cmakeListsOrSettingsJson: 'CMakeListsTxtBasic'
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          buildWithCMakeArgs: '-- -v'
-          buildDirectory: '${{ runner.workspace }}/b/${{ runner.os }}'
+        run: |
+          cmake -S ${{ runner.workspace }} -B ${{ runner.workspace }}/b/${{ runner.os }} -GNinja
+          cmake --build ${{ runner.workspace }}
       - name: Run clang format
         if: matrix.os == 'ubuntu-latest'
         run : |
