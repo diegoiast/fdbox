@@ -346,16 +346,13 @@ int glob_inside_dir(const char *dir_name, const char *pattern, struct linked_fil
 
         while ((entry = readdir(dir)) != 0) {
                 int r = fnmatch(pattern, entry->d_name, GLOB_DEFAULT_FLAGS);
-                if (r) {
+                if (r != FNM_NOMATCH) {
                         list_push_front(list, entry->d_name);
 #if 0
                         if (S_ISDIR(entry->d_type)) {
                                 next = glob_inside_dir(entry->d_name, pattern, NULL, NULL)
                         }
 #endif
-                } else {
-                        closedir(dir);
-                        return r;
                 }
         }
 
