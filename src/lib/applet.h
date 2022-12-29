@@ -11,8 +11,8 @@ typedef const char *(*function_help)();
 #include <stdbool.h>
 #endif
 
-#define CASE_INSENSITVE false
-#define CASE_SENSITVE true
+#define CASE_INSENSITIVE false
+#define CASE_SENSITIVE true
 
 struct applet {
         function_help help_text;

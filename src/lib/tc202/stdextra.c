@@ -1,8 +1,5 @@
 #include "lib/tc202/stdextra.h"
-#include "fdbox.h"
 
-#include <ctype.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

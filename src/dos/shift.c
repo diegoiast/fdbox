@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "dos/shift.h"
-#include "fdbox.h"
 
 /*
 This file is part of fdbox

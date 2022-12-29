@@ -40,6 +40,7 @@ add_executable(
   src/lib/environ.c
   src/lib/strextra.c
   src/lib/readline.c
+  src/lib/sglob.c
   src/dos/beep.c
   src/dos/call.c
   src/dos/cd.c
@@ -67,12 +68,11 @@ add_executable(
   src/unix/cal.c
   src/unix/head.c
   src/unix/hexdump.c
-  src/unix/tail.c)
+  src/unix/tail.c
+  )
 
 if(WIN32)
   target_sources(fdbox PRIVATE
-      src/lib/win32/win32-glob.c
-      src/lib/win32/win32-glob.h
       src/lib/tc202/stdextra.c
     )
 

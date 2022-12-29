@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "dos/type.h"
-#include "fdbox.h"
 #include "lib/args.h"
 
 #define LINE_PRINT "%5zd  "
@@ -56,9 +55,13 @@ int command_type(int argc, char *argv[]) {
 
         for (i = 0; i < config.global.files.count; i++) {
                 const char *file_name = config.global.files.file[i];
-                FILE *file = fopen(file_name, "r");
                 char line[1024];
                 size_t line_number = 0;
+                FILE *file = fopen(file_name, "r");
+
+                if (file == NULL) {
+                        return EXIT_FAILURE;
+                }
 
                 while (fgets(line, sizeof(line), file)) {
                         line_number++;

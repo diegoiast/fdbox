@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "dos/set.h"
-#include "fdbox.h"
-#include "lib/tc202/stdextra.h"
 
 /*
 This file is part of fdbox
@@ -19,7 +16,10 @@ For license - read license.txt
 #endif
 
 int command_set(int argc, char *argv[]) {
+        /* msdos and windows have this in stdlib.h */
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
         extern char **environ;
+#endif
         char **s = environ;
         int r;
         const char *name = argv[1];

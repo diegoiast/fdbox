@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "dos/call.h"
-#include "fdbox.h"
 
 /*
  This file is part of fdbox

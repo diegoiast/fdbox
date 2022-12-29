@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "dos/prompt.h"
-#include "fdbox.h"
 
 #if defined(__MSDOS__) || defined(__WIN32__)
 /* setenv is not supported under TC, implement this locally

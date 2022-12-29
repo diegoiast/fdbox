@@ -4,18 +4,12 @@ For license - read license.txt
 */
 
 #include <ctype.h>
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "lib/applet.h"
-#include "lib/args.h"
 #include "lib/environ.h"
 #include "lib/readline.h"
-
-#include "dos/history.h"
-#include "dos/prompt.h"
 
 #ifdef __TURBOC__
 #include "dos.h"
@@ -40,8 +34,6 @@ void clrscr() { _clearscreen(_GCLEARSCREEN); }
 #endif
 
 #if defined(__WIN32__)
-#include <conio.h>
-#include <io.h>
 #include <stdbool.h>
 #include <windows.h>
 

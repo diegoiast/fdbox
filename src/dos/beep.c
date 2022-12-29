@@ -2,7 +2,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #ifdef WIN32
 // https://docs.microsoft.com/en-us/windows/desktop/api/utilapiset/nf-utilapiset-beep

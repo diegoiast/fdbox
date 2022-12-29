@@ -34,27 +34,28 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "lib/strextra.h"
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include "lib/sglob.h"
 #include <dirent.h>
 #include <fcntl.h>
-#include <glob.h>
 #include <stdbool.h>
 #endif
 
 #ifdef __WIN32__
 #include "lib/win32/dirent.h"
-#include "lib/win32/win32-glob.h"
+#include "lib/sglob.h"
 #endif
 
 #if defined(__TURBOC__)
-#include "lib/tc202/dos-glob.h"
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#include "lib/sglob.h"
+#include <sys/stat.h>
 #endif
 
 #if defined(__WATCOMC__)
-#include "lib/tc202/dos-glob.h"
 #include <strings.h>
 #include <sys/stat.h>
+#include "lib/sglob.h"
 #endif
 
 /***************************************************************************
@@ -62,13 +63,17 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
  ***************************************************************************/
 
 #define SORT_NAME 0x01
-#define SORT_EXTENTION 0x02
+#define SORT_EXTENSION 0x02
 #define SORT_DIRS 0x04
 #define SORT_DATE 0x08
 #define SORT_SIZE 0x10
 
-#define MAX_DIR_FILES 128
+#if defined(__WATCOMC__)
+/* under watcom C - 256 files need 30k stack... still investigating... */
+#define MAX_DIR_ENTRY_FILES 256
+#else
 #define MAX_DIR_ENTRY_FILES 1024
+#endif
 
 struct dir_config {
         bool show_help;
@@ -162,7 +167,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         memset(files, 0, sizeof(files));
         for (i = 0; i < files2->count; i++) {
                 glob_t globbuf = {0};
-                glob(files2->file[i], GLOB_DOOFFS | GLOB_NOSORT, NULL, &globbuf);
+                serenity_glob(files2->file[i], GLOB_DOOFFS | GLOB_NOSORT, NULL, &globbuf);
                 for (j = 0; j != globbuf.gl_pathc; j++) {
                         const char *file_name = globbuf.gl_pathv[j];
                         requested_count++;
@@ -175,7 +180,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                                 file_count++;
                         }
                 }
-                globfree(&globbuf);
+                serenity_globfree(&globbuf);
         }
 
         /* and sort if needed */
@@ -309,7 +314,7 @@ static void dir_config_print(struct dir_config *config) {
         if (flag_test(config->sort_order, SORT_NAME)) {
                 printf("name ");
         }
-        if (flag_test(config->sort_order, SORT_EXTENTION)) {
+        if (flag_test(config->sort_order, SORT_EXTENSION)) {
                 printf("extension ");
         }
         if (flag_test(config->sort_order, SORT_DIRS)) {
@@ -382,7 +387,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                                 flag_set(&config->sort_order, SORT_NAME, true);
                                 break;
                         case 'e':
-                                flag_set(&config->sort_order, SORT_EXTENTION, true);
+                                flag_set(&config->sort_order, SORT_EXTENSION, true);
                                 break;
                         case 'g':
                                 flag_set(&config->sort_order, SORT_DIRS, true);
@@ -497,7 +502,7 @@ static int dir_file_comperator(const void *a, const void *b) {
                         order -= 2;
                 }
         }
-        if (flag_test(dir_file_order, SORT_EXTENTION)) {
+        if (flag_test(dir_file_order, SORT_EXTENSION)) {
                 const char *ext1, *ext2;
                 int v;
                 ext1 = file_get_extension(file1->file_name);

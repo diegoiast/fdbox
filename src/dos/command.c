@@ -95,7 +95,7 @@ int command_execute_line(const char *line) {
 
         if (command_args_split(line, &args)) {
                 fprintf(stderr, "Command line parsing failed\n");
-                return EXIT_SUCCESS;
+                return EXIT_FAILURE;
         }
 
         if (args.argc == 0) {
@@ -109,7 +109,7 @@ int command_execute_line(const char *line) {
                 return EXIT_FAILURE;
         }
 
-        cmd = find_applet(CASE_INSENSITVE, args.argv[0], commands);
+        cmd = find_applet(CASE_INSENSITIVE, args.argv[0], commands);
         if (cmd != NULL) {
                 code = cmd->handler(args.argc, args.argv);
                 errno = code;
@@ -145,7 +145,6 @@ int command_command(int argc, char *argv[]) {
         }
 
         do {
-                char prompt[256];
                 const char *t;
                 int l;
 
@@ -154,8 +153,9 @@ int command_command(int argc, char *argv[]) {
                         command_prompt(1, NULL);
                         t = getenv("PROMPT");
                 }
-                get_prompt(t, prompt, 256);
-                printf("%s", prompt);
+                get_prompt(t, line, 256);
+                printf("%s", line);
+                fflush(stdout);
                 l = read_line(line, 1024);
                 if (l < 0) {
                         return EXIT_FAILURE;
