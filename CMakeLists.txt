@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-# add the executable
+# set the project name
 project(fdbox VERSION 0.1)
 
 include(cmake/CPM.cmake)
@@ -17,7 +17,8 @@ cpmaddpackage(
   # path to exclude (optional, supports regular expressions)
   "CMAKE_FORMAT_EXCLUDE cmake/CPM.cmake")
 
-add_executable(
+
+  add_executable(
   tests
   src/tests.c
   src/lib/applet.c
@@ -26,6 +27,13 @@ add_executable(
   src/lib/readline.c
   src/lib/strextra.c
 )
+if(WIN32)
+  target_sources(tests PRIVATE
+    src/lib/win32/win32-glob.h
+    src/lib/tc202/stdextra.c
+  )
+endif()
+
 target_include_directories(tests PUBLIC "${PROJECT_BINARY_DIR}"
                                         "${PROJECT_SOURCE_DIR}/src/")
 

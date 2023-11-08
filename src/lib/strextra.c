@@ -2,6 +2,14 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <sys/stat.h>
+
+#if defined(__TURBOC__)
+#include "lib/tc202/dos-glob.h"
+#include "lib/tc202/stdbool.h"
+#include "lib/tc202/stdextra.h"
+#endif
+
 const char *str_bool(bool b) { return b ? "true" : "false"; }
 
 char *str_to_lower(char *s) {

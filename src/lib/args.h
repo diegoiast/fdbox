@@ -25,6 +25,9 @@ For license - read license.txt
 
 #define ARG_MAX_FILES 128
 
+/* TODO - is this the correct module for this file? */
+bool file_exists(const char *file_name);
+
 void hexDump(char *desc, void *addr, int len);
 void print_agrs(int argc, char *argv[]);
 /* int dos_parseargs(int *argc, char **argv[], const char* template, char **output); */

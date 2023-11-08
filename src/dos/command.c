@@ -15,14 +15,15 @@ For license - read license.txt
 #include "lib/args.h"
 #include "lib/environ.h"
 #include "lib/readline.h"
-#include "lib/strextra.h"
 
 #include "dos/prompt.h"
 
-#ifdef __MSDOS__
+#if defined(__TURBOC__)
 #include "lib/tc202/stdbool.h"
 #include "lib/tc202/stdextra.h"
+#include <io.h>
 #include <process.h>
+#include <io.h>
 #endif
 
 #if defined(__WATCOMC__)
@@ -52,16 +53,29 @@ For license - read license.txt
 #define P_NOWAIT 1  /* both concurrent -- not implemented */
 #define P_OVERLAY 2 /* child replaces parent, parent no longer exists */
 
+/* TODO properly support values documented here:
+   https://www.qnx.com/developers/docs/6.5.0SP1.update/com.qnx.doc.neutrino_lib_ref/s/spawnvp.html
+ */
 int spawnvp(int mode, char *path, char *argv[]) {
         pid_t child_pid;
         child_pid = fork();
         if (child_pid != 0) {
-                int status;
-                waitpid(child_pid, &status, 0);
-                return status;
+                int status = 0;
+                int rc = waitpid(child_pid, &status, 0);
+                if (rc < 0) {
+                    return rc;
+                }
+                /* https://man7.org/linux/man-pages/man2/wait.2.html */
+                int a_status = WEXITSTATUS(status);
+                int b_staus = WIFEXITED(status);
+                if (WIFEXITED(status)) {
+                    return WEXITSTATUS(status);
+                }
+                /* TODO - use better errors */
+                return -1;
         } else {
                 execvp(path, argv);
-                fprintf(stderr, "an error occurred in execvp\n");
+                /* fprintf(stderr, "an error occurred in execvp\n"); */
                 abort();
         }
         return 0;
@@ -76,6 +90,7 @@ static void command_shell_config_init(struct command_shell_config *config);
 static bool command_shell_config_parse(int argc, char *argv[], struct command_shell_config *config);
 static void command_shell_config_print(const struct command_shell_config *config);
 static void command_shell_print_extended_help();
+static char *find_batch_in_path(const char *batch_file_name);
 
 int read_line(char line[], int max_size);
 
@@ -86,8 +101,11 @@ int read_line(char line[], int max_size);
 int command_execute_line(const char *line) {
         struct command_args args;
         struct applet *cmd;
+        const char *command_name;
         int code;
+        bool is_silent = false; /* TODO use global state from echo! */
         extern struct applet commands[];
+        bool is_interactive = isatty(fileno(stdin));
 
         /* this function will not modify the args, so its marked `const
          * but some commands (date/time) will modify the args instead of making copies
@@ -103,13 +121,23 @@ int command_execute_line(const char *line) {
                 return EXIT_SUCCESS;
         }
 
+        command_name = args.argv[0];
+        if (*command_name == '@') {
+                is_silent = !is_silent;
+                command_name = command_name + 1;
+        }
+        /* ok, this fails, since we modify the original line, this will get fixed soon */
+        if (!is_silent && !is_interactive) {
+                puts(line);
+        }
+
         /* Special handling for exit, as it should break the main loop */
-        if (strcasecmp(args.argv[0], "exit") == 0) {
+        if (strcasecmp(command_name, "exit") == 0) {
                 command_args_free(&args);
                 return EXIT_FAILURE;
         }
 
-        cmd = find_applet(CASE_INSENSITVE, args.argv[0], commands);
+        cmd = find_applet(CASE_INSENSITVE, command_name, commands);
         if (cmd != NULL) {
                 code = cmd->handler(args.argc, args.argv);
                 errno = code;
@@ -117,16 +145,115 @@ int command_execute_line(const char *line) {
                         fprintf(stderr, "Command failed (%d)\n", code);
                 }
         } else {
-                int err;
-                readline_deinit();
-                err = spawnvp(P_WAIT, args.argv[0], args.argv);
-                readline_init();
-                if (err != 0) {
-                        fprintf(stderr, "Command not found - %d \n", err);
+                /* is it a batch file ? */
+                char *batch_file_path = find_batch_in_path(command_name);
+                bool ok = false;
+
+                if (batch_file_path != NULL) {
+                        if (freopen(batch_file_path, "r", stdin)) {
+                                ok = true;
+                        }
+                } else {
+                        int err;
+                        readline_deinit();
+                        err = spawnvp(P_WAIT, args.argv[0], args.argv);
+                        readline_init();
+                        if (err != 0) {
+                                /* fprintf(stderr, "Command not found - %d \n", err); */
+                        } else {
+                            ok = true;
+                        }
                 }
+
+                if (!ok) {
+                        fprintf(stderr, "Command not found\n");
+                        errno = ENOENT;
+                }
+                free(batch_file_path);
+                errno = ENOENT;
         }
 
         command_args_free(&args);
+        return EXIT_SUCCESS;
+}
+
+int command_execute_line_old(char *line) {
+        size_t c_argc;
+        char *c_argv[256];
+        const char* command_name;
+        bool parsed_ok;
+        bool is_silent = false; /* TODO use global state from echo! */
+        struct applet *cmd;
+        int code;
+        extern struct applet commands[];
+        bool is_interactive = isatty(fileno(stdin));
+
+        /* this function will not modify the args, so its marked `const
+         * but some commands (date/time) will modify the args instead of making copies
+         * this is OK for now */
+        parsed_ok = command_split_args(line, &c_argc, (const char **)c_argv, 256);
+        if (!parsed_ok) {
+                fprintf(stderr, "Command line parsing failed\n");
+                return EXIT_SUCCESS;
+        }
+
+        if (c_argc == 0) {
+                return EXIT_SUCCESS;
+        }
+
+        command_name = c_argv[0];
+        if (*command_name == '@') {
+                is_silent = !is_silent;
+                command_name = command_name+1;
+        }
+
+        /* Special handling for exit, as it should break the main loop */
+
+        if (strcasecmp(command_name, "exit") == 0) {
+                if (is_interactive) {
+                        printf("interactive shell, not exit, just redirecting stdin back\n");
+                        if ((freopen("", "r", stdin) == NULL)) {
+                            fprintf(stderr, "Error reopening stdin\n");
+                            abort();
+                        }
+                }
+                else {
+                        printf("exit shell!\n");
+                        return EXIT_SUCCESS;
+                }
+        }
+
+        cmd = find_applet(CASE_INSENSITVE, c_argv[0], commands);
+        /* ok, this fails, since we modify the original line, this will get fixed soon */
+        if (!is_silent && !is_interactive) {
+                puts(line);
+        }
+       if (cmd != NULL) {
+                code = cmd->handler(c_argc, c_argv);
+                errno = code;
+                if (code != EXIT_SUCCESS) {
+                        fprintf(stderr, "Command failed (%d)\n", code);
+                }
+        } else {
+                /* is it a batch file ? */
+                char *batch_file_path = find_batch_in_path(command_name);
+                bool ok = false;
+
+                if (batch_file_path != NULL) {
+                        if (freopen(batch_file_path, "r", stdin)) {
+                                ok = true;
+                        }
+                } else {
+                        /* execvp */
+                }
+
+                if (!ok) {
+                        fprintf(stderr, "Command not found\n");
+                        errno = ENOENT;
+                }
+                free(batch_file_path);
+                errno = ENOENT;
+        }
         return EXIT_SUCCESS;
 }
 
@@ -143,24 +270,33 @@ int command_command(int argc, char *argv[]) {
                 command_shell_print_extended_help();
                 return EXIT_SUCCESS;
         }
-
         do {
-                char prompt[256];
-                const char *t;
                 int l;
-
-                t = getenv("PROMPT");
-                if (t == NULL) {
+                bool is_interactive = isatty(fileno(stdin));
+                if (is_interactive) {
+                        char prompt[256];
+                        const char *t;
                         command_prompt(1, NULL);
                         t = getenv("PROMPT");
+                        if (t == NULL) {
+                                command_prompt(1, NULL);
+                                t = getenv("PROMPT");
+                        }
+                        get_prompt(t, prompt, 256);
+                        printf("%s", prompt);
                 }
-                get_prompt(t, prompt, 256);
-                printf("%s", prompt);
                 l = read_line(line, 1024);
                 if (l < 0) {
                         return EXIT_FAILURE;
                 }
 
+                if (feof(stdin)) {
+                        printf("EOF, exit!");
+                        break;
+                }
+                if ((pos = strchr(line, '\r')) != NULL) {
+                        *pos = '\0';
+                }
                 if ((pos = strchr(line, '\n')) != NULL) {
                         *pos = '\0';
                 }
@@ -206,6 +342,21 @@ static void command_shell_print_extended_help() {
         printf("   command {shell command} /l\n");
         printf("   Runs an interactive shell \n");
         printf("   TODO: properly implement the command.com swithces \n");
+}
+
+static char *find_batch_in_path(const char *batch_file_name) {
+        char *f;
+        if (file_exists(batch_file_name)) {
+                return strdup(batch_file_name);
+        }
+        f = malloc(strlen(batch_file_name) + 4);
+        strcpy(f, batch_file_name);
+        strcat(f, ".bat");
+        if (file_exists(f)) {
+                return f;
+        }
+        free(f);
+        return NULL;
 }
 
 /* read line */

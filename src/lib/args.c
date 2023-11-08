@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "fdbox.h"
 #include "lib/args.h"
@@ -78,6 +79,21 @@ void print_agrs(int argc, char *argv[]) {
         for (i = 0; i < argc; i++) {
                 printf("%d: '%s', ", i, argv[i]);
         }
+}
+
+bool file_exists(const char *file_name) {
+#if 1
+    struct stat path_stat;
+    int rc = stat(file_name, &path_stat);
+    return rc == 0;
+#else
+    FILE* f = fopen(file_name, "r");
+    bool exists = f != NULL;
+    if (f != NULL) {
+        fclose(f);
+    }
+    return exists;
+#endif
 }
 
 void command_config_init(struct command_config *config) {
