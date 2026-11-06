@@ -2,14 +2,17 @@
 # This file is part of fdbox
 # For license - read license.txt
 #
-# build.sh <gdos-cc> <arch> <sysroot> <output.EXE>
+# build.sh <gdos-cc> <arch> <sysroot> <output.EXE> [cflags]
 #
 # Builds fdbox for GonWare (GDOS) as GCOM.EXE with GonWare's tools/gdos-cc.sh
 # against its C library (mlibc): the POSIX code of fdbox with DOS
 # conventions (__GONWARE__), the DOS glob of src/lib/gonware.
+# -DGONWARE_COMMAND gives COMMAND.EXE, the shell of an installed system: as
+# the first shell (/P) it frees GDOS's boot archive before AUTOEXEC.BTM.
 
 set -eu
 cc=$1 arch=$2 sysroot=$3 output=$4
+shift 4
 cd "$(dirname "$0")/.."
 
 sh "$cc" "$arch" "$sysroot" "$output" \
@@ -54,4 +57,4 @@ sh "$cc" "$arch" "$sysroot" "$output" \
 	src/lib/gonware/glob.c \
 	-- -Isrc/lib/gonware -Isrc -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -D__GONWARE__ \
 	-Wno-unused-parameter -Wno-unused-but-set-variable -Wno-return-type -Wno-sign-compare \
-	-Wno-missing-field-initializers -Wno-unused-variable -Wno-unused-function
+	-Wno-missing-field-initializers -Wno-unused-variable -Wno-unused-function "$@"
