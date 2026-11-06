@@ -21,6 +21,7 @@ sh "$cc" "$arch" "$sysroot" "$output" \
 	src/dos/beep.c \
 	src/dos/call.c \
 	src/dos/cd.c \
+	src/dos/chcp.c \
 	src/dos/cls.c \
 	src/dos/command.c \
 	src/dos/copymove.c \

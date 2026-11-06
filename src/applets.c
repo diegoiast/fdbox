@@ -26,6 +26,7 @@
 #include "dos/md.h"
 #include "dos/path.h"
 #include "dos/prompt.h"
+#include "dos/chcp.h"
 #include "dos/reboot.h"
 #include "dos/rem.h"
 #include "dos/set.h"
@@ -45,6 +46,7 @@ struct applet commands[] = {
         {help_beep, command_beep, "beep"},
         {help_call, command_call, "call"},
         {help_cd, command_cd, "cd"},
+        {help_chcp, command_chcp, "chcp"},
         {help_cls, command_cls, "cls"},
         {help_copy, command_copy, "copy"},
         {help_command, command_command, "command"},
