@@ -237,6 +237,7 @@ int command_command(int argc, char *argv[]) {
                 }
                 get_prompt(t, prompt, 256);
                 printf("%s", prompt);
+                fflush(stdout); /* the prompt has no line end */
                 l = read_line(line, 1024);
                 if (l < 0) {
                         return EXIT_FAILURE;
