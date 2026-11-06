@@ -17,6 +17,7 @@ For license - read license.txt
 #include "lib/readline.h"
 #include "lib/strextra.h"
 
+#include "dos/batch.h"
 #include "dos/prompt.h"
 
 #ifdef __MSDOS__
@@ -46,7 +47,60 @@ For license - read license.txt
 #include <windows.h>
 #endif
 
-#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#if defined(__GONWARE__)
+#include <gonware/syscall.h>
+#include <strings.h>
+
+#define P_WAIT 0
+
+extern char **environ;
+
+/* GDOS starts a program and waits for its end (GDOS_SPAWN); there is no
+ * fork. A name without a directory is looked for in the current directory
+ * and then in PATH, a name without an extension also as NAME.EXE. */
+static int spawn_try(const char *dir, const char *name, char *argv[], int *status) {
+        char path[260];
+        int ext = strrchr(name, '.') > strrchr(name, '\\');
+        long r;
+
+        if (dir && *dir)
+                snprintf(path, sizeof(path), "%s%s%s%s", dir,
+                         strchr("\\/:", dir[strlen(dir) - 1]) ? "" : "\\", name, ext ? "" : ".EXE");
+        else
+                snprintf(path, sizeof(path), "%s%s", name, ext ? "" : ".EXE");
+        r = gdos_call3(GDOS_SPAWN, path, argv, environ);
+        if (r == -GDOS_ENOENT || r == -GDOS_ENOTDIR)
+                return 0;
+        *status = r < 0 ? 1 : (int)r;
+        if (r < 0)
+                fprintf(stderr, "%s: cannot start (error %ld)\n", path, -r);
+        return 1;
+}
+
+int spawnvp(int mode, char *name, char *argv[]) {
+        int status = 0;
+        const char *p;
+        (void)mode;
+        if (spawn_try(NULL, name, argv, &status))
+                return status;
+        if (strpbrk(name, "\\/:"))
+                return -1;
+        p = getenv("PATH");
+        while (p && *p) {
+                char dir[260];
+                size_t n = strcspn(p, ";");
+                if (n && n < sizeof(dir)) {
+                        memcpy(dir, p, n);
+                        dir[n] = 0;
+                        if (spawn_try(dir, name, argv, &status))
+                                return status;
+                }
+                p += n + (p[n] == ';');
+        }
+        return -1;
+}
+
+#elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 
 #define P_WAIT 0    /* child runs separately, parent waits until exit */
 #define P_NOWAIT 1  /* both concurrent -- not implemented */
@@ -103,6 +157,17 @@ int command_execute_line(const char *line) {
                 return EXIT_SUCCESS;
         }
 
+#if defined(__GONWARE__)
+        /* "D:" changes the current drive */
+        if (args.argc == 1 && isalpha((unsigned char)args.argv[0][0]) && args.argv[0][1] == ':' &&
+            !args.argv[0][2]) {
+                if (chdir(args.argv[0]))
+                        fprintf(stderr, "Invalid drive specification\n");
+                command_args_free(&args);
+                return EXIT_SUCCESS;
+        }
+#endif
+
         /* Special handling for exit, as it should break the main loop */
         if (strcasecmp(args.argv[0], "exit") == 0) {
                 command_args_free(&args);
@@ -113,17 +178,33 @@ int command_execute_line(const char *line) {
         if (cmd != NULL) {
                 code = cmd->handler(args.argc, args.argv);
                 errno = code;
+#if !defined(__GONWARE__)
+                /* on GonWare the commands report their errors themselves */
                 if (code != EXIT_SUCCESS) {
                         fprintf(stderr, "Command failed (%d)\n", code);
                 }
+#endif
         } else {
                 int err;
+                char batch[260];
                 readline_deinit();
                 err = spawnvp(P_WAIT, args.argv[0], args.argv);
                 readline_init();
+#if defined(__GONWARE__)
+                /* spawnvp: -1 if there is no such program, else its exit status */
+                if (err == -1 && batch_find(args.argv[0], batch, sizeof(batch)))
+                        err = batch_run(batch, args.argc, args.argv);
+                else if (err == -1) {
+                        fprintf(stderr, "Bad command or file name - %s\n", args.argv[0]);
+                        err = 1;
+                }
+                errno = err; /* the error level */
+#else
+                (void)batch;
                 if (err != 0) {
                         fprintf(stderr, "Command not found - %d \n", err);
                 }
+#endif
         }
 
         command_args_free(&args);

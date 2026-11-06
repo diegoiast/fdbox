@@ -303,8 +303,8 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         fclose(source);
         fclose(dest);
         if (total_read != total_written) {
-                fprintf(stderr, "Failed writing to %s (wrote %ld/%ld bytes)\n", to, total_written,
-                        total_read);
+                fprintf(stderr, "Failed writing to %s (wrote %lld/%lld bytes)\n", to,
+                        (long long)total_written, (long long)total_read);
                 return errno;
         }
 

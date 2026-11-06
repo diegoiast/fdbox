@@ -177,15 +177,18 @@ bool command_split_args(char *full_cmd, size_t *argc, const char *argv[], size_t
 bool command_merge_args(size_t argc, const char *argv[], char *line, size_t max_line_size) {
         size_t i = 0, l = 0;
 
+        /* the arguments with one space between them (none at the end) */
         line[0] = 0;
         for (i = 0; i < argc; i++) {
-                size_t k = strlen(argv[i]);
+                size_t k = strlen(argv[i]) + (i ? 1 : 0);
                 if (l + k >= max_line_size) {
                         return false;
                 }
-                strncat(line, argv[i], max_line_size);
-                strncat(line, " ", max_line_size);
-                l += k;
+                if (i) {
+                        line[l++] = ' ';
+                }
+                strcpy(line + l, argv[i]);
+                l += strlen(argv[i]);
         };
         return true;
 }
@@ -236,7 +239,11 @@ int command_args_split(const char *line, struct command_args *args) {
 
                 if (isspace(*c)) {
                         /* do not copy empty words */
-                        if (state == appending) {
+                        if (state == equals) {
+                                /* "=" or "==" ends with the space */
+                                copy_word = true;
+                                state = scanning;
+                        } else if (state == appending) {
                                 if (bracket != 0) {
                                         copy_char = true;
                                 } else {
@@ -260,12 +267,16 @@ int command_args_split(const char *line, struct command_args *args) {
                                 }
                         }
                 } else if (*c == '=') {
-                        if (state == appending) {
-                                copy_word = true;
-                                new_word = true;
+                        if (state == appending && bracket == 0) {
+                                copy_word = word[0] != '\0';
+                                new_word = copy_word;
+                                copy_char = !copy_word;
                                 state = equals;
                         } else {
+                                /* "==" stays one word, as does "=" in quotes */
                                 copy_char = true;
+                                if (state == scanning)
+                                        state = equals;
                         }
                 } else {
                         if (state == equals) {
@@ -294,7 +305,8 @@ int command_args_split(const char *line, struct command_args *args) {
                         *p_word = '\0';
                         wordlen = 0;
                         bracket = 0;
-                        if (state != equals) {
+                        /* a word that starts right away (after "=") keeps appending */
+                        if (state != equals && !new_word) {
                                 state = scanning;
                         }
                 }

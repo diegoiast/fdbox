@@ -22,6 +22,7 @@
 #include "dos/goto.h"
 #include "dos/history.h"
 #include "dos/if.h"
+#include "dos/load.h"
 #include "dos/md.h"
 #include "dos/path.h"
 #include "dos/prompt.h"
@@ -56,6 +57,7 @@ struct applet commands[] = {
         {help_goto, command_goto, "goto"},
         {help_history, command_history, "history"},
         {help_if, command_if, "if"},
+        {help_load, command_load, "load"},
         {help_md, command_md, "mkdir"},
         {help_move, command_move, "move"},
         {help_path, command_path, "path"},

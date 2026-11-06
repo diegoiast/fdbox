@@ -55,6 +55,8 @@ add_executable(
   src/dos/goto.c
   src/dos/history.c
   src/dos/if.c
+  src/dos/batch.c
+  src/dos/load.c
   src/dos/md.c
   src/dos/path.c
   src/dos/prompt.c

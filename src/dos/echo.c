@@ -42,7 +42,7 @@ int command_echo(int argc, char *argv[]) {
                 }
         }
 
-        if (!command_merge_args(argc - 1, argv + 1, line, sizeof(line))) {
+        if (!command_merge_args(argc - 1, (const char **)(argv + 1), line, sizeof(line))) {
                 fprintf(stderr, "Warning - could not expand line\n");
         }
 

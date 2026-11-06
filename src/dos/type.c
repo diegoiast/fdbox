@@ -38,6 +38,7 @@ static void type_config_print(const struct type_config *config);
 static void type_print_extended_help();
 
 int command_type(int argc, char *argv[]) {
+        int rc = EXIT_SUCCESS;
         struct type_config config;
         size_t i;
 
@@ -60,6 +61,11 @@ int command_type(int argc, char *argv[]) {
                 char line[1024];
                 size_t line_number = 0;
 
+                if (!file) {
+                        fprintf(stderr, "File not found - %s\n", file_name);
+                        rc = EXIT_FAILURE;
+                        continue;
+                }
                 while (fgets(line, sizeof(line), file)) {
                         line_number++;
                         if (config.show_lines) {
@@ -70,7 +76,7 @@ int command_type(int argc, char *argv[]) {
                 fclose(file);
         }
 
-        return EXIT_SUCCESS;
+        return rc;
 }
 
 const char *help_type() { return "Prints the content of a file"; }

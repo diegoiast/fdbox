@@ -136,7 +136,52 @@ int command_dir(int argc, char *argv[]) {
                 config.global.files.count = 1;
         }
 
+#if defined(__GONWARE__)
+        {
+                /* as in DOS: "DIR D:" and "DIR NAME" of a directory list its files */
+                static char patterns[ARG_MAX_FILES][260];
+                static char where[260];
+                const char *first;
+                size_t i, l;
+
+                for (i = 0; i < config.global.files.count; i++) {
+                        const char *f = config.global.files.file[i];
+                        struct stat st;
+                        l = strlen(f);
+                        if (l && strchr(":\\/", f[l - 1]))
+                                snprintf(patterns[i], sizeof(patterns[i]), "%s*.*", f);
+                        else if (!strpbrk(f, "*?") && !stat(f, &st) && S_ISDIR(st.st_mode))
+                                snprintf(patterns[i], sizeof(patterns[i]), "%s\\*.*", f);
+                        else
+                                snprintf(patterns[i], sizeof(patterns[i]), "%s", f);
+                        config.global.files.file[i] = patterns[i];
+                }
+                /* the directory shown: that of the first pattern */
+                first = config.global.files.file[0];
+                l = 0;
+                for (i = 0; first[i]; i++)
+                        if (strchr(":\\/", first[i]))
+                                l = i + 1;
+                if (!l) {
+                        if (!getcwd(where, sizeof(where)))
+                                strcpy(where, ".");
+                } else if (l == 2 && first[1] == ':') {
+                        /* "D:": the current directory of that drive */
+                        char here[260], drive[3] = {first[0], ':', 0};
+                        if (!getcwd(here, sizeof(here)) || chdir(drive) ||
+                            !getcwd(where, sizeof(where)))
+                                snprintf(where, sizeof(where), "%s", drive);
+                        chdir(here);
+                } else {
+                        snprintf(where, sizeof(where), "%.*s", (int)l, first);
+                        if (l > 1 && where[l - 2] != ':' && strchr("\\/", where[l - 1]))
+                                where[l - 1] = 0;
+                }
+                dir_display_dir(&config, where, &config.global.files, 1);
+        }
+#else
         dir_display_dir(&config, ".", &config.global.files, 1);
+#endif
         return EXIT_SUCCESS;
 }
 
@@ -198,11 +243,21 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 total_bytes += files[i].file_details.st_size;
                 fname = files[i].file_name;
 
+#if defined(__GONWARE__)
+                {
+                        /* the name only, the directory is in the heading */
+                        char *p;
+                        for (p = fname; *p; p++)
+                                if (*p == '\\' || *p == '/' || *p == ':')
+                                        fname = p + 1;
+                }
+#else
                 if (strcmp(dir_name, ".") != 0) {
                         if (str_is_prefix(fname, dir_name)) {
                                 fname += strlen(dir_name) + 1;
                         }
                 }
+#endif
                 if (S_ISDIR(files[i].file_details.st_mode)) {
                         total_dirs++;
                         if (config->wide) {
@@ -232,7 +287,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                         if (S_ISDIR(files[i].file_details.st_mode)) {
                                 printf("%-40s %10s %s", display, "<DIR>", ttime);
                         } else {
-                                printf("%-40s %10ld %s", display, files[i].file_details.st_size,
+                                printf("%-40s %10lld %s", display, (long long)files[i].file_details.st_size,
                                        ttime);
                         }
                         lines++;

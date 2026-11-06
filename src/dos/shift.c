@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "dos/shift.h"
+#include "dos/batch.h"
 #include "fdbox.h"
 
 /*
@@ -10,8 +11,7 @@ For license - read license.txt
 */
 
 int command_shift(int argc, char *argv[]) {
-        printf("shift - TODO: Unimplemented yet\n");
-        return EXIT_FAILURE;
+        return batch_shift();
 }
 
 const char *help_shift() { return "Here should be a basic help for shift"; }

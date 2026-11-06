@@ -39,9 +39,10 @@ For license - read license.txt
 int command_cd(int argc, char *argv[]) {
         const char *path = argv[1];
         if (argc == 1) {
-                char cwd[128];
-#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__) || defined(__WATCOMC__)
-                getcwd(cwd, 128);
+                char cwd[260];
+#if defined(__linux__) || defined(__MSDOS__) || defined(__APPLE__) || defined(__WATCOMC__) ||    \
+    defined(__GONWARE__)
+                getcwd(cwd, sizeof(cwd));
 #elif defined(__WIN32__)
                 DWORD err = GetCurrentDirectory(128, cwd);
 #else
