@@ -61,6 +61,7 @@ struct applet commands[] = {
         {help_md, command_md, "mkdir"},
         {help_move, command_move, "move"},
         {help_path, command_path, "path"},
+        {help_poweroff, command_poweroff, "poweroff"},
         {help_prompt, command_prompt, "prompt"},
         {help_reboot, command_reboot, "reboot"},
         {help_rem, command_rem, "rem"},
