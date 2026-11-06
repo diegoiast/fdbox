@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(__GONWARE__) || defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include <unistd.h>
+#endif
+
 #include "dos/type.h"
 #include "fdbox.h"
 #include "lib/args.h"
@@ -51,6 +55,18 @@ int command_type(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
         if (config.global.files.count == 0) {
+#if defined(__GONWARE__) || defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+                /* no file but a redirected input ("TYPE < X", "A | TYPE"):
+                 * that */
+                if (!isatty(0)) {
+                        /* fd 0 itself: stdin's buffer belongs to the shell */
+                        char buf[1024];
+                        ssize_t n;
+                        while ((n = read(0, buf, sizeof(buf))) > 0)
+                                fwrite(buf, 1, (size_t)n, stdout);
+                        return EXIT_SUCCESS;
+                }
+#endif
                 type_print_extended_help();
                 return EXIT_SUCCESS;
         }

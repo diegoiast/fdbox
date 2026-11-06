@@ -18,7 +18,10 @@ For license - read license.txt
 #include "lib/strextra.h"
 
 #include "dos/batch.h"
+#include "dos/echo.h"
+#include "dos/for.h"
 #include "dos/prompt.h"
+#include "fdbox.h"
 
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
@@ -137,7 +140,7 @@ int read_line(char line[], int max_size);
  * we should exit. For now it works
  */
 
-int command_execute_line(const char *line) {
+static int execute_command(const char *line) {
         struct command_args args;
         struct applet *cmd;
         int code;
@@ -154,6 +157,26 @@ int command_execute_line(const char *line) {
 
         if (args.argc == 0) {
                 command_args_free(&args);
+                return EXIT_SUCCESS;
+        }
+
+        /* ECHO prints the text as written: "ECHO a=b" keeps "a=b" */
+        if (strcasecmp(args.argv[0], "echo") == 0) {
+                const char *t = line;
+                while (isspace((unsigned char)*t))
+                        t++;
+                t += 4;
+                if (*t == ' ' || *t == '\t')
+                        t++;
+                command_args_free(&args);
+                errno = echo_line(t);
+                return EXIT_SUCCESS;
+        }
+
+        /* FOR takes its command as written, before words are split */
+        if (strcasecmp(args.argv[0], "for") == 0) {
+                command_args_free(&args);
+                errno = for_line(line);
                 return EXIT_SUCCESS;
         }
 
@@ -210,6 +233,176 @@ int command_execute_line(const char *line) {
         command_args_free(&args);
         return EXIT_SUCCESS;
 }
+
+#if defined(__GONWARE__) || defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include <fcntl.h>
+#include <unistd.h>
+
+#define PIPE_STAGES 8
+
+/* "<", ">" and ">>" of one command */
+struct redirect {
+        char in[260], out[260];
+        bool append;
+};
+
+/* takes the redirections outside quotes out of cmd; false: a name is missing */
+static bool redirect_parse(char *cmd, struct redirect *r) {
+        char *s = cmd, *o = cmd, quote = 0;
+
+        memset(r, 0, sizeof(*r));
+        while (*s) {
+                char *dst;
+                size_t n = 0;
+
+                if (quote || *s == '"') {
+                        quote = quote ? (*s == quote ? 0 : quote) : *s;
+                        *o++ = *s++;
+                        continue;
+                }
+                if (*s != '<' && *s != '>') {
+                        *o++ = *s++;
+                        continue;
+                }
+                dst = *s == '<' ? r->in : r->out;
+                if (*s == '>')
+                        r->append = s[1] == '>';
+                s += *s == '>' && s[1] == '>' ? 2 : 1;
+                while (isspace((unsigned char)*s))
+                        s++;
+                if (*s == '"') {
+                        for (s++; *s && *s != '"'; s++)
+                                if (n < 259)
+                                        dst[n++] = *s;
+                        s += *s == '"';
+                } else {
+                        for (; *s && !isspace((unsigned char)*s) && !strchr("<>|", *s); s++)
+                                if (n < 259)
+                                        dst[n++] = *s;
+                }
+                dst[n] = 0;
+                if (!n)
+                        return false;
+        }
+        /* "ECHO A > X" writes "A", not "A " */
+        while (o > cmd && isspace((unsigned char)o[-1]) && !quote)
+                o--;
+        *o = 0;
+        return true;
+}
+
+/* moves fd to target, keeping the old one in *saved */
+static bool redirect_fd(const char *path, int flags, int target, int *saved) {
+        int fd = open(path, flags, 0666);
+
+        if (fd < 0) {
+                fprintf(stderr, "%s: cannot open\n", path);
+                return false;
+        }
+        *saved = dup(target);
+        dup2(fd, target);
+        close(fd);
+        return true;
+}
+
+static void redirect_undo(int saved[2]) {
+        int i;
+
+        fflush(stdout);
+        for (i = 0; i < 2; i++)
+                if (saved[i] >= 0) {
+                        dup2(saved[i], i);
+                        close(saved[i]);
+                }
+}
+
+/* one command with its redirections; in and out (pipe files) unless the
+ * command names its own */
+static int execute_redirected(char *cmd, const char *in, const char *out) {
+        struct redirect r;
+        int saved[2] = {-1, -1}, code, level;
+
+        if (!redirect_parse(cmd, &r)) {
+                fprintf(stderr, "Syntax error: a redirection without a file name\n");
+                errno = 1;
+                return EXIT_SUCCESS;
+        }
+        if (!*r.in && in)
+                snprintf(r.in, sizeof(r.in), "%s", in);
+        if (!*r.out && out) {
+                snprintf(r.out, sizeof(r.out), "%s", out);
+                r.append = false;
+        }
+        fflush(stdout);
+        if ((*r.in && !redirect_fd(r.in, O_RDONLY, 0, &saved[0])) ||
+            (*r.out && !redirect_fd(r.out, O_WRONLY | O_CREAT | (r.append ? O_APPEND : O_TRUNC), 1,
+                                    &saved[1]))) {
+                redirect_undo(saved);
+                errno = 1;
+                return EXIT_SUCCESS;
+        }
+        code = execute_command(cmd);
+        level = errno;
+        redirect_undo(saved);
+        errno = level;
+        return code;
+}
+
+/* a pipe is a file, as in DOS: in %TEMP%, %TMP% or the current directory */
+static void pipe_name(unsigned n, char *path, size_t size) {
+        const char *dir = getenv("TEMP");
+        const char *sep = DIRECTORY_DELIMITER;
+
+        if (!dir || !*dir)
+                dir = getenv("TMP");
+        if (!dir || !*dir)
+                dir = "", sep = "";
+        else if (strchr("\\/:", dir[strlen(dir) - 1]))
+                sep = "";
+        snprintf(path, size, "%s%sPIPE%u.$$$", dir, sep, n);
+}
+
+/* "a | b | c": each command's output is the next one's input */
+int command_execute_line(const char *line) {
+        char buf[1024], *stage[PIPE_STAGES], pipes[2][260], quote = 0, *s;
+        unsigned n = 1, i;
+        int code = EXIT_SUCCESS;
+
+        snprintf(buf, sizeof(buf), "%s", line);
+        stage[0] = buf;
+        for (s = buf; *s; s++) {
+                if (quote || *s == '"')
+                        quote = quote ? (*s == quote ? 0 : quote) : *s;
+                else if (*s == '|') {
+                        if (n == PIPE_STAGES) {
+                                fprintf(stderr, "Too many pipes\n");
+                                errno = 1;
+                                return EXIT_SUCCESS;
+                        }
+                        *s = 0;
+                        stage[n++] = s + 1;
+                }
+        }
+        for (i = 0; i < n; i++) {
+                const char *in = i ? pipes[(i - 1) & 1] : NULL;
+                char *out = i + 1 < n ? pipes[i & 1] : NULL;
+
+                if (out)
+                        pipe_name(i, out, sizeof(pipes[0]));
+                code = execute_redirected(stage[i], in, out);
+                if (in)
+                        remove(in);
+                if (code != EXIT_SUCCESS) {
+                        if (out)
+                                remove(out);
+                        break;
+                }
+        }
+        return code;
+}
+#else
+int command_execute_line(const char *line) { return execute_command(line); }
+#endif
 
 int command_command(int argc, char *argv[]) {
         char line[1024], *pos;
