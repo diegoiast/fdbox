@@ -201,6 +201,19 @@ bool test_args_split() {
         ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 args - a=12");
         command_args_free(&args);
 
+        rc = command_args_split("a = 12", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(3, args.argc, "3 args - a = 12");
+        command_args_free(&args);
+
+        rc = command_args_split("if 42 == 42 echo ok", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(6, args.argc, "6 args - if 42 == 42 echo ok") &&
+              verify_string_equals("==", args.argv[2], "== is one word");
+        command_args_free(&args);
+
+        rc = command_args_split("if a==b echo ok", &args);
+        ok |= rc == EXIT_SUCCESS && verify_int_equals(6, args.argc, "6 args - if a==b echo ok");
+        command_args_free(&args);
+
         return ok;
 }
 

@@ -4,6 +4,7 @@
 #include "dos/cls.h"
 #include "fdbox.h"
 #include "lib/readline.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -17,4 +18,4 @@ int command_cls(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_cls() { return "Clear screen"; }
+const char *help_cls() { return _("Clear screen"); }

@@ -3,6 +3,7 @@
 
 #include "dos/exit.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -10,8 +11,8 @@ For license - read license.txt
 */
 
 int command_exit(int argc, char *argv[]) {
-        printf("exit - TODO: Unimplemented yet\n");
+        fputs(_("exit - TODO: Unimplemented yet\n"), stdout);
         return EXIT_FAILURE;
 }
 
-const char *help_exit() { return "Exits the interactive shell"; }
+const char *help_exit() { return _("Exits the interactive shell"); }

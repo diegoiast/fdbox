@@ -4,6 +4,7 @@
 
 #include "dos/ver.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -17,4 +18,4 @@ int command_ver(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_ver() { return "Display the vresion of the shell"; }
+const char *help_ver() { return _("Display the version of the shell"); }

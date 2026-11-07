@@ -8,5 +8,7 @@ For license - read license.txt
 
 int command_reboot(int arc, char *argv[]);
 const char *help_reboot();
+int command_poweroff(int argc, char *argv[]);
+const char *help_poweroff();
 
 #endif //__reboot_h__

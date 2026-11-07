@@ -22,9 +22,12 @@
 #include "dos/goto.h"
 #include "dos/history.h"
 #include "dos/if.h"
+#include "dos/load.h"
 #include "dos/md.h"
 #include "dos/path.h"
 #include "dos/prompt.h"
+#include "dos/chcp.h"
+#include "dos/keyb.h"
 #include "dos/reboot.h"
 #include "dos/rem.h"
 #include "dos/set.h"
@@ -44,6 +47,7 @@ struct applet commands[] = {
         {help_beep, command_beep, "beep"},
         {help_call, command_call, "call"},
         {help_cd, command_cd, "cd"},
+        {help_chcp, command_chcp, "chcp"},
         {help_cls, command_cls, "cls"},
         {help_copy, command_copy, "copy"},
         {help_command, command_command, "command"},
@@ -56,9 +60,12 @@ struct applet commands[] = {
         {help_goto, command_goto, "goto"},
         {help_history, command_history, "history"},
         {help_if, command_if, "if"},
+        {help_keyb, command_keyb, "keyb"},
+        {help_load, command_load, "load"},
         {help_md, command_md, "mkdir"},
         {help_move, command_move, "move"},
         {help_path, command_path, "path"},
+        {help_poweroff, command_poweroff, "poweroff"},
         {help_prompt, command_prompt, "prompt"},
         {help_reboot, command_reboot, "reboot"},
         {help_rem, command_rem, "rem"},

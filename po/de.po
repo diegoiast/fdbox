@@ -1,0 +1,756 @@
+# German translation of fdbox (GCOM on GonWare).
+# This file is distributed under the same license as fdbox.
+msgid ""
+msgstr ""
+"Project-Id-Version: fdbox\n"
+"Report-Msgid-Bugs-To: https://gitea.disconnected-by-peer.at/GonSoft/fdbox/"
+"issues\n"
+"POT-Creation-Date: 2026-11-07 19:45+0100\n"
+"PO-Revision-Date: 2026-11-07 18:00+0100\n"
+"Last-Translator: Mario Fetka <mario.fetka@gmail.com>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/dos/batch.c:151
+#, c-format
+msgid "%s: cannot read the batch file\n"
+msgstr "%s: die Stapeldatei kann nicht gelesen werden\n"
+
+#: src/dos/batch.c:207
+msgid "GOTO works only in batch files\n"
+msgstr "GOTO geht nur in Stapeldateien\n"
+
+#: src/dos/batch.c:227
+#, c-format
+msgid "Label not found: %.*s\n"
+msgstr "Marke nicht gefunden: %.*s\n"
+
+#: src/dos/beep.c:37
+msgid "Missing argument /f - frequency\n"
+msgstr "Parameter /f fehlt - Frequenz\n"
+
+#: src/dos/beep.c:42 src/dos/beep.c:54
+#, c-format
+msgid "Invalid time argument: %s\n"
+msgstr "Ungültige Zeitangabe: %s\n"
+
+#: src/dos/beep.c:49
+msgid "Missing argument /l - length\n"
+msgstr "Parameter /l fehlt - Länge\n"
+
+#: src/dos/beep.c:63
+#, c-format
+msgid "No supported argument /%c\n"
+msgstr "Parameter nicht unterstützt: /%c\n"
+
+#: src/dos/beep.c:69
+#, c-format
+msgid "Invalid argument: %s\n"
+msgstr "Ungültiger Parameter: %s\n"
+
+#: src/dos/beep.c:76
+msgid "    beep /f [frequency] /t [time/milliseconds]\n"
+msgstr "    beep /f [Frequenz] /t [Zeit/Millisekunden]\n"
+
+#: src/dos/beep.c:77
+msgid ""
+"\n"
+"  /f frequency in hertz"
+msgstr ""
+"\n"
+"  /f Frequenz in Hertz"
+
+#: src/dos/beep.c:78
+msgid ""
+"\n"
+"  /t length of the beep in milliseconds\n"
+msgstr ""
+"\n"
+"  /t Länge des Tons in Millisekunden\n"
+
+#: src/dos/beep.c:97
+msgid ""
+"Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with "
+"DOS)"
+msgstr ""
+"Gibt den Unix-Signalton '\\a' aus (alle Parameter werden wegen DOS-"
+"Kompatibilität ignoriert)"
+
+#: src/dos/beep.c:99
+msgid "Makes sound for a specified length in milliseconds"
+msgstr "Gibt einen Ton der angegebenen Länge in Millisekunden aus"
+
+#: src/dos/call.c:31
+msgid "Here should be a basic help for call"
+msgstr "Hier sollte eine kurze Hilfe zu CALL stehen"
+
+#: src/dos/cd.c:56
+msgid "cd can only have a single directory\n"
+msgstr "CD nimmt nur ein Verzeichnis\n"
+
+#: src/dos/cd.c:85
+msgid "Change working directory, pass none to display current directory"
+msgstr "Wechselt das Arbeitsverzeichnis, ohne Angabe zeigt es das aktuelle"
+
+#: src/dos/chcp.c:29
+msgid "CHCP [number]\n"
+msgstr "CHCP [Nummer]\n"
+
+#: src/dos/chcp.c:35
+#, c-format
+msgid "Invalid code page - %s\n"
+msgstr "Ungültige Codepage - %s\n"
+
+#: src/dos/chcp.c:41
+#, c-format
+msgid "Invalid code page - %s (no UNI_%03lu.TAB)\n"
+msgstr "Ungültige Codepage - %s (kein UNI_%03lu.TAB)\n"
+
+#: src/dos/chcp.c:45
+#, c-format
+msgid "Invalid code page - %s (no single-byte DOS code page)\n"
+msgstr "Ungültige Codepage - %s (keine Einzelbyte-DOS-Codepage)\n"
+
+#: src/dos/chcp.c:48
+#, c-format
+msgid "Active code page: %ld\n"
+msgstr "Aktive Codepage: %ld\n"
+
+#: src/dos/chcp.c:53
+msgid "CHCP: only on GonWare\n"
+msgstr "CHCP: nur unter GonWare\n"
+
+#: src/dos/chcp.c:58
+msgid "Shows or changes the code page"
+msgstr "Zeigt oder ändert die Codepage"
+
+#: src/dos/cls.c:21
+msgid "Clear screen"
+msgstr "Löscht den Bildschirm"
+
+#: src/dos/command.c:197
+#, c-format
+msgid "%s is a driver: LOAD %s, if you mean it\n"
+msgstr "%s ist ein Treiber: LOAD %s, wenn das gemeint ist\n"
+
+#: src/dos/command.c:201
+#, c-format
+msgid "%s: cannot start (error %ld)\n"
+msgstr "%s: kann nicht starten (Fehler %ld)\n"
+
+#: src/dos/command.c:222
+msgid "an error occurred in execvp\n"
+msgstr "Fehler in execvp\n"
+
+#: src/dos/command.c:255
+msgid "Command line parsing failed\n"
+msgstr "Die Befehlszeile ist fehlerhaft\n"
+
+#: src/dos/command.c:289
+msgid "Invalid drive specification\n"
+msgstr "Ungültige Laufwerksangabe\n"
+
+#: src/dos/command.c:308
+#, c-format
+msgid "Command failed (%d)\n"
+msgstr "Befehl fehlgeschlagen (%d)\n"
+
+#: src/dos/command.c:318
+#, c-format
+msgid "Bad command or file name - %s\n"
+msgstr "Befehl oder Dateiname nicht gefunden - %s\n"
+
+#: src/dos/command.c:327
+#, c-format
+msgid "Command not found - %d \n"
+msgstr "Befehl nicht gefunden - %d \n"
+
+#: src/dos/command.c:398
+#, c-format
+msgid "%s: cannot open\n"
+msgstr "%s: kann nicht geöffnet werden\n"
+
+#: src/dos/command.c:425
+msgid "Syntax error: a redirection without a file name\n"
+msgstr "Syntaxfehler: Umleitung ohne Dateiname\n"
+
+#: src/dos/command.c:477
+msgid "Too many pipes\n"
+msgstr "Zu viele Pipes\n"
+
+#: src/dos/command.c:549
+msgid "Runs an MS-DOS interactive shell"
+msgstr "Startet eine interaktive MS-DOS-Shell"
+
+#: src/dos/command.c:580
+msgid "   command {shell command} /l\n"
+msgstr "   command {Shell-Befehl} /l\n"
+
+#: src/dos/command.c:581
+msgid "   Runs an interactive shell \n"
+msgstr "   Startet eine interaktive Shell \n"
+
+#: src/dos/command.c:582
+msgid "   TODO: properly implement the command.com switches \n"
+msgstr "   TODO: die Schalter von COMMAND.COM richtig umsetzen \n"
+
+#: src/dos/copymove.c:85
+msgid "Error: no source file provided\n"
+msgstr "Fehler: keine Quelldatei angegeben\n"
+
+#: src/dos/copymove.c:90
+msgid "Error: no destination file provided\n"
+msgstr "Fehler: keine Zieldatei angegeben\n"
+
+#: src/dos/copymove.c:135
+msgid "Copies one or more files to another location"
+msgstr "Kopiert eine oder mehrere Dateien an einen anderen Ort"
+
+#: src/dos/copymove.c:137
+msgid "Moves one or more files to another location"
+msgstr "Verschiebt eine oder mehrere Dateien an einen anderen Ort"
+
+#: src/dos/copymove.c:207
+msgid "   copy [from] [to] /a /y /v\n"
+msgstr "   copy [von] [nach] /a /y /v\n"
+
+#: src/dos/copymove.c:209
+msgid "   /a Copy attributes\n"
+msgstr "   /a Attribute mitkopieren\n"
+
+#: src/dos/copymove.c:210 src/dos/copymove.c:221
+msgid "   /y Ask for confirmation on overwrite (WIP)\n"
+msgstr "   /y Vor dem Überschreiben fragen (in Arbeit)\n"
+
+#: src/dos/copymove.c:211 src/dos/copymove.c:222
+msgid "   /v Verbose copy\n"
+msgstr "   /v Ausführlich kopieren\n"
+
+#: src/dos/copymove.c:212 src/dos/copymove.c:223 src/dos/dir.c:484
+msgid "Examples:\n"
+msgstr "Beispiele:\n"
+
+#: src/dos/copymove.c:213
+msgid "> copy c:\\autoexec.bat c:\\autoexec.old \n"
+msgstr "> copy c:\\autoexec.bat c:\\autoexec.old \n"
+
+#: src/dos/copymove.c:214
+msgid "> copy *.exe backup\\ \n"
+msgstr "> copy *.exe backup\\ \n"
+
+#: src/dos/copymove.c:219
+msgid "   move [from] [to] /a /y /v\n"
+msgstr "   move [von] [nach] /a /y /v\n"
+
+#: src/dos/copymove.c:224
+msgid "> move c:\\autoexec.bat c:\\autoexec.old \n"
+msgstr "> move c:\\autoexec.bat c:\\autoexec.old \n"
+
+#: src/dos/copymove.c:225
+msgid "> move *.exe backup\\ \n"
+msgstr "> move *.exe backup\\ \n"
+
+#: src/dos/copymove.c:262
+#, c-format
+msgid "Failed reading from %s\n"
+msgstr "Lesen von %s fehlgeschlagen\n"
+
+#: src/dos/copymove.c:267
+#, c-format
+msgid "Failed opening %s for writing\n"
+msgstr "%s kann nicht zum Schreiben geöffnet werden\n"
+
+#: src/dos/copymove.c:307
+#, c-format
+msgid "Failed writing to %s (wrote %lld/%lld bytes)\n"
+msgstr "Schreiben nach %s fehlgeschlagen (%lld/%lld Bytes geschrieben)\n"
+
+#: src/dos/copymove.c:314
+msgid "Warning: copying attributes on MSDOS is not supported yet\n"
+msgstr "Warnung: Attribute kopieren geht unter MS-DOS noch nicht\n"
+
+#: src/dos/copymove.c:325
+#, c-format
+msgid "Error: failed setting time on %s\n"
+msgstr "Fehler: Zeit von %s kann nicht gesetzt werden\n"
+
+#: src/dos/copymove.c:330
+#, c-format
+msgid "Error: failed setting ownership on %s\n"
+msgstr "Fehler: Besitzer von %s kann nicht gesetzt werden\n"
+
+#: src/dos/copymove.c:363
+#, c-format
+msgid "Error: failed moving %s->%s\n"
+msgstr "Fehler: %s->%s kann nicht verschoben werden\n"
+
+#: src/dos/copymove.c:367
+#, c-format
+msgid "Error: failed deleting original file: %s\n"
+msgstr "Fehler: Originaldatei kann nicht gelöscht werden: %s\n"
+
+#: src/dos/datetime.c:73
+msgid "Enter new time (hh:mm:ss [am/pm]): "
+msgstr "Neue Uhrzeit (hh:mm:ss [am/pm]): "
+
+#: src/dos/datetime.c:99
+msgid "Enter new date (mm-dd-[yy]yy): "
+msgstr "Neues Datum (mm-dd-[yy]yy): "
+
+#: src/dos/datetime.c:106
+msgid "Display or modify system date"
+msgstr "Zeigt oder ändert das Systemdatum"
+
+#: src/dos/datetime.c:107
+msgid "Display or modify system time"
+msgstr "Zeigt oder ändert die Systemzeit"
+
+#: src/dos/datetime.c:191
+#, c-format
+msgid "Current date is %02d-%02d-%4d\n"
+msgstr "Aktuelles Datum: %02d-%02d-%4d\n"
+
+#: src/dos/datetime.c:250
+#, c-format
+msgid "TODO: set time to %02d:%02d:%02d\n"
+msgstr "TODO: Zeit auf %02d:%02d:%02d setzen\n"
+
+#: src/dos/datetime.c:268
+#, c-format
+msgid "Current time is %02d:%02d:%02d\n"
+msgstr "Aktuelle Uhrzeit: %02d:%02d:%02d\n"
+
+#: src/dos/datetime.c:273
+msgid "        date /d [new date]\n"
+msgstr "        date /d [neues Datum]\n"
+
+#: src/dos/datetime.c:274
+msgid ""
+"        /d displays date and exits\n"
+"\n"
+msgstr ""
+"        /d zeigt das Datum und endet\n"
+"\n"
+
+#: src/dos/datetime.c:275
+msgid "If you pass a date to this command, it will just set it\n"
+msgstr "Mit einem Datum setzt der Befehl es nur,\n"
+
+#: src/dos/datetime.c:276 src/dos/datetime.c:285
+msgid "and not be interactive. If you don't - the command will\n"
+msgstr "ohne zu fragen. Ohne Angabe fragt der Befehl\n"
+
+#: src/dos/datetime.c:277
+msgid "prompt you for a new date\n"
+msgstr "nach einem neuen Datum\n"
+
+#: src/dos/datetime.c:282
+msgid "        time /t [new time]\n"
+msgstr "        time /t [neue Uhrzeit]\n"
+
+#: src/dos/datetime.c:283
+msgid ""
+"        /t displays time and exits\n"
+"\n"
+msgstr ""
+"        /t zeigt die Uhrzeit und endet\n"
+"\n"
+
+#: src/dos/datetime.c:284
+msgid "If you pass a time to this command, it will just set it\n"
+msgstr "Mit einer Uhrzeit setzt der Befehl sie nur,\n"
+
+#: src/dos/datetime.c:286
+msgid "prompt you for a new time\n"
+msgstr "nach einer neuen Uhrzeit\n"
+
+#: src/dos/del.c:67 src/dos/dir.c:119 src/dos/md.c:56
+msgid "Failed parsing command line args\n"
+msgstr "Die Parameter sind fehlerhaft\n"
+
+#: src/dos/del.c:98
+#, c-format
+msgid "Deleted %d files\n"
+msgstr "%d Dateien gelöscht\n"
+
+#: src/dos/del.c:100
+#, c-format
+msgid "Deleted %d/%d files\n"
+msgstr "%d/%d Dateien gelöscht\n"
+
+#: src/dos/del.c:105
+#, c-format
+msgid "Deleted %d directories\n"
+msgstr "%d Verzeichnisse gelöscht\n"
+
+#: src/dos/del.c:107
+#, c-format
+msgid "Deleted %d/%d directories\n"
+msgstr "%d/%d Verzeichnisse gelöscht\n"
+
+#: src/dos/del.c:115
+msgid "Delete one or more files"
+msgstr "Löscht eine oder mehrere Dateien"
+
+#: src/dos/del.c:160
+msgid "   del [files] /p /v /r /f\n"
+msgstr "   del [Dateien] /p /v /r /f\n"
+
+#: src/dos/del.c:161
+msgid "   /p Prompt for deletion of each file\n"
+msgstr "   /p Vor jeder Datei fragen\n"
+
+#: src/dos/del.c:162
+msgid "   /v Verbose delete\n"
+msgstr "   /v Ausführlich löschen\n"
+
+#: src/dos/del.c:163
+msgid "   /r Recursive delete (delete subdirs)\n"
+msgstr "   /r Rekursiv löschen (mit Unterverzeichnissen)\n"
+
+#: src/dos/del.c:164
+msgid "   /f Force deletion of subdirs, or RO files\n"
+msgstr "   /f Auch Unterverzeichnisse und schreibgeschützte Dateien löschen\n"
+
+#: src/dos/dir.c:130
+#, c-format
+msgid "Warning: %zd/%zd files will not be displayed\n"
+msgstr "Warnung: %zd/%zd Dateien werden nicht angezeigt\n"
+
+#: src/dos/dir.c:234
+#, c-format
+msgid "Warning: %d/%d files will not be shown\n"
+msgstr "Warnung: %d/%d Dateien werden nicht angezeigt\n"
+
+#: src/dos/dir.c:238
+#, c-format
+msgid ""
+"\n"
+"Directory of %s\n"
+msgstr ""
+"\n"
+"Verzeichnis von %s\n"
+
+#: src/dos/dir.c:302
+msgid "Press enter to continue...\n"
+msgstr "Weiter mit Enter...\n"
+
+#: src/dos/dir.c:315
+#, c-format
+msgid "%10d files(s)\t %lld bytes\n"
+msgstr "%10d Datei(en)\t %lld Bytes\n"
+
+#: src/dos/dir.c:316
+#, c-format
+msgid "%10d dirs(s) \t %lld free\n"
+msgstr "%10d Verz.     \t %lld frei\n"
+
+#: src/dos/dir.c:342
+msgid "Displays a list of files and subdirectories in a directory"
+msgstr "Listet die Dateien und Unterverzeichnisse eines Verzeichnisses"
+
+#: src/dos/dir.c:453
+#, c-format
+msgid "invalid sort argument %c/\n"
+msgstr "ungültige Sortierung %c/\n"
+
+#: src/dos/dir.c:471
+msgid "   dir [files] /p /w /s /b /l /O [files]\n"
+msgstr "   dir [Dateien] /p /w /s /b /l /O [Dateien]\n"
+
+#: src/dos/dir.c:473
+msgid "   /p pause after each screen\n"
+msgstr "   /p nach jeder Seite anhalten\n"
+
+#: src/dos/dir.c:474
+msgid "   /w use wide format, no details\n"
+msgstr "   /w breites Format, ohne Einzelheiten\n"
+
+#: src/dos/dir.c:475
+msgid "   /s display contents of sub directories as well\n"
+msgstr "   /s auch den Inhalt der Unterverzeichnisse zeigen\n"
+
+#: src/dos/dir.c:476
+msgid "   /b bare format - print no headers or summary\n"
+msgstr "   /b nur Namen - ohne Kopf und Summe\n"
+
+#: src/dos/dir.c:477
+msgid "   /l lower case - all names are displayed in lower case\n"
+msgstr "   /l Kleinbuchstaben - alle Namen klein\n"
+
+#: src/dos/dir.c:478
+msgid "   /a[] filter files by attributes\n"
+msgstr "   /a[] Dateien nach Attributen auswählen\n"
+
+#: src/dos/dir.c:479
+msgid "       /ad - directories    /ar - readonly   /ah - hidden\n"
+msgstr "       /ad - Verzeichnisse  /ar - schreibgeschützt  /ah - versteckt\n"
+
+#: src/dos/dir.c:480
+msgid "       /as - system files\n"
+msgstr "       /as - Systemdateien\n"
+
+#: src/dos/dir.c:481
+msgid "   /o[esdng] sort files\n"
+msgstr "   /o[esdng] Dateien sortieren\n"
+
+#: src/dos/dir.c:482
+msgid "       /oe - extension       /os - by name    /od - date\n"
+msgstr "       /oe - Erweiterung     /os - Name       /od - Datum\n"
+
+#: src/dos/dir.c:483
+msgid "       /on - by size         /og - directories first \n"
+msgstr "       /on - Größe           /og - Verzeichnisse zuerst \n"
+
+#: src/dos/dir.c:485
+msgid "> dir /w /os *.exe\n"
+msgstr "> dir /w /os *.exe\n"
+
+#: src/dos/dir.c:486
+msgid "> dir /p /b *.txt *.com\n"
+msgstr "> dir /p /b *.txt *.com\n"
+
+#: src/dos/echo.c:31 src/dos/echo.c:62
+#, c-format
+msgid "Echo is %s\n"
+msgstr "ECHO ist %s\n"
+
+#: src/dos/echo.c:47
+msgid "Warning - could not expand line\n"
+msgstr "Warnung - die Zeile kann nicht erweitert werden\n"
+
+#: src/dos/echo.c:78
+msgid "Prints a string"
+msgstr "Gibt einen Text aus"
+
+#: src/dos/exit.c:14
+msgid "exit - TODO: Unimplemented yet\n"
+msgstr "exit - TODO: noch nicht umgesetzt\n"
+
+#: src/dos/exit.c:18
+msgid "Exits the interactive shell"
+msgstr "Beendet die interaktive Shell"
+
+#: src/dos/for.c:82 src/dos/for.c:88 src/dos/for.c:99
+msgid "Syntax error: FOR %V IN (set) DO command\n"
+msgstr "Syntaxfehler: FOR %V IN (Menge) DO Befehl\n"
+
+#: src/dos/for.c:143
+msgid "Runs a command for each file of a set"
+msgstr "Führt einen Befehl für jede Datei einer Menge aus"
+
+#: src/dos/goto.c:16
+msgid "GOTO needs a label\n"
+msgstr "GOTO braucht eine Marke\n"
+
+#: src/dos/goto.c:22
+msgid "Here should be a basic help for goto"
+msgstr "Hier sollte eine kurze Hilfe zu GOTO stehen"
+
+#: src/dos/history.c:23
+msgid "Displays all readline history available"
+msgstr "Zeigt die gesamte Befehlsgeschichte"
+
+#: src/dos/keyb.c:26
+msgid "KEYB [code]\n"
+msgstr "KEYB [Code]\n"
+
+#: src/dos/keyb.c:30
+#, c-format
+msgid "Invalid keyboard code specified - %s\n"
+msgstr "Ungültiger Tastaturcode - %s\n"
+
+#: src/dos/keyb.c:33
+#, c-format
+msgid "Current keyboard code: %s\n"
+msgstr "Aktueller Tastaturcode: %s\n"
+
+#: src/dos/keyb.c:38
+msgid "KEYB: only on GonWare\n"
+msgstr "KEYB: nur unter GonWare\n"
+
+#: src/dos/keyb.c:43
+msgid "Shows or changes the keyboard layout"
+msgstr "Zeigt oder ändert die Tastaturbelegung"
+
+#: src/dos/if.c:126
+msgid "Conditionally execute a command"
+msgstr "Führt einen Befehl unter einer Bedingung aus"
+
+#: src/dos/load.c:32
+msgid "LOAD module [arguments]\n"
+msgstr "LOAD Modul [Parameter]\n"
+
+#: src/dos/load.c:43
+#, c-format
+msgid "LOAD: %s not found\n"
+msgstr "LOAD: %s nicht gefunden\n"
+
+#: src/dos/load.c:47
+#, c-format
+msgid "LOAD: %s was not loaded\n"
+msgstr "LOAD: %s wurde nicht geladen\n"
+
+#: src/dos/load.c:54
+msgid "LOAD: modules exist only on GonWare\n"
+msgstr "LOAD: Module gibt es nur unter GonWare\n"
+
+#: src/dos/load.c:59
+msgid "Loads a kernel module (GLM)"
+msgstr "Lädt ein Kernelmodul (GLM)"
+
+#: src/dos/md.c:78
+msgid "Create one or more directories"
+msgstr "Legt ein oder mehrere Verzeichnisse an"
+
+#: src/dos/md.c:114
+msgid "   md [files] /r\n"
+msgstr "   md [Verzeichnisse] /r\n"
+
+#: src/dos/md.c:115
+msgid "   /r Recursive creation (otherwise, creates only top level)\n"
+msgstr "   /r Rekursiv anlegen (sonst nur die oberste Ebene)\n"
+
+#: src/dos/md.c:169
+#, c-format
+msgid "Created %s\n"
+msgstr "%s angelegt\n"
+
+#: src/dos/md.c:171
+#, c-format
+msgid "Failed creating %s\n"
+msgstr "%s kann nicht angelegt werden\n"
+
+#: src/dos/path.c:14
+msgid "path - TODO: Unimplemented yet\n"
+msgstr "path - TODO: noch nicht umgesetzt\n"
+
+#: src/dos/path.c:18
+msgid "Here should be a basic help for path"
+msgstr "Hier sollte eine kurze Hilfe zu PATH stehen"
+
+#: src/dos/prompt.c:33
+msgid "Set the prompt"
+msgstr "Setzt die Eingabeaufforderung"
+
+#: src/dos/reboot.c:24
+#, c-format
+msgid "%s: the machine did not restart\n"
+msgstr "%s: die Maschine hat nicht neu gestartet\n"
+
+#: src/dos/reboot.c:25
+#, c-format
+msgid "%s: the machine did not switch off\n"
+msgstr "%s: die Maschine hat sich nicht ausgeschaltet\n"
+
+#: src/dos/reboot.c:29
+#, c-format
+msgid "%s: only on GonWare\n"
+msgstr "%s: nur unter GonWare\n"
+
+#: src/dos/reboot.c:54
+msgid "Writes the volumes back and restarts the machine"
+msgstr "Schreibt die Volumes zurück und startet die Maschine neu"
+
+#: src/dos/reboot.c:56
+msgid "Writes the volumes back and switches the machine off"
+msgstr "Schreibt die Volumes zurück und schaltet die Maschine aus"
+
+#: src/dos/rem.c:19
+msgid "Used in batch files for comments"
+msgstr "Für Kommentare in Stapeldateien"
+
+#: src/dos/set.c:74
+msgid "Display or modify environment variable"
+msgstr "Zeigt oder ändert Umgebungsvariablen"
+
+#: src/dos/shift.c:18
+msgid "Here should be a basic help for shift"
+msgstr "Hier sollte eine kurze Hilfe zu SHIFT stehen"
+
+#: src/dos/type.c:82
+#, c-format
+msgid "File not found - %s\n"
+msgstr "Datei nicht gefunden - %s\n"
+
+#: src/dos/type.c:99
+msgid "Prints the content of a file"
+msgstr "Gibt den Inhalt einer Datei aus"
+
+#: src/dos/type.c:135
+msgid "   type [files] /l\n"
+msgstr "   type [Dateien] /l\n"
+
+#: src/dos/type.c:136
+msgid "   /l print line numbers\n"
+msgstr "   /l mit Zeilennummern\n"
+
+#: src/dos/ver.c:21
+msgid "Display the version of the shell"
+msgstr "Zeigt die Version der Shell"
+
+#: src/help.c:22
+#, c-format
+msgid "FDBox version %s (%d)\n"
+msgstr "FDBox Version %s (%d)\n"
+
+#: src/help.c:23
+msgid "Available applets:\n"
+msgstr "Verfügbare Befehle:\n"
+
+#: src/help.c:35
+msgid "Displays about text (this help)"
+msgstr "Zeigt diese Hilfe"
+
+#: src/main.c:34
+#, c-format
+msgid "%c: was not cleanly unmounted, checking it\n"
+msgstr "%c: wurde nicht sauber abgemeldet, wird geprüft\n"
+
+#: src/main.c:41
+#, c-format
+msgid "%c: stays read-only: run OFSCK /F %c: or ORECOVER\n"
+msgstr "%c: bleibt schreibgeschützt: OFSCK /F %c: oder ORECOVER ausführen\n"
+
+#: src/main.c:74
+msgid ""
+"The check found errors it could not repair. EXIT goes on with the start.\n"
+msgstr ""
+"Die Prüfung hat Fehler gefunden, die sie nicht beheben konnte. EXIT setzt "
+"den Start fort.\n"
+
+#: src/unix/cal.c:12
+msgid "cal - TODO: Unimplemented yet\n"
+msgstr "cal - TODO: noch nicht umgesetzt\n"
+
+#: src/unix/cal.c:16
+msgid "Here should be a basic help for cal"
+msgstr "Hier sollte eine kurze Hilfe zu CAL stehen"
+
+#: src/unix/head.c:12
+msgid "head - TODO: Unimplemented yet\n"
+msgstr "head - TODO: noch nicht umgesetzt\n"
+
+#: src/unix/head.c:16
+msgid "Here should be a basic help for head"
+msgstr "Hier sollte eine kurze Hilfe zu HEAD stehen"
+
+#: src/unix/hexdump.c:12
+msgid "hexdump - TODO: Unimplemented yet\n"
+msgstr "hexdump - TODO: noch nicht umgesetzt\n"
+
+#: src/unix/hexdump.c:16
+msgid "Here should be a basic help for hexdump"
+msgstr "Hier sollte eine kurze Hilfe zu HEXDUMP stehen"
+
+#: src/unix/tail.c:12
+msgid "tail - TODO: Unimplemented yet\n"
+msgstr "tail - TODO: noch nicht umgesetzt\n"
+
+#: src/unix/tail.c:16
+msgid "Here should be a basic help for tail"
+msgstr "Hier sollte eine kurze Hilfe zu TAIL stehen"

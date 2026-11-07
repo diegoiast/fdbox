@@ -2,7 +2,9 @@
 #include <stdlib.h>
 
 #include "dos/goto.h"
+#include "dos/batch.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -10,8 +12,11 @@ For license - read license.txt
 */
 
 int command_goto(int argc, char *argv[]) {
-        printf("goto - TODO: Unimplemented yet\n");
-        return EXIT_FAILURE;
+        if (argc < 2) {
+                fputs(_("GOTO needs a label\n"), stderr);
+                return EXIT_FAILURE;
+        }
+        return batch_goto(argv[1]);
 }
 
-const char *help_goto() { return "Here should be a basic help for goto"; }
+const char *help_goto() { return _("Here should be a basic help for goto"); }

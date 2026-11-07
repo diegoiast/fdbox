@@ -8,6 +8,7 @@
 #include "fdbox.h"
 #include "lib/args.h"
 #include "lib/strextra.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -63,7 +64,7 @@ int command_del(int argc, char *argv[]) {
 
         del_config_init(&config);
         if (!del_config_parse(argc, argv, &config)) {
-                printf("Failed parsing command line args\n");
+                fputs(_("Failed parsing command line args\n"), stdout);
                 return EXIT_FAILURE;
         }
         /* del_config_print(&config); */
@@ -94,16 +95,16 @@ int command_del(int argc, char *argv[]) {
         if (config.global.verbose) {
                 if (total_files != 0) {
                         if (total_files == total_deleted_files) {
-                                printf("Deleted %d files\n", total_files);
+                                printf(_("Deleted %d files\n"), total_files);
                         } else {
-                                printf("Deleted %d/%d files\n", total_deleted_files, total_files);
+                                printf(_("Deleted %d/%d files\n"), total_deleted_files, total_files);
                         }
                 }
                 if (total_dirs != 0) {
                         if (total_dirs == total_deleted_dirs) {
-                                printf("Deleted %d directories\n", total_dirs);
+                                printf(_("Deleted %d directories\n"), total_dirs);
                         } else {
-                                printf("Deleted %d/%d directories\n", total_deleted_dirs,
+                                printf(_("Deleted %d/%d directories\n"), total_deleted_dirs,
                                        total_dirs);
                         }
                 }
@@ -111,7 +112,7 @@ int command_del(int argc, char *argv[]) {
         return EXIT_FAILURE;
 }
 
-const char *help_del() { return "Delete one or more files"; }
+const char *help_del() { return _("Delete one or more files"); }
 
 static void del_config_init(struct del_config *config) {
         config->prompt = false;
@@ -156,11 +157,11 @@ static void del_config_print(const struct del_config *config) {
 static void del_print_extended_help() {
         printf("%s\n", help_del());
 
-        printf("   del [files] /p /v /r /f\n");
-        printf("   /p Prompt for deletion of each file\n");
-        printf("   /v Verbose delete\n");
-        printf("   /r Recursive delete (delete subdirs)\n");
-        printf("   /f Force deletion of subdirs, or RO files\n");
+        fputs(_("   del [files] /p /v /r /f\n"), stdout);
+        fputs(_("   /p Prompt for deletion of each file\n"), stdout);
+        fputs(_("   /v Verbose delete\n"), stdout);
+        fputs(_("   /r Recursive delete (delete subdirs)\n"), stdout);
+        fputs(_("   /f Force deletion of subdirs, or RO files\n"), stdout);
 }
 
 static deletion_result del_single_file(struct del_config *config, const char *file_name) {
