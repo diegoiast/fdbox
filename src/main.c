@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef FDBOX_NLS
+#include <locale.h>
+#endif
 #include "lib/nls.h"
 
 extern struct applet commands[];
@@ -103,6 +106,14 @@ static int gonware_main(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
 #ifdef FDBOX_NLS
+#if !defined(__GONWARE__)
+        /* GonWare's libintl takes the language from the environment and
+         * finds the catalogues built into the program */
+        setlocale(LC_ALL, "");
+#ifdef FDBOX_LOCALEDIR
+        bindtextdomain("fdbox", FDBOX_LOCALEDIR);
+#endif
+#endif
         textdomain("fdbox");
 #endif
 #if defined(__GONWARE__)
