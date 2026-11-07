@@ -52,55 +52,151 @@ For license - read license.txt
 
 #if defined(__GONWARE__)
 #include <gonware/syscall.h>
+#include <sys/stat.h>
 #include <strings.h>
 
 #define P_WAIT 0
 
 extern char **environ;
 
-/* GDOS starts a program and waits for its end (GDOS_SPAWN); there is no
- * fork. A name without a directory is looked for in the current directory
- * and then in PATH, a name without an extension also as NAME.EXE. */
-static int spawn_try(const char *dir, const char *name, char *argv[], int *status) {
-        char path[260];
-        int ext = strrchr(name, '.') > strrchr(name, '\\');
-        long r;
+/* Commands that are no applet are files, found as on DOS: a name without
+ * a directory in the current directory, then in each directory of PATH;
+ * a name without an extension with each extension of PATHEXT in turn (by
+ * default .EXE;.BTM;.BAT;.GLM), nothing is fixed to one kind of file.
+ * What runs it goes by the extension: .BTM and .BAT the batch interpreter,
+ * GLMs (.GLM, .HBA, .DEV) GDOS in the foreground (GDOS_RUN: SERVER runs
+ * SERVER.GLM so), anything else GDOS as a program (GDOS_SPAWN, waiting
+ * for its end; there is no fork). A bare name found nowhere is asked of
+ * GDOS itself with the same extensions: it has the programs of the boot
+ * archive while that is there (OFSCK ...). */
+#define PATHEXT_DEFAULT ".EXE;.BTM;.BAT;.GLM"
 
-        if (dir && *dir)
-                snprintf(path, sizeof(path), "%s%s%s%s", dir,
-                         strchr("\\/:", dir[strlen(dir) - 1]) ? "" : "\\", name, ext ? "" : ".EXE");
-        else
-                snprintf(path, sizeof(path), "%s%s", name, ext ? "" : ".EXE");
-        r = gdos_call3(GDOS_SPAWN, path, argv, environ);
-        if (r == -GDOS_ENOENT || r == -GDOS_ENOTDIR)
-                return 0;
-        *status = r < 0 ? 1 : (int)r;
-        if (r < 0)
-                fprintf(stderr, "%s: cannot start (error %ld)\n", path, -r);
-        return 1;
+static bool has_ext(const char *name, const char *ext) {
+        size_t n = strlen(name), e = strlen(ext);
+        return n > e && strcasecmp(name + n - e, ext) == 0;
 }
 
-int spawnvp(int mode, char *name, char *argv[]) {
-        int status = 0;
+static bool is_file(const char *path) {
+        struct stat st;
+        return stat(path, &st) == 0 && !S_ISDIR(st.st_mode);
+}
+
+/* name in dir (NULL: as given), with the extensions of PATHEXT when it
+ * has none */
+static bool find_in_dir(const char *dir, const char *name, char *path, size_t size) {
+        const char *base = name, *p, *exts;
+        const char *sep = "";
+
+        for (p = name; *p; p++)
+                if (*p == '\\' || *p == '/' || *p == ':')
+                        base = p + 1;
+        if (dir && *dir && !strchr("\\/:", dir[strlen(dir) - 1]))
+                sep = "\\";
+        if (strchr(base, '.')) {
+                snprintf(path, size, "%s%s%s", dir ? dir : "", sep, name);
+                return is_file(path);
+        }
+        exts = getenv("PATHEXT");
+        if (!exts || !*exts)
+                exts = PATHEXT_DEFAULT;
+        while (*exts) {
+                size_t n = strcspn(exts, ";");
+                if (n && n < 16) {
+                        snprintf(path, size, "%s%s%s%.*s", dir ? dir : "", sep, name, (int)n, exts);
+                        if (is_file(path))
+                                return true;
+                }
+                exts += n + (exts[n] == ';');
+        }
+        return false;
+}
+
+static bool command_find(const char *name, char *path, size_t size) {
         const char *p;
-        (void)mode;
-        if (spawn_try(NULL, name, argv, &status))
-                return status;
+        if (find_in_dir(NULL, name, path, size))
+                return true;
         if (strpbrk(name, "\\/:"))
-                return -1;
-        p = getenv("PATH");
-        while (p && *p) {
+                return false;
+        for (p = getenv("PATH"); p && *p;) {
                 char dir[260];
                 size_t n = strcspn(p, ";");
                 if (n && n < sizeof(dir)) {
                         memcpy(dir, p, n);
                         dir[n] = 0;
-                        if (spawn_try(dir, name, argv, &status))
-                                return status;
+                        if (find_in_dir(dir, name, path, size))
+                                return true;
                 }
                 p += n + (p[n] == ';');
         }
-        return -1;
+        return false;
+}
+
+static bool is_module(const char *path) {
+        return has_ext(path, ".glm") || has_ext(path, ".hba") || has_ext(path, ".dev");
+}
+
+/* a program or GLM by GDOS (GDOS_SPAWN, GDOS_RUN) */
+static long gdos_start(const char *path, int argc, char *argv[]) {
+        if (is_module(path)) {
+                static char args[256];
+                int i;
+                args[0] = 0;
+                for (i = 1; i < argc && strlen(args) + strlen(argv[i]) + 2 <= sizeof(args); i++) {
+                        if (i > 1)
+                                strcat(args, " ");
+                        strcat(args, argv[i]);
+                }
+                return gdos_call2(GDOS_RUN, path, args);
+        }
+        return gdos_call3(GDOS_SPAWN, path, argv, environ);
+}
+
+/* a bare name GDOS has itself (the boot archive while it is there):
+   tried with each extension of PATHEXT; -GDOS_ENOENT when it has none */
+static long gdos_bare(const char *name, int argc, char *argv[], char *path, size_t size) {
+        const char *exts = getenv("PATHEXT");
+        long r;
+        if (strpbrk(name, "\\/:"))
+                return -GDOS_ENOENT;
+        if (strchr(name, '.')) {
+                snprintf(path, size, "%s", name);
+                return has_ext(name, ".btm") || has_ext(name, ".bat") ? -GDOS_ENOENT
+                                                                       : gdos_start(name, argc, argv);
+        }
+        if (!exts || !*exts)
+                exts = PATHEXT_DEFAULT;
+        while (*exts) {
+                size_t n = strcspn(exts, ";");
+                if (n && n < 16) {
+                        snprintf(path, size, "%s%.*s", name, (int)n, exts);
+                        if (!has_ext(path, ".btm") && !has_ext(path, ".bat")) {
+                                r = gdos_start(path, argc, argv);
+                                if (r != -GDOS_ENOENT)
+                                        return r;
+                        }
+                }
+                exts += n + (exts[n] == ';');
+        }
+        return -GDOS_ENOENT;
+}
+
+/* runs the file found for argv[0]; its status, -1 when there is none */
+static int command_run(int argc, char *argv[]) {
+        char path[260];
+        long r;
+
+        if (command_find(argv[0], path, sizeof(path))) {
+                if (has_ext(path, ".btm") || has_ext(path, ".bat"))
+                        return batch_run(path, argc, argv);
+                r = gdos_start(path, argc, argv);
+        } else if ((r = gdos_bare(argv[0], argc, argv, path, sizeof(path))) == -GDOS_ENOENT)
+                return -1;
+        if (r < 0) {
+                fprintf(stderr, "%s: cannot %s (error %ld)\n", path,
+                        r == -GDOS_ENOEXEC && is_module(path) ? "run it (no glm_main?)" : "start", -r);
+                return 1;
+        }
+        return (int)r;
 }
 
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
@@ -209,21 +305,19 @@ static int execute_command(const char *line) {
 #endif
         } else {
                 int err;
-                char batch[260];
-                readline_deinit();
-                err = spawnvp(P_WAIT, args.argv[0], args.argv);
-                readline_init();
 #if defined(__GONWARE__)
-                /* spawnvp: -1 if there is no such program, else its exit status */
-                if (err == -1 && batch_find(args.argv[0], batch, sizeof(batch)))
-                        err = batch_run(batch, args.argc, args.argv);
-                else if (err == -1) {
+                readline_deinit();
+                err = command_run(args.argc, args.argv);
+                readline_init();
+                if (err == -1) {
                         fprintf(stderr, "Bad command or file name - %s\n", args.argv[0]);
                         err = 1;
                 }
                 errno = err; /* the error level */
 #else
-                (void)batch;
+                readline_deinit();
+                err = spawnvp(P_WAIT, args.argv[0], args.argv);
+                readline_init();
                 if (err != 0) {
                         fprintf(stderr, "Command not found - %d \n", err);
                 }
