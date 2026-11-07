@@ -5,6 +5,7 @@
 
 #include "fdbox.h"
 #include "lib/args.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox

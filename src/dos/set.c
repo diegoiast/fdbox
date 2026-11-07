@@ -8,6 +8,7 @@
 #include "lib/args.h"
 #include "fdbox.h"
 #include "lib/tc202/stdextra.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -70,4 +71,4 @@ int command_set(int argc, char *argv[]) {
         }
 }
 
-const char *help_set() { return "Display or modify environment variable"; }
+const char *help_set() { return _("Display or modify environment variable"); }

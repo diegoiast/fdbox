@@ -12,6 +12,7 @@
 #include "dos/beep.h"
 #include "fdbox.h"
 #include "lib/args.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -33,24 +34,24 @@ int command_beep(int argc, char *argv[]) {
                 case 'f':
                         argument = command_config_next(argc, argv, &config);
                         if (argument == NULL) {
-                                printf("Missing argument /f - frequency\n");
+                                fputs(_("Missing argument /f - frequency\n"), stdout);
                                 return EXIT_FAILURE;
                         }
                         frequency = strtol(argument, NULL, 0);
                         if (errno != 0) {
-                                printf("Invalid time argument: %s\n", argument);
+                                printf(_("Invalid time argument: %s\n"), argument);
                                 return EXIT_FAILURE;
                         }
                         break;
                 case 'l':
                         argument = command_config_next(argc, argv, &config);
                         if (argument == NULL) {
-                                printf("Missing argument /l - length\n");
+                                fputs(_("Missing argument /l - length\n"), stdout);
                                 return EXIT_FAILURE;
                         }
                         length = strtol(argument, NULL, 0);
                         if (errno != 0) {
-                                printf("Invalid time argument: %s\n", argument);
+                                printf(_("Invalid time argument: %s\n"), argument);
                                 return EXIT_FAILURE;
                         }
                         break;
@@ -59,22 +60,22 @@ int command_beep(int argc, char *argv[]) {
                 case ARG_DONE:
                         break;
                 default:
-                        printf("No supported argument /%c\n", c2);
+                        printf(_("No supported argument /%c\n"), c2);
                         return EXIT_FAILURE;
                 }
         } while (c1 >= 0);
 
         if (config.files.count != 0) {
-                printf("Invalid argument: %s\n", config.files.file[0]);
+                printf(_("Invalid argument: %s\n"), config.files.file[0]);
                 return EXIT_FAILURE;
         }
 
         if (config.show_help) {
                 printf("%s\n", help_beep());
                 printf("\n");
-                printf("    beep /f [frequency] /t [time/milliseconds]\n");
-                printf("\n  \f requecny in hertz");
-                printf("\n  \t length of the beep in milliseconds");
+                fputs(_("    beep /f [frequency] /t [time/milliseconds]\n"), stdout);
+                fputs(_("\n  /f frequency in hertz"), stdout);
+                fputs(_("\n  /t length of the beep in milliseconds\n"), stdout);
                 return EXIT_SUCCESS;
         }
 #if defined(__unix__) || defined(__APPLE__) || defined(__DJGPP__)
@@ -93,8 +94,8 @@ int command_beep(int argc, char *argv[]) {
 
 const char *help_beep() {
 #if defined(__unix__) || defined(__APPLE__)
-        return "Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with DOS)";
+        return _("Sounds a unix bell: '\\a' (all arguments are ignored for compatibility with DOS)");
 #elif defined(WIN32) || defined(__MSDOS__) || defined(__WATCOMC__)
-        return "Makes sound for a specified length in milliseconds";
+        return _("Makes sound for a specified length in milliseconds");
 #endif
 }

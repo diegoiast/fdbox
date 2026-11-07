@@ -6,6 +6,7 @@
 #include "fdbox.h"
 #include "lib/args.h"
 #include "lib/environ.h"
+#include "lib/nls.h"
 
 #if defined(__TURBOC__)
 #include "lib/tc202/stdextra.h"
@@ -27,7 +28,7 @@ int command_echo(int argc, char *argv[]) {
         char expanded[1024 * 4];
 
         if (argc == 1) {
-                printf("Echo is %s\n", echo_is_on ? "ON" : "OFF");
+                printf(_("Echo is %s\n"), echo_is_on ? "ON" : "OFF");
                 return EXIT_SUCCESS;
         }
 
@@ -43,7 +44,7 @@ int command_echo(int argc, char *argv[]) {
         }
 
         if (!command_merge_args(argc - 1, (const char **)(argv + 1), line, sizeof(line))) {
-                fprintf(stderr, "Warning - could not expand line\n");
+                fputs(_("Warning - could not expand line\n"), stderr);
         }
 
         expand_string(line, expanded, sizeof(expanded));
@@ -58,7 +59,7 @@ int echo_line(const char *text) {
         while (end > text && (end[-1] == ' ' || end[-1] == '\t'))
                 end--;
         if (end == text) {
-                printf("Echo is %s\n", echo_is_on ? "ON" : "OFF");
+                printf(_("Echo is %s\n"), echo_is_on ? "ON" : "OFF");
                 return EXIT_SUCCESS;
         }
         if (end - text == 2 && strncasecmp(text, "on", 2) == 0) {
@@ -74,4 +75,4 @@ int echo_line(const char *text) {
         return EXIT_SUCCESS;
 }
 
-const char *help_echo() { return "Prints a string"; }
+const char *help_echo() { return _("Prints a string"); }

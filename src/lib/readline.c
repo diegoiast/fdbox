@@ -16,6 +16,7 @@ For license - read license.txt
 
 #include "dos/history.h"
 #include "dos/prompt.h"
+#include "lib/nls.h"
 
 #ifdef __TURBOC__
 #include "dos.h"

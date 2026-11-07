@@ -4,6 +4,7 @@
 #include "fdbox.h"
 #include "help.h"
 #include "lib/applet.h"
+#include "lib/nls.h"
 
 #if defined(__TURBOC__)
 #include "lib/tc202/stdextra.h"
@@ -18,8 +19,8 @@ extern struct applet commands[];
 
 int command_help(int argc, char *argv[]) {
         struct applet *app = commands;
-        printf("FDBox version %s (%d)\n", FDBOX_VERSION_STR, FDBOX_VERSION);
-        printf("Available applets:\n");
+        printf(_("FDBox version %s (%d)\n"), FDBOX_VERSION_STR, FDBOX_VERSION);
+        fputs(_("Available applets:\n"), stdout);
 
         while (app != NULL && app->name != NULL) {
                 printf("    %-15s%s\n", app->name, app->help_text());
@@ -31,4 +32,4 @@ int command_help(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_help() { return "Displays about text (this help)"; }
+const char *help_help() { return _("Displays about text (this help)"); }

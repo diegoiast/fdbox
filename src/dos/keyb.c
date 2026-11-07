@@ -3,6 +3,7 @@
 
 #include "dos/keyb.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 #if defined(__GONWARE__)
 #include <gonware/syscall.h>
@@ -22,21 +23,21 @@ int command_keyb(int argc, char *argv[]) {
         char cur[8];
 
         if (argc > 2) {
-                fprintf(stderr, "KEYB [code]\n");
+                fputs(_("KEYB [code]\n"), stderr);
                 return EXIT_FAILURE;
         }
         if (gdos_call2(GDOS_KEYB, argc == 2 ? (long)argv[1] : 0, (long)cur) < 0) {
-                fprintf(stderr, "Invalid keyboard code specified - %s\n", argv[1]);
+                fprintf(stderr, _("Invalid keyboard code specified - %s\n"), argv[1]);
                 return EXIT_FAILURE;
         }
-        printf("Current keyboard code: %s\n", cur);
+        printf(_("Current keyboard code: %s\n"), cur);
         return EXIT_SUCCESS;
 #else
         (void)argc;
         (void)argv;
-        fprintf(stderr, "KEYB: only on GonWare\n");
+        fputs(_("KEYB: only on GonWare\n"), stderr);
         return EXIT_FAILURE;
 #endif
 }
 
-const char *help_keyb() { return "Shows or changes the keyboard layout"; }
+const char *help_keyb() { return _("Shows or changes the keyboard layout"); }

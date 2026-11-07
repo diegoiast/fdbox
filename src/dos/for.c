@@ -8,6 +8,7 @@
 #include "dos/command.h"
 #include "dos/for.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 #if defined(__TURBOC__)
 #include "lib/tc202/dos-glob.h"
@@ -78,13 +79,13 @@ int for_line(const char *line) {
         s = next_word(line, word, sizeof(word)); /* FOR */
         s = next_word(s, var, sizeof(var));
         if (var[0] != '%' || !var[1]) {
-                fprintf(stderr, "Syntax error: FOR %%V IN (set) DO command\n");
+                fputs(_("Syntax error: FOR %V IN (set) DO command\n"), stderr);
                 return 1;
         }
         s = next_word(s, word, sizeof(word));
         s = skip_space(s);
         if (strcasecmp(word, "in") != 0 || *s != '(' || !(close = strchr(s, ')'))) {
-                fprintf(stderr, "Syntax error: FOR %%V IN (set) DO command\n");
+                fputs(_("Syntax error: FOR %V IN (set) DO command\n"), stderr);
                 return 1;
         }
         n = (size_t)(close - s - 1);
@@ -95,7 +96,7 @@ int for_line(const char *line) {
         command = next_word(close + 1, word, sizeof(word));
         command = skip_space(command);
         if (strcasecmp(word, "do") != 0 || !*command) {
-                fprintf(stderr, "Syntax error: FOR %%V IN (set) DO command\n");
+                fputs(_("Syntax error: FOR %V IN (set) DO command\n"), stderr);
                 return 1;
         }
 
@@ -139,4 +140,4 @@ int command_for(int argc, char *argv[]) {
         return for_line(line);
 }
 
-const char *help_for() { return "Runs a command for each file of a set"; }
+const char *help_for() { return _("Runs a command for each file of a set"); }

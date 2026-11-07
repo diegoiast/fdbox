@@ -4,6 +4,7 @@
 #include "dos/shift.h"
 #include "dos/batch.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -14,4 +15,4 @@ int command_shift(int argc, char *argv[]) {
         return batch_shift();
 }
 
-const char *help_shift() { return "Here should be a basic help for shift"; }
+const char *help_shift() { return _("Here should be a basic help for shift"); }

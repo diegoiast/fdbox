@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lib/nls.h"
 
 extern struct applet commands[];
 
@@ -30,14 +31,14 @@ static int gonware_check(void) {
                 if (gdos_call2(GDOS_VOLUME, d, &vol) || !(vol.flags & GDOS_VOL_DIRTY) ||
                     (vol.flags & GDOS_VOL_RDONLY))
                         continue;
-                printf("%c: was not cleanly unmounted, checking it\n", d);
+                printf(_("%c: was not cleanly unmounted, checking it\n"), d);
                 snprintf(line, sizeof(line), "OFSCK /AUTO %c:", d);
                 errno = 0;
                 command_execute_line(line);
                 if (errno > worst)
                         worst = errno;
                 if (!gdos_call2(GDOS_VOLUME, d, &vol) && (vol.flags & GDOS_VOL_DIRTY))
-                        printf("%c: stays read-only: run OFSCK /F %c: or ORECOVER\n", d, d);
+                        printf(_("%c: stays read-only: run OFSCK /F %c: or ORECOVER\n"), d, d);
         }
         return worst;
 }
@@ -70,7 +71,7 @@ static int gonware_main(int argc, char *argv[]) {
                 readline_deinit();
                 if (level < 2)
                         return 0; /* clean, or repaired */
-                printf("The check found errors it could not repair. EXIT goes on with the start.\n");
+                fputs(_("The check found errors it could not repair. EXIT goes on with the start.\n"), stdout);
                 readline_init();
                 atexit(readline_deinit);
                 return command_command(1, argv);
@@ -101,6 +102,9 @@ static int gonware_main(int argc, char *argv[]) {
 #endif
 
 int main(int argc, char *argv[]) {
+#ifdef FDBOX_NLS
+        textdomain("fdbox");
+#endif
 #if defined(__GONWARE__)
         if (argc < 2 || argv[1][0] == '/' || !find_applet(CASE_INSENSITVE, argv[1], commands))
                 return gonware_main(argc, argv);

@@ -9,6 +9,7 @@
 #include "dos/type.h"
 #include "fdbox.h"
 #include "lib/args.h"
+#include "lib/nls.h"
 
 #define LINE_PRINT "%5zd  "
 
@@ -78,7 +79,7 @@ int command_type(int argc, char *argv[]) {
                 size_t line_number = 0;
 
                 if (!file) {
-                        fprintf(stderr, "File not found - %s\n", file_name);
+                        fprintf(stderr, _("File not found - %s\n"), file_name);
                         rc = EXIT_FAILURE;
                         continue;
                 }
@@ -95,7 +96,7 @@ int command_type(int argc, char *argv[]) {
         return rc;
 }
 
-const char *help_type() { return "Prints the content of a file"; }
+const char *help_type() { return _("Prints the content of a file"); }
 
 /* internal API, all functions bellow should be static */
 static void type_config_init(struct type_config *config) {
@@ -131,6 +132,6 @@ static void type_config_print(const struct type_config *config) {
 static void type_print_extended_help() {
         printf("%s\n", help_type());
 
-        printf("   type [files] /l\n");
-        printf("   /l print line numbers\n");
+        fputs(_("   type [files] /l\n"), stdout);
+        fputs(_("   /l print line numbers\n"), stdout);
 }

@@ -22,6 +22,7 @@ For license - read license.txt
 #include "dos/for.h"
 #include "dos/prompt.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 #ifdef __MSDOS__
 #include "lib/tc202/stdbool.h"
@@ -193,11 +194,11 @@ static int command_run(int argc, char *argv[]) {
         } else if ((r = gdos_bare(argv[0], argc, argv, path, sizeof(path))) == -GDOS_ENOENT)
                 return -1;
         if (r == -GDOS_EPERM) {
-                fprintf(stderr, "%s is a driver: LOAD %s, if you mean it\n", path, argv[0]);
+                fprintf(stderr, _("%s is a driver: LOAD %s, if you mean it\n"), path, argv[0]);
                 return 1;
         }
         if (r < 0) {
-                fprintf(stderr, "%s: cannot start (error %ld)\n", path, -r);
+                fprintf(stderr, _("%s: cannot start (error %ld)\n"), path, -r);
                 return 1;
         }
         return (int)r;
@@ -218,7 +219,7 @@ int spawnvp(int mode, char *path, char *argv[]) {
                 return status;
         } else {
                 execvp(path, argv);
-                fprintf(stderr, "an error occurred in execvp\n");
+                fputs(_("an error occurred in execvp\n"), stderr);
                 abort();
         }
         return 0;
@@ -251,7 +252,7 @@ static int execute_command(const char *line) {
          * this is OK for now */
 
         if (command_args_split(line, &args)) {
-                fprintf(stderr, "Command line parsing failed\n");
+                fputs(_("Command line parsing failed\n"), stderr);
                 return EXIT_SUCCESS;
         }
 
@@ -285,7 +286,7 @@ static int execute_command(const char *line) {
         if (args.argc == 1 && isalpha((unsigned char)args.argv[0][0]) && args.argv[0][1] == ':' &&
             !args.argv[0][2]) {
                 if (chdir(args.argv[0]))
-                        fprintf(stderr, "Invalid drive specification\n");
+                        fputs(_("Invalid drive specification\n"), stderr);
                 command_args_free(&args);
                 return EXIT_SUCCESS;
         }
@@ -304,7 +305,7 @@ static int execute_command(const char *line) {
 #if !defined(__GONWARE__)
                 /* on GonWare the commands report their errors themselves */
                 if (code != EXIT_SUCCESS) {
-                        fprintf(stderr, "Command failed (%d)\n", code);
+                        fprintf(stderr, _("Command failed (%d)\n"), code);
                 }
 #endif
         } else {
@@ -314,7 +315,7 @@ static int execute_command(const char *line) {
                 err = command_run(args.argc, args.argv);
                 readline_init();
                 if (err == -1) {
-                        fprintf(stderr, "Bad command or file name - %s\n", args.argv[0]);
+                        fprintf(stderr, _("Bad command or file name - %s\n"), args.argv[0]);
                         err = 1;
                 }
                 errno = err; /* the error level */
@@ -323,7 +324,7 @@ static int execute_command(const char *line) {
                 err = spawnvp(P_WAIT, args.argv[0], args.argv);
                 readline_init();
                 if (err != 0) {
-                        fprintf(stderr, "Command not found - %d \n", err);
+                        fprintf(stderr, _("Command not found - %d \n"), err);
                 }
 #endif
         }
@@ -394,7 +395,7 @@ static bool redirect_fd(const char *path, int flags, int target, int *saved) {
         int fd = open(path, flags, 0666);
 
         if (fd < 0) {
-                fprintf(stderr, "%s: cannot open\n", path);
+                fprintf(stderr, _("%s: cannot open\n"), path);
                 return false;
         }
         *saved = dup(target);
@@ -421,7 +422,7 @@ static int execute_redirected(char *cmd, const char *in, const char *out) {
         int saved[2] = {-1, -1}, code, level;
 
         if (!redirect_parse(cmd, &r)) {
-                fprintf(stderr, "Syntax error: a redirection without a file name\n");
+                fputs(_("Syntax error: a redirection without a file name\n"), stderr);
                 errno = 1;
                 return EXIT_SUCCESS;
         }
@@ -473,7 +474,7 @@ int command_execute_line(const char *line) {
                         quote = quote ? (*s == quote ? 0 : quote) : *s;
                 else if (*s == '|') {
                         if (n == PIPE_STAGES) {
-                                fprintf(stderr, "Too many pipes\n");
+                                fputs(_("Too many pipes\n"), stderr);
                                 errno = 1;
                                 return EXIT_SUCCESS;
                         }
@@ -545,7 +546,7 @@ int command_command(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_command() { return "Runs an MS-DOS interactive shell"; }
+const char *help_command() { return _("Runs an MS-DOS interactive shell"); }
 
 /* internal API, all functions bellow should be static */
 static void command_shell_config_init(struct command_shell_config *config) {
@@ -576,9 +577,9 @@ static void command_shell_config_print(const struct command_shell_config *config
 static void command_shell_print_extended_help() {
         printf("%s\n", help_command());
 
-        printf("   command {shell command} /l\n");
-        printf("   Runs an interactive shell \n");
-        printf("   TODO: properly implement the command.com swithces \n");
+        fputs(_("   command {shell command} /l\n"), stdout);
+        fputs(_("   Runs an interactive shell \n"), stdout);
+        fputs(_("   TODO: properly implement the command.com switches \n"), stdout);
 }
 
 /* read line */

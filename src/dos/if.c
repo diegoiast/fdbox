@@ -14,6 +14,7 @@ For license - read license.txt
 #include "fdbox.h"
 #include "lib/environ.h"
 #include "lib/strextra.h"
+#include "lib/nls.h"
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <glob.h>
@@ -122,7 +123,7 @@ int command_if(int argc, char *argv[]) {
         return rc;
 }
 
-const char *help_if() { return "Conditionally execute a command"; }
+const char *help_if() { return _("Conditionally execute a command"); }
 
 /* this implementation also returns true for directories, is this OK? */
 static bool if_file_exists(const char *path) {

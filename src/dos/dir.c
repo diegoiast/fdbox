@@ -32,6 +32,7 @@ https://github.com/tproffen/DiffuseCode/blob/master/lib_f90/win32-glob.c
 #include "fdbox.h"
 #include "lib/args.h"
 #include "lib/strextra.h"
+#include "lib/nls.h"
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <dirent.h>
@@ -115,7 +116,7 @@ int command_dir(int argc, char *argv[]) {
         /* first read configuration from command line */
         dir_config_init(&config);
         if (!dir_parse_config(argc, argv, &config)) {
-                printf("Failed parsing command line args\n");
+                fputs(_("Failed parsing command line args\n"), stdout);
                 return EXIT_FAILURE;
         }
         /*        dir_config_print(&config); */
@@ -126,7 +127,7 @@ int command_dir(int argc, char *argv[]) {
         }
 
         if (config.global.files.overflow != 0) {
-                fprintf(stderr, "Warning: %zd/%zd files not be displayed\n",
+                fprintf(stderr, _("Warning: %zd/%zd files will not be displayed\n"),
                         config.global.files.overflow,
                         config.global.files.overflow + config.global.files.count);
         }
@@ -230,11 +231,11 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         }
 
         if (requested_count != file_count) {
-                fprintf(stderr, "Warning: %d/%d files will not be showed\n",
+                fprintf(stderr, _("Warning: %d/%d files will not be shown\n"),
                         (int)requested_count - MAX_DIR_ENTRY_FILES, (int)requested_count);
         }
         if (!config->bare) {
-                printf("\nDirectory of %s\n", dir_name);
+                printf(_("\nDirectory of %s\n"), dir_name);
         }
         for (i = 0; i < file_count; i++) {
                 char display[200];
@@ -298,7 +299,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 /* https://stackoverflow.com/questions/18801483/press-any-key-to-continue-function-in-c/18801616
                  */
                 if (config->pause && lines == 24) {
-                        printf("Press enter to continue...\n");
+                        fputs(_("Press enter to continue...\n"), stdout);
                         getchar();
                 }
 
@@ -311,8 +312,8 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
                 putchar('\n');
         }
         if (!config->bare) {
-                printf("%10d files(s)\t %lld bytes\n", total_files, total_bytes);
-                printf("%10d dirs(s) \t %lld free\n", total_dirs, free_bytes);
+                printf(_("%10d files(s)\t %lld bytes\n"), total_files, total_bytes);
+                printf(_("%10d dirs(s) \t %lld free\n"), total_dirs, free_bytes);
         }
         for (i = 0; i < file_count; i++) {
                 if (config->subdirs) {
@@ -338,7 +339,7 @@ static void dir_display_dir(struct dir_config *config, const char *dir_name,
         }
 }
 
-const char *help_dir() { return "Displays a list of files and subdirectories in a directory"; }
+const char *help_dir() { return _("Displays a list of files and subdirectories in a directory"); }
 
 /****************************************************************************
  * internal functions
@@ -449,7 +450,7 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
                                 flag_set(&config->sort_order, SORT_SIZE, true);
                                 break;
                         default:
-                                printf("invalid sort argument %c/\n", c2);
+                                printf(_("invalid sort argument %c/\n"), c2);
                                 return false;
                         }
                         break;
@@ -467,22 +468,22 @@ static bool dir_parse_config(int argc, char *argv[], struct dir_config *config) 
 
 static void dir_print_extended_help() {
         printf("%s\n", help_dir());
-        printf("   dir [files] /p /w /s /b /l /O [files]\n");
+        fputs(_("   dir [files] /p /w /s /b /l /O [files]\n"), stdout);
 
-        printf("   /p pause after each screen\n");
-        printf("   /w use wide format, no details\n");
-        printf("   /s display contents of sub directories as well\n");
-        printf("   /b bare format - print no headers of suffix\n");
-        printf("   /l lower case - all names are dislpayed in lower case\n");
-        printf("   /a[] filter files by attributes\n");
-        printf("       /ad - directoroies    /ar - readonly   /ah - hidden\n");
-        printf("       /as - system files\n");
-        printf("   /o[esdng] sort files\n");
-        printf("       /oe - extension       /os - by name    /od - date\n");
-        printf("       /on - by size         /og - directories first \n");
-        printf("Examples:\n");
-        printf("> dir /w /os *.exe\n");
-        printf("> dir /p /b *.txt *.com\n");
+        fputs(_("   /p pause after each screen\n"), stdout);
+        fputs(_("   /w use wide format, no details\n"), stdout);
+        fputs(_("   /s display contents of sub directories as well\n"), stdout);
+        fputs(_("   /b bare format - print no headers or summary\n"), stdout);
+        fputs(_("   /l lower case - all names are displayed in lower case\n"), stdout);
+        fputs(_("   /a[] filter files by attributes\n"), stdout);
+        fputs(_("       /ad - directories    /ar - readonly   /ah - hidden\n"), stdout);
+        fputs(_("       /as - system files\n"), stdout);
+        fputs(_("   /o[esdng] sort files\n"), stdout);
+        fputs(_("       /oe - extension       /os - by name    /od - date\n"), stdout);
+        fputs(_("       /on - by size         /og - directories first \n"), stdout);
+        fputs(_("Examples:\n"), stdout);
+        fputs(_("> dir /w /os *.exe\n"), stdout);
+        fputs(_("> dir /p /b *.txt *.com\n"), stdout);
 }
 
 static void dir_format_date_time(long ff_fdate, long ff_ftime, char *time, char *date) {

@@ -8,6 +8,7 @@
 #include "dos/command.h"
 #include "lib/args.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 /*
  This file is part of fdbox
@@ -27,4 +28,4 @@ int command_call(int argc, char *argv[]) {
         return errno;
 }
 
-const char *help_call() { return "Here should be a basic help for call"; }
+const char *help_call() { return _("Here should be a basic help for call"); }

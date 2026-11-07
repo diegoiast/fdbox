@@ -3,6 +3,7 @@
 #include "lib/readline.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "lib/nls.h"
 
 int command_history(int argc, char *argv[]) {
         int n = 0;
@@ -19,4 +20,4 @@ int command_history(int argc, char *argv[]) {
         return EXIT_SUCCESS;
 }
 
-const char *help_history() { return "Displays all readline history available"; }
+const char *help_history() { return _("Displays all readline history available"); }

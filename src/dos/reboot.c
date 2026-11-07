@@ -3,6 +3,7 @@
 
 #include "dos/reboot.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 #if defined(__GONWARE__)
 #include <gonware/syscall.h>
@@ -20,11 +21,12 @@ static int power(const char *name, int how) {
 #if defined(__GONWARE__)
         fflush(stdout);
         gdos_call1(GDOS_POWER, how);
-        fprintf(stderr, "%s: the machine did not %s\n", name,
-                how == GDOS_POWER_REBOOT ? "restart" : "switch off");
+        fprintf(stderr, how == GDOS_POWER_REBOOT ? _("%s: the machine did not restart\n")
+                                                 : _("%s: the machine did not switch off\n"),
+                name);
 #else
         (void)how;
-        fprintf(stderr, "%s: only on GonWare\n", name);
+        fprintf(stderr, _("%s: only on GonWare\n"), name);
 #endif
         return EXIT_FAILURE;
 }
@@ -49,6 +51,6 @@ int command_poweroff(int argc, char *argv[]) {
 #endif
 }
 
-const char *help_reboot() { return "Writes the volumes back and restarts the machine"; }
+const char *help_reboot() { return _("Writes the volumes back and restarts the machine"); }
 
-const char *help_poweroff() { return "Writes the volumes back and switches the machine off"; }
+const char *help_poweroff() { return _("Writes the volumes back and switches the machine off"); }

@@ -16,6 +16,7 @@ For license - read license.txt
 #include "dos/prompt.h"
 #include "lib/environ.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 extern bool echo_is_on;
 
@@ -147,7 +148,7 @@ int batch_run(const char *path, int argc, char *argv[]) {
         memset(&b, 0, sizeof(b));
         b.lines = read_lines(path, &b.count);
         if (!b.lines) {
-                fprintf(stderr, "%s: cannot read the batch file\n", path);
+                fprintf(stderr, _("%s: cannot read the batch file\n"), path);
                 return 1;
         }
         b.args[0] = strdup(path);
@@ -203,7 +204,7 @@ int batch_goto(const char *label) {
         size_t i, n;
 
         if (!b) {
-                fprintf(stderr, "GOTO works only in batch files\n");
+                fputs(_("GOTO works only in batch files\n"), stderr);
                 return EXIT_FAILURE;
         }
         while (*label == ':')
@@ -223,7 +224,7 @@ int batch_goto(const char *label) {
                         return EXIT_SUCCESS;
                 }
         }
-        fprintf(stderr, "Label not found: %.*s\n", (int)n, label);
+        fprintf(stderr, _("Label not found: %.*s\n"), (int)n, label);
         b->done = true;
         return EXIT_FAILURE;
 }

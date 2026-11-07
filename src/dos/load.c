@@ -16,6 +16,7 @@ check that one means it.
 
 #include "dos/load.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 #if defined(__GONWARE__)
 #include <gonware/syscall.h>
@@ -28,7 +29,7 @@ int command_load(int argc, char *argv[]) {
         int i;
 
         if (argc < 2) {
-                printf("LOAD module [arguments]\n");
+                fputs(_("LOAD module [arguments]\n"), stdout);
                 return EXIT_FAILURE;
         }
         args[0] = 0;
@@ -39,20 +40,20 @@ int command_load(int argc, char *argv[]) {
         }
         r = gdos_call2(GDOS_LOAD, argv[1], args);
         if (r == -GDOS_ENOENT) {
-                fprintf(stderr, "LOAD: %s not found\n", argv[1]);
+                fprintf(stderr, _("LOAD: %s not found\n"), argv[1]);
                 return EXIT_FAILURE;
         }
         if (r < 0) {
-                fprintf(stderr, "LOAD: %s was not loaded\n", argv[1]);
+                fprintf(stderr, _("LOAD: %s was not loaded\n"), argv[1]);
                 return EXIT_FAILURE;
         }
         return (int)r;
 #else
         (void)argc;
         (void)argv;
-        fprintf(stderr, "LOAD: modules exist only on GonWare\n");
+        fputs(_("LOAD: modules exist only on GonWare\n"), stderr);
         return EXIT_FAILURE;
 #endif
 }
 
-const char *help_load() { return "Loads a kernel module (GLM)"; }
+const char *help_load() { return _("Loads a kernel module (GLM)"); }

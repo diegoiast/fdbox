@@ -12,6 +12,7 @@
 #include "fdbox.h"
 #include "lib/args.h"
 #include "lib/strextra.h"
+#include "lib/nls.h"
 
 /*
 This file is part of fdbox
@@ -81,12 +82,12 @@ static int command_move_copy(int argc, char *argv[], struct copy_config *config)
         }
 
         if (config->source_file == NULL || config->source_file[0] == '\0') {
-                fprintf(stderr, "Error: no source file provided\n");
+                fputs(_("Error: no source file provided\n"), stderr);
                 return EXIT_FAILURE;
         }
 
         if (config->dest_file == NULL || config->dest_file[0] == '\0') {
-                fprintf(stderr, "Error: no destination file provided\n");
+                fputs(_("Error: no destination file provided\n"), stderr);
                 return EXIT_FAILURE;
         }
 
@@ -131,9 +132,9 @@ int command_move(int argc, char *argv[]) {
         return command_move_copy(argc, argv, &config);
 }
 
-const char *help_copy() { return "Copies one or more files to another location"; }
+const char *help_copy() { return _("Copies one or more files to another location"); }
 
-const char *help_move() { return "Moves one or more files to another location"; }
+const char *help_move() { return _("Moves one or more files to another location"); }
 
 static void copy_move_config_init(struct copy_config *config) {
         /*config->verify = false;*/
@@ -203,25 +204,25 @@ static void copy_move_print_config(struct copy_config *config) {
 
 static void copy_print_extended_help() {
         printf("%s\n", help_copy());
-        printf("   copy [from] [to] /a /y /v\n");
+        fputs(_("   copy [from] [to] /a /y /v\n"), stdout);
 
-        printf("   /a Copy attributes\n");
-        printf("   /y Ask for confirmation on overrite (WIP)\n");
-        printf("   /v Verbose copy\n");
-        printf("Examples:\n");
-        printf("> copy c:\\autoexec.bat c:\\autoexec.old \n");
-        printf("> copy *.exe backup\\ \n");
+        fputs(_("   /a Copy attributes\n"), stdout);
+        fputs(_("   /y Ask for confirmation on overwrite (WIP)\n"), stdout);
+        fputs(_("   /v Verbose copy\n"), stdout);
+        fputs(_("Examples:\n"), stdout);
+        fputs(_("> copy c:\\autoexec.bat c:\\autoexec.old \n"), stdout);
+        fputs(_("> copy *.exe backup\\ \n"), stdout);
 }
 
 static void move_print_extended_help() {
         printf("%s\n", help_copy());
-        printf("   move [from] [to] /a /y /v\n");
+        fputs(_("   move [from] [to] /a /y /v\n"), stdout);
 
-        printf("   /y Ask for confirmation on overrite (WIP)\n");
-        printf("   /v Verbose copy\n");
-        printf("Examples:\n");
-        printf("> move c:\\autoexec.bat c:\\autoexec.old \n");
-        printf("> move *.exe backup\\ \n");
+        fputs(_("   /y Ask for confirmation on overwrite (WIP)\n"), stdout);
+        fputs(_("   /v Verbose copy\n"), stdout);
+        fputs(_("Examples:\n"), stdout);
+        fputs(_("> move c:\\autoexec.bat c:\\autoexec.old \n"), stdout);
+        fputs(_("> move *.exe backup\\ \n"), stdout);
 }
 
 static bool copy_move_is_dir(const char *path) {
@@ -258,12 +259,12 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
 
         source = fopen(from, "rb");
         if (source == NULL) {
-                fprintf(stderr, "Failed reading from %s\n", from);
+                fprintf(stderr, _("Failed reading from %s\n"), from);
                 return errno;
         }
         dest = fopen(to, "wb");
         if (dest == NULL) {
-                fprintf(stderr, "Failed openning %s for writing\n", to);
+                fprintf(stderr, _("Failed opening %s for writing\n"), to);
                 fclose(source);
                 return errno;
         }
@@ -303,14 +304,14 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
         fclose(source);
         fclose(dest);
         if (total_read != total_written) {
-                fprintf(stderr, "Failed writing to %s (wrote %lld/%lld bytes)\n", to,
+                fprintf(stderr, _("Failed writing to %s (wrote %lld/%lld bytes)\n"), to,
                         (long long)total_written, (long long)total_read);
                 return errno;
         }
 
         if (config->copy_attributes) {
 #if defined(__MSDOS__) || defined(__WATCOMC__)
-                fprintf(stderr, "Warning: copying attributes on MSDOS is not supported yet\n");
+                fputs(_("Warning: copying attributes on MSDOS is not supported yet\n"), stderr);
 #else
                 struct stat source_attr;
                 struct utimbuf new_times;
@@ -321,12 +322,12 @@ static int copy_single_file(const char *from, const char *to, struct copy_config
                 new_times.modtime = source_attr.st_mtime;
                 err = utime(to, &new_times);
                 if (err) {
-                        fprintf(stderr, "Error: failed setting time on %s\n", to);
+                        fprintf(stderr, _("Error: failed setting time on %s\n"), to);
                         return errno;
                 }
                 err = chmod(to, source_attr.st_mode);
                 if (err) {
-                        fprintf(stderr, "Error: failed setting ownership on %s\n", to);
+                        fprintf(stderr, _("Error: failed setting ownership on %s\n"), to);
                         return errno;
                 }
 #endif
@@ -359,11 +360,11 @@ static int move_single_file(const char *from, const char *to, struct copy_config
         config->copy_attributes = true;
         r = copy_single_file(from, to, config);
         if (r != 0) {
-                fprintf(stderr, "Error: failed moving %s->%s\n", from, to);
+                fprintf(stderr, _("Error: failed moving %s->%s\n"), from, to);
         }
         r = remove(from);
         if (r != 0) {
-                fprintf(stderr, "Error: failed deleting original file: %s\n", from);
+                fprintf(stderr, _("Error: failed deleting original file: %s\n"), from);
                 return EXIT_FAILURE;
         }
         return EXIT_SUCCESS;
