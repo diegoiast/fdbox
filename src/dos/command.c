@@ -64,8 +64,9 @@ extern char **environ;
  * a name without an extension with each extension of PATHEXT in turn (by
  * default .EXE;.BTM;.BAT;.GLM), nothing is fixed to one kind of file.
  * What runs it goes by the extension: .BTM and .BAT the batch interpreter,
- * GLMs (.GLM, .HBA, .DEV) GDOS in the foreground (GDOS_RUN: SERVER runs
- * SERVER.GLM so), anything else GDOS as a program (GDOS_SPAWN, waiting
+ * GLMs (.GLM, .HBA, .DEV) GDOS (GDOS_RUN: one with a glm_main runs in the
+ * foreground, so SERVER runs SERVER.GLM; one without stays loaded; a
+ * driver needs LOAD), anything else GDOS as a program (GDOS_SPAWN, waiting
  * for its end; there is no fork). A bare name found nowhere is asked of
  * GDOS itself with the same extensions: it has the programs of the boot
  * archive while that is there (OFSCK ...). */
@@ -191,9 +192,12 @@ static int command_run(int argc, char *argv[]) {
                 r = gdos_start(path, argc, argv);
         } else if ((r = gdos_bare(argv[0], argc, argv, path, sizeof(path))) == -GDOS_ENOENT)
                 return -1;
+        if (r == -GDOS_EPERM) {
+                fprintf(stderr, "%s is a driver: LOAD %s, if you mean it\n", path, argv[0]);
+                return 1;
+        }
         if (r < 0) {
-                fprintf(stderr, "%s: cannot %s (error %ld)\n", path,
-                        r == -GDOS_ENOEXEC && is_module(path) ? "run it (no glm_main?)" : "start", -r);
+                fprintf(stderr, "%s: cannot start (error %ld)\n", path, -r);
                 return 1;
         }
         return (int)r;
