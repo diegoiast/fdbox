@@ -22,6 +22,8 @@ For license - read license.txt
 
 int command_echo(int arc, char *argv[]);
 const char *help_echo();
+/* ECHO with the text as written after it (the shell, see command.c) */
+int echo_line(const char *text);
 
 extern bool echo_is_on;
 

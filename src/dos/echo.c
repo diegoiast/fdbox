@@ -11,7 +11,7 @@
 #include "lib/tc202/stdextra.h"
 #endif
 
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) || defined(__GONWARE__) || defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <strings.h>
 #endif
 
@@ -42,11 +42,34 @@ int command_echo(int argc, char *argv[]) {
                 }
         }
 
-        if (!command_merge_args(argc - 1, argv + 1, line, sizeof(line))) {
+        if (!command_merge_args(argc - 1, (const char **)(argv + 1), line, sizeof(line))) {
                 fprintf(stderr, "Warning - could not expand line\n");
         }
 
         expand_string(line, expanded, sizeof(expanded));
+        puts(expanded);
+        return EXIT_SUCCESS;
+}
+
+int echo_line(const char *text) {
+        char expanded[1024 * 4];
+        const char *end = text + strlen(text);
+
+        while (end > text && (end[-1] == ' ' || end[-1] == '\t'))
+                end--;
+        if (end == text) {
+                printf("Echo is %s\n", echo_is_on ? "ON" : "OFF");
+                return EXIT_SUCCESS;
+        }
+        if (end - text == 2 && strncasecmp(text, "on", 2) == 0) {
+                echo_is_on = true;
+                return EXIT_SUCCESS;
+        }
+        if (end - text == 3 && strncasecmp(text, "off", 3) == 0) {
+                echo_is_on = false;
+                return EXIT_SUCCESS;
+        }
+        expand_string(text, expanded, sizeof(expanded));
         puts(expanded);
         return EXIT_SUCCESS;
 }

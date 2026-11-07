@@ -25,7 +25,12 @@
 
 #define DEBUG_LINE printf("%s:%d %s() - PING\n", __FILE__, __LINE__, __FUNCTION__)
 
-#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+/* GonWare (GDOS): the POSIX C library (mlibc), but DOS conventions */
+#if defined(__GONWARE__)
+#define DIRECTORY_DELIMITER "\\"
+#define ARGUMENT_DELIMIER '/'
+#define ALL_FILES_GLOB "*.*"
+#elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #define DIRECTORY_DELIMITER "/"
 #define ARGUMENT_DELIMIER '-'
 #define ALL_FILES_GLOB "*"

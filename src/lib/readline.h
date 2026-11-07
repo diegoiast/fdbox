@@ -69,6 +69,8 @@ size_t readline_delete_left(struct readline_session *session);
 size_t readline_delete_right(struct readline_session *session);
 size_t readline_replace(struct readline_session *session, size_t index, char c);
 size_t readline_insert(struct readline_session *session, size_t index, char c);
+/* inserts a whole character (n bytes, UTF-8) at the cursor */
+size_t readline_insert_seq(struct readline_session *session, const char *seq, size_t n);
 size_t readline_set(struct readline_session *session, const char *new_text);
 void readline_move_home(struct readline_session *session);
 void readline_move_end(struct readline_session *session);
