@@ -129,11 +129,14 @@ int read_char() {
                                 } else {
                                         return 0;
                                 }
-                        case '3':
+                        case '3': /* ESC [ 3 ~ and so on */
+                                getchar();
                                 return KEY_DEL;
                         case '5':
+                                getchar();
                                 return KEY_PGUP;
                         case '6':
+                                getchar();
                                 return KEY_PGDOWN;
                         default:
                                 printf("read escape code: %d\n", i);
@@ -338,6 +341,88 @@ void move_cursor_back(size_t n) {
         }
 }
 
+/*
+The line holds UTF-8 on POSIX and GonWare (a character is several bytes,
+a wide one - CJK, Hangul ... - takes two cells of the screen), single
+bytes of the code page elsewhere. index and current_size count bytes;
+the cursor moves by cells.
+*/
+#if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#define READLINE_UTF8 1
+#else
+#define READLINE_UTF8 0
+#endif
+
+/* the bytes of the character that starts with lead */
+static size_t char_len(unsigned char lead) {
+        if (!READLINE_UTF8 || lead < 0xc0) {
+                return 1;
+        }
+        return lead >= 0xf0 ? 4 : lead >= 0xe0 ? 3 : 2;
+}
+
+/* the start of the character before byte i */
+static size_t char_prev(const char *line, size_t i) {
+        if (i == 0) {
+                return 0;
+        }
+        i--;
+        while (READLINE_UTF8 && i > 0 && ((unsigned char)line[i] & 0xc0) == 0x80) {
+                i--;
+        }
+        return i;
+}
+
+/* the cells of a character: 2 for the East Asian wide and full-width ones
+   (as wcwidth, Markus Kuhn's ranges; GDOS's console uses the same) */
+static size_t char_cells(const char *p) {
+        unsigned long u;
+        unsigned char c = (unsigned char)p[0];
+        if (!READLINE_UTF8 || c < 0xe0) {
+                return 1;
+        }
+        if (c >= 0xf0) {
+                u = ((unsigned long)(c & 7) << 18) | ((unsigned long)(p[1] & 0x3f) << 12) |
+                    ((unsigned long)(p[2] & 0x3f) << 6) | (unsigned long)(p[3] & 0x3f);
+                return (u >= 0x20000 && u <= 0x3fffd) ? 2 : 1;
+        }
+        u = ((unsigned long)(c & 0x0f) << 12) | ((unsigned long)(p[1] & 0x3f) << 6) |
+            (unsigned long)(p[2] & 0x3f);
+        return (u >= 0x1100 && u <= 0x115f) || u == 0x2329 || u == 0x232a ||
+                       (u >= 0x2e80 && u <= 0xa4cf && u != 0x303f) ||
+                       (u >= 0xac00 && u <= 0xd7a3) || (u >= 0xf900 && u <= 0xfaff) ||
+                       (u >= 0xfe10 && u <= 0xfe19) || (u >= 0xfe30 && u <= 0xfe6f) ||
+                       (u >= 0xff00 && u <= 0xff60) || (u >= 0xffe0 && u <= 0xffe6)
+                   ? 2
+                   : 1;
+}
+
+/* the cells of bytes from..to-1 of the line */
+static size_t cells(const char *line, size_t from, size_t to) {
+        size_t n = 0;
+        while (from < to && line[from]) {
+                n += char_cells(line + from);
+                from += char_len((unsigned char)line[from]);
+        }
+        return n;
+}
+
+static void put_spaces(size_t n) {
+        while (n--) {
+                putchar(' ');
+        }
+}
+
+/* the line from byte i is shown again, followed by blank cells over what
+   was there before; the cursor goes back to i */
+static void redraw_from(struct readline_session *session, size_t i, size_t blank) {
+        size_t n = cells(session->line, i, session->current_size);
+        printf("%s", session->line + i);
+        put_spaces(blank);
+        move_cursor_back(n + blank);
+        fflush(stdout);
+}
+
 void readline_session_init(struct readline_session *session) {
         session->line = NULL;
         session->max_size = 0;
@@ -374,6 +459,8 @@ static void save_history(struct readline_session *session) {
 }
 
 int readline(struct readline_session *session) {
+        char seq[4];
+        size_t i, n;
         session->line[0] = 0;
         while (session->index < session->max_size) {
                 int c = read_char();
@@ -440,122 +527,129 @@ int readline(struct readline_session *session) {
                         clear_screen();
                         return 0;
                 default:
-                        if (session->override) {
-                                session->current_size =
-                                    readline_replace(session, session->index, c);
-                                putchar(c);
-                                if (session->index == session->current_size) {
-                                        session->current_size++;
-                                }
-                                session->index++;
-                        } else {
-                                session->current_size = readline_insert(session, session->index, c);
-                                session->index++;
+                        if (c < 0 || c > 0xff || (READLINE_UTF8 && (c & 0xc0) == 0x80)) {
+                                break; /* a key without a character, a stray UTF-8 byte */
                         }
+                        /* a whole character: its UTF-8 bytes */
+                        seq[0] = (char)c;
+                        n = char_len((unsigned char)c);
+                        for (i = 1; i < n; i++) {
+                                seq[i] = (char)read_char();
+                        }
+                        if (session->current_size + n >= session->max_size) {
+                                break;
+                        }
+                        if (session->override && session->index < session->current_size) {
+                                readline_delete_right(session);
+                        }
+                        session->current_size = readline_insert_seq(session, seq, n);
                 }
         }
         return session->current_size;
 }
 
+size_t readline_insert_seq(struct readline_session *session, const char *seq, size_t n) {
+        char *at = session->line + session->index;
+        memmove(at + n, at, session->current_size - session->index + 1);
+        memcpy(at, seq, n);
+        session->current_size += n;
+        printf("%.*s", (int)n, at);
+        session->index += n;
+        redraw_from(session, session->index, 0);
+        return session->current_size;
+}
+
 size_t readline_delete_left(struct readline_session *session) {
-        size_t i;
-        str_del_char(session->line, session->index - 1);
-        move_cursor_back(session->index);
-        printf("%s ", session->line);
-        session->current_size = strlen(session->line);
-        move_cursor_back(session->current_size + 1);
-        session->index--;
-        if (session->index > session->current_size) {
-                session->index = session->current_size;
+        size_t p, w;
+        if (session->index == 0) {
+                return 0;
         }
-        for (i = 0; i < session->index; i++) {
-                putchar(session->line[i]);
-        }
-        fflush(stdout);
+        p = char_prev(session->line, session->index);
+        w = cells(session->line, p, session->index);
+        memmove(session->line + p, session->line + session->index,
+                session->current_size - session->index + 1);
+        session->current_size -= session->index - p;
+        session->index = p;
+        move_cursor_back(w);
+        redraw_from(session, p, w);
         return session->index;
 }
 
 size_t readline_delete_right(struct readline_session *session) {
-        size_t i;
-        str_del_char(session->line, session->index);
-        move_cursor_back(session->index);
-        printf("%s ", session->line);
-        session->current_size = strlen(session->line);
-        for (i = 0; i < session->index; i++) {
-                putchar(session->line[i]);
+        size_t n, w;
+        if (session->index >= session->current_size) {
+                return session->index;
         }
-        fflush(stdout);
+        n = char_len((unsigned char)session->line[session->index]);
+        w = char_cells(session->line + session->index);
+        memmove(session->line + session->index, session->line + session->index + n,
+                session->current_size - session->index - n + 1);
+        session->current_size -= n;
+        redraw_from(session, session->index, w);
         return session->index;
 }
 
 size_t readline_replace(struct readline_session *session, size_t index, char c) {
-        session->line[index] = c;
-        if (session->index == session->current_size) {
-                session->line[index + 1] = '\0';
+        session->index = index;
+        if (session->index < session->current_size) {
+                readline_delete_right(session);
         }
-        putchar(c);
-        putchar('\b');
-        fflush(stdout);
-        return session->current_size;
+        return readline_insert(session, session->index, c);
 }
 
 size_t readline_insert(struct readline_session *session, size_t index, char c) {
-        str_ins_char(session->line, session->max_size, c, index);
-        printf("%s", session->line + index);
-        session->current_size = strlen(session->line);
-        move_cursor_back(session->current_size - index - 1);
-
-        index++;
-        if (session->index > session->current_size) {
-                session->current_size = index;
-        }
-        session->line[session->current_size] = 0;
-        return session->current_size;
+        session->index = index;
+        return readline_insert_seq(session, &c, 1);
 }
 
 size_t readline_set(struct readline_session *session, const char *new_text) {
-        size_t l;
-        move_cursor_back(session->index);
-        for (l = 0; l < session->current_size; l++) {
-                putchar(' ');
+        size_t l, old = cells(session->line, 0, session->current_size);
+        move_cursor_back(cells(session->line, 0, session->index));
+        put_spaces(old);
+        move_cursor_back(old);
+        l = strlen(new_text);
+        if (l >= session->max_size) {
+                l = session->max_size - 1;
         }
-        move_cursor_back(session->current_size);
-        l = strlen(new_text) + 1;
         memcpy(session->line, new_text, l);
+        session->line[l] = 0;
         session->current_size = l;
         session->current_history++;
-        session->index = l - 1;
+        session->index = l;
         printf("%s", session->line);
         fflush(stdout);
         return l;
 }
 
 void readline_move_home(struct readline_session *session) {
-        move_cursor_back(session->index);
+        move_cursor_back(cells(session->line, 0, session->index));
         session->index = 0;
         fflush(stdout);
 }
 
 void readline_move_end(struct readline_session *session) {
-        while (session->line[session->index] != '\0') {
-                putchar(session->line[session->index]);
-                session->index++;
-        }
+        printf("%s", session->line + session->index);
+        session->index = session->current_size;
         fflush(stdout);
 }
 
 void readline_move_left(struct readline_session *session) {
+        size_t p;
         if (session->index > 0) {
-                session->index--;
-                putchar('\b');
+                p = char_prev(session->line, session->index);
+                move_cursor_back(cells(session->line, p, session->index));
+                session->index = p;
+                fflush(stdout);
         }
 }
 
 void readline_move_right(struct readline_session *session) {
-        char next = session->line[session->index];
-        if (session->index < session->max_size && next != '\0') {
-                putchar(session->line[session->index]);
-                session->index++;
+        size_t n;
+        if (session->index < session->current_size) {
+                n = char_len((unsigned char)session->line[session->index]);
+                printf("%.*s", (int)n, session->line + session->index);
+                session->index += n;
+                fflush(stdout);
         }
 }
 

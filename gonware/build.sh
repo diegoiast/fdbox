@@ -33,6 +33,7 @@ sh "$cc" "$arch" "$sysroot" "$output" \
 	src/dos/for.c \
 	src/dos/goto.c \
 	src/dos/history.c \
+	src/dos/keyb.c \
 	src/dos/if.c \
 	src/dos/load.c \
 	src/dos/md.c \

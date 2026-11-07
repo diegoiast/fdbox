@@ -27,6 +27,7 @@
 #include "dos/path.h"
 #include "dos/prompt.h"
 #include "dos/chcp.h"
+#include "dos/keyb.h"
 #include "dos/reboot.h"
 #include "dos/rem.h"
 #include "dos/set.h"
@@ -59,6 +60,7 @@ struct applet commands[] = {
         {help_goto, command_goto, "goto"},
         {help_history, command_history, "history"},
         {help_if, command_if, "if"},
+        {help_keyb, command_keyb, "keyb"},
         {help_load, command_load, "load"},
         {help_md, command_md, "mkdir"},
         {help_move, command_move, "move"},

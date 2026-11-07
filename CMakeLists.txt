@@ -61,6 +61,7 @@ add_executable(
   src/dos/path.c
   src/dos/prompt.c
   src/dos/chcp.c
+  src/dos/keyb.c
   src/dos/reboot.c
   src/dos/rem.c
   src/dos/set.c
