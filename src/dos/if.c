@@ -14,6 +14,7 @@ For license - read license.txt
 #include "fdbox.h"
 #include "lib/environ.h"
 #include "lib/strextra.h"
+#include "lib/nls.h"
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <glob.h>
@@ -62,7 +63,7 @@ int command_if(int argc, char *argv[]) {
                 if (argv[arg_index] != NULL && arg_index < argc) {
                         int error_test = 0;
                         error_test = strtol(argv[arg_index], NULL, 10);
-                        evaluated_value = error_test == save_errno;
+                        evaluated_value = save_errno >= error_test; /* as in DOS: at least */
                 } else {
                         /* we could not even parse the error level, this is bad */
                         evaluated_value = false;
@@ -108,14 +109,21 @@ int command_if(int argc, char *argv[]) {
         } else {
                 command_to_execute = find_else_command(argc - arg_index, argv + arg_index);
         }
+        /* IF leaves the error level alone: that of the command it ran, or
+         * the one before */
+        rc = save_errno;
         if (command_to_execute != NULL) {
-                rc = command_execute_line(command_to_execute);
+                errno = save_errno;
+                if (command_execute_line(command_to_execute) != EXIT_SUCCESS)
+                        rc = save_errno; /* EXIT */
+                else
+                        rc = errno;
                 free(command_to_execute);
         }
         return rc;
 }
 
-const char *help_if() { return "Conditionally execute a command"; }
+const char *help_if() { return _("Conditionally execute a command"); }
 
 /* this implementation also returns true for directories, is this OK? */
 static bool if_file_exists(const char *path) {

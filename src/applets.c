@@ -7,9 +7,11 @@
 #include <stddef.h>
 
 /* applets includes */
+#include "./help.h"
 #include "dos/beep.h"
 #include "dos/call.h"
 #include "dos/cd.h"
+#include "dos/chcp.h"
 #include "dos/cls.h"
 #include "dos/cmd_dir.h"
 #include "dos/command.h"
@@ -22,6 +24,8 @@
 #include "dos/goto.h"
 #include "dos/history.h"
 #include "dos/if.h"
+#include "dos/keyb.h"
+#include "dos/load.h"
 #include "dos/md.h"
 #include "dos/path.h"
 #include "dos/prompt.h"
@@ -31,19 +35,24 @@
 #include "dos/shift.h"
 #include "dos/type.h"
 #include "dos/ver.h"
-#if 0
+#include "unix/basename.h"
 #include "unix/cal.h"
+#include "unix/dirname.h"
 #include "unix/head.h"
 #include "unix/hexdump.h"
+#include "unix/pwd.h"
+#include "unix/sort.h"
 #include "unix/tail.h"
-#endif
-#include "./help.h"
+#include "unix/touch.h"
+#include "unix/uniq.h"
+#include "unix/wc.h"
 
 /* clang-format off */
 struct applet commands[] = {
         {help_beep, command_beep, "beep"},
         {help_call, command_call, "call"},
         {help_cd, command_cd, "cd"},
+        {help_chcp, command_chcp, "chcp"},
         {help_cls, command_cls, "cls"},
         {help_copy, command_copy, "copy"},
         {help_command, command_command, "command"},
@@ -56,9 +65,12 @@ struct applet commands[] = {
         {help_goto, command_goto, "goto"},
         {help_history, command_history, "history"},
         {help_if, command_if, "if"},
+        {help_keyb, command_keyb, "keyb"},
+        {help_load, command_load, "load"},
         {help_md, command_md, "mkdir"},
         {help_move, command_move, "move"},
         {help_path, command_path, "path"},
+        {help_poweroff, command_poweroff, "poweroff"},
         {help_prompt, command_prompt, "prompt"},
         {help_reboot, command_reboot, "reboot"},
         {help_rem, command_rem, "rem"},
@@ -67,13 +79,17 @@ struct applet commands[] = {
         {help_time, command_time, "time"},
         {help_type, command_type, "type"},
         {help_ver, command_ver, "ver"},
-#if 0
-        { help_type,  command_type, "type" },
-        { help_cal,  command_cal, "cal" },
-        { help_head,  command_head, "head" },
-        { help_hexdump,  command_hexdump, "hexdump" },
-        { help_tail,  command_tail, "tail" },
-#endif
+        {help_cal, command_cal, "cal"},
+        {help_head, command_head, "head"},
+        {help_hexdump, command_hexdump, "hexdump"},
+        {help_pwd, command_pwd, "pwd"},
+        {help_tail, command_tail, "tail"},
+        {help_wc, command_wc, "wc"},
+        {help_touch, command_touch, "touch"},
+        {help_basename, command_basename, "basename"},
+        {help_dirname, command_dirname, "dirname"},
+        {help_sort, command_sort, "sort"},
+        {help_uniq, command_uniq, "uniq"},
         {help_help, command_help, "help"},
         {NULL, NULL, NULL}
 };

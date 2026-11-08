@@ -55,19 +55,30 @@ add_executable(
   src/dos/goto.c
   src/dos/history.c
   src/dos/if.c
+  src/dos/batch.c
+  src/dos/load.c
   src/dos/md.c
   src/dos/path.c
   src/dos/prompt.c
+  src/dos/chcp.c
+  src/dos/keyb.c
   src/dos/reboot.c
   src/dos/rem.c
   src/dos/set.c
   src/dos/shift.c
   src/dos/type.c
   src/dos/ver.c
+  src/unix/basename.c
   src/unix/cal.c
+  src/unix/dirname.c
   src/unix/head.c
   src/unix/hexdump.c
-  src/unix/tail.c)
+  src/unix/pwd.c
+  src/unix/sort.c
+  src/unix/tail.c
+  src/unix/touch.c
+  src/unix/uniq.c
+  src/unix/wc.c)
 
 if(WIN32)
   target_sources(fdbox PRIVATE
@@ -83,3 +94,29 @@ endif()
 
 target_include_directories(fdbox PUBLIC "${PROJECT_BINARY_DIR}"
                                         "${PROJECT_SOURCE_DIR}/src/")
+
+# Translations (src/lib/nls.h, po/): -DFDBOX_NLS=ON builds fdbox with
+# gettext and the catalogues of po/ as <prefix>/share/locale/<lang>/
+# LC_MESSAGES/fdbox.mo
+option(FDBOX_NLS "Translated messages (gettext)" OFF)
+if(FDBOX_NLS)
+  find_package(Intl REQUIRED)
+  find_program(MSGFMT msgfmt REQUIRED)
+  include(GNUInstallDirs)
+  set(FDBOX_LOCALEDIR "${CMAKE_INSTALL_FULL_LOCALEDIR}" CACHE PATH "Where the catalogues are installed")
+  target_compile_definitions(fdbox PRIVATE FDBOX_NLS "FDBOX_LOCALEDIR=\"${FDBOX_LOCALEDIR}\"")
+  target_include_directories(fdbox PRIVATE ${Intl_INCLUDE_DIRS})
+  target_link_libraries(fdbox PRIVATE ${Intl_LIBRARIES})
+  file(GLOB _pos CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/po/*.po")
+  foreach(_po IN LISTS _pos)
+    get_filename_component(_lang "${_po}" NAME_WE)
+    set(_mo "${PROJECT_BINARY_DIR}/locale/${_lang}/LC_MESSAGES/fdbox.mo")
+    add_custom_command(OUTPUT "${_mo}"
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/locale/${_lang}/LC_MESSAGES"
+      COMMAND "${MSGFMT}" -o "${_mo}" "${_po}"
+      DEPENDS "${_po}")
+    list(APPEND _mos "${_mo}")
+    install(FILES "${_mo}" DESTINATION "${FDBOX_LOCALEDIR}/${_lang}/LC_MESSAGES")
+  endforeach()
+  add_custom_target(fdbox-catalogues ALL DEPENDS ${_mos})
+endif()

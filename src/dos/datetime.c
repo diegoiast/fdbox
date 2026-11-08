@@ -18,6 +18,7 @@ For license - read license.txt
 #include "fdbox.h"
 #include "lib/args.h"
 #include "lib/strextra.h"
+#include "lib/nls.h"
 
 #ifdef _POSIX_C_SOURCE
 #include <stdbool.h>
@@ -69,7 +70,7 @@ int command_time(int argc, char *argv[]) {
         date_print_time();
         if (config.interactive) {
                 char new_date[128];
-                printf("Enter new time (hh:mm:ss [am/pm]): ");
+                fputs(_("Enter new time (hh:mm:ss [am/pm]): "), stdout);
                 fgets(new_date, 128, stdin);
                 return date_set_new_time(new_date);
         }
@@ -95,15 +96,15 @@ int command_date(int argc, char *argv[]) {
         date_print_date();
         if (config.interactive) {
                 char new_date[128];
-                printf("Enter new date (mm-dd-[yy]yy): ");
+                fputs(_("Enter new date (mm-dd-[yy]yy): "), stdout);
                 fgets(new_date, 128, stdin);
                 return date_set_new_date(new_date);
         }
         return EXIT_SUCCESS;
 }
 
-const char *help_date() { return "Display or modify system time"; }
-const char *help_time() { return "Display or modify system date"; }
+const char *help_date() { return _("Display or modify system date"); }
+const char *help_time() { return _("Display or modify system time"); }
 
 static void date_time_config_init(struct date_time_config *config) {
         config->interactive = true;
@@ -152,7 +153,7 @@ static int date_set_new_date(char *new_date) {
         if (year <= 0 || month <= 0 || day <= 0) {
                 return EXIT_FAILURE;
         }
-        /*        printf("TODO: set the date to %02d-%02d-%4d\n", day, month, year); */
+        /*        printf(_("TODO: set the date to %02d-%02d-%4d\n"), day, month, year); */
 
 #if defined(_POSIX_C_SOURCE)
         {
@@ -187,7 +188,7 @@ static int date_set_new_date(char *new_date) {
 static void date_print_date() {
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
-        printf("Current date is %02d-%02d-%4d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
+        printf(_("Current date is %02d-%02d-%4d\n"), tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
 }
 
 static int date_set_new_time(char *new_time) {
@@ -246,7 +247,7 @@ static int date_set_new_time(char *new_time) {
 #elif defined(__MSDOS__)
         {
                 struct time the_time;
-                printf("TODO: set time to %02d:%02d:%02d\n", hour, minute, second);
+                printf(_("TODO: set time to %02d:%02d:%02d\n"), hour, minute, second);
 
                 the_time.ti_hour = hour;
                 the_time.ti_min = minute;
@@ -264,23 +265,23 @@ static int date_set_new_time(char *new_time) {
 static void date_print_time() {
         time_t t = time(NULL);
         struct tm *tm = localtime(&t);
-        printf("Current time is %02d:%02d:%02d\n", tm->tm_hour, tm->tm_min, tm->tm_sec);
+        printf(_("Current time is %02d:%02d:%02d\n"), tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
 
 static void date_print_extended_help() {
         printf("%s\n", help_date());
-        printf("        date /d [new date]\n");
-        printf("        /d displays date and exits\n\n");
-        printf("If you pass a date to this command, it will just set it\n");
-        printf("and not be interactive. If you don't - the command will\n");
-        printf("prompt you for a new date\n");
+        fputs(_("        date /d [new date]\n"), stdout);
+        fputs(_("        /d displays date and exits\n\n"), stdout);
+        fputs(_("If you pass a date to this command, it will just set it\n"), stdout);
+        fputs(_("and not be interactive. If you don't - the command will\n"), stdout);
+        fputs(_("prompt you for a new date\n"), stdout);
 }
 
 static void time_print_extended_help() {
         printf("%s\n", help_time());
-        printf("        time /t [new time]\n");
-        printf("        /t displays time and exits\n\n");
-        printf("If you pass a time to this command, it will just set it\n");
-        printf("and not be interactive. If you don't - the command will\n");
-        printf("prompt you for a new time\n");
+        fputs(_("        time /t [new time]\n"), stdout);
+        fputs(_("        /t displays time and exits\n\n"), stdout);
+        fputs(_("If you pass a time to this command, it will just set it\n"), stdout);
+        fputs(_("and not be interactive. If you don't - the command will\n"), stdout);
+        fputs(_("prompt you for a new time\n"), stdout);
 }

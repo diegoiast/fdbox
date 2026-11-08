@@ -3,6 +3,7 @@
 
 #include "dos/prompt.h"
 #include "fdbox.h"
+#include "lib/nls.h"
 
 #if defined(__MSDOS__) || defined(__WIN32__)
 /* setenv is not supported under TC, implement this locally
@@ -29,4 +30,4 @@ int command_prompt(int argc, char *argv[]) {
         return r;
 }
 
-const char *help_prompt() { return "Set the prompt"; }
+const char *help_prompt() { return _("Set the prompt"); }

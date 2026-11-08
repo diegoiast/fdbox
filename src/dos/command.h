@@ -10,6 +10,6 @@ int command_command(int arc, char *argv[]);
 const char *help_command();
 
 /* EXIT_FAILURE means exit was triggered */
-int command_execute_line(char *line);
+int command_execute_line(const char *line);
 
 #endif //__command_h__

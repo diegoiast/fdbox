@@ -2,9 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(__GONWARE__) || defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#include <unistd.h>
+#endif
+
 #include "dos/type.h"
 #include "fdbox.h"
 #include "lib/args.h"
+#include "lib/nls.h"
 
 #define LINE_PRINT "%5zd  "
 
@@ -38,6 +43,7 @@ static void type_config_print(const struct type_config *config);
 static void type_print_extended_help();
 
 int command_type(int argc, char *argv[]) {
+        int rc = EXIT_SUCCESS;
         struct type_config config;
         size_t i;
 
@@ -50,6 +56,18 @@ int command_type(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
         }
         if (config.global.files.count == 0) {
+#if defined(__GONWARE__) || defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+                /* no file but a redirected input ("TYPE < X", "A | TYPE"):
+                 * that */
+                if (!isatty(0)) {
+                        /* fd 0 itself: stdin's buffer belongs to the shell */
+                        char buf[1024];
+                        ssize_t n;
+                        while ((n = read(0, buf, sizeof(buf))) > 0)
+                                fwrite(buf, 1, (size_t)n, stdout);
+                        return EXIT_SUCCESS;
+                }
+#endif
                 type_print_extended_help();
                 return EXIT_SUCCESS;
         }
@@ -60,6 +78,11 @@ int command_type(int argc, char *argv[]) {
                 char line[1024];
                 size_t line_number = 0;
 
+                if (!file) {
+                        fprintf(stderr, _("File not found - %s\n"), file_name);
+                        rc = EXIT_FAILURE;
+                        continue;
+                }
                 while (fgets(line, sizeof(line), file)) {
                         line_number++;
                         if (config.show_lines) {
@@ -70,10 +93,10 @@ int command_type(int argc, char *argv[]) {
                 fclose(file);
         }
 
-        return EXIT_SUCCESS;
+        return rc;
 }
 
-const char *help_type() { return "Prints the content of a file"; }
+const char *help_type() { return _("Prints the content of a file"); }
 
 /* internal API, all functions bellow should be static */
 static void type_config_init(struct type_config *config) {
@@ -109,6 +132,6 @@ static void type_config_print(const struct type_config *config) {
 static void type_print_extended_help() {
         printf("%s\n", help_type());
 
-        printf("   type [files] /l\n");
-        printf("   /l print line numbers\n");
+        fputs(_("   type [files] /l\n"), stdout);
+        fputs(_("   /l print line numbers\n"), stdout);
 }
