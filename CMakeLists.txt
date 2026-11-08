@@ -68,11 +68,17 @@ add_executable(
   src/dos/shift.c
   src/dos/type.c
   src/dos/ver.c
+  src/unix/basename.c
   src/unix/cal.c
+  src/unix/dirname.c
   src/unix/head.c
   src/unix/hexdump.c
   src/unix/pwd.c
-  src/unix/tail.c)
+  src/unix/sort.c
+  src/unix/tail.c
+  src/unix/touch.c
+  src/unix/uniq.c
+  src/unix/wc.c)
 
 if(WIN32)
   target_sources(fdbox PRIVATE

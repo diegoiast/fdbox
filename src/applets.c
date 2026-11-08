@@ -35,11 +35,17 @@
 #include "dos/shift.h"
 #include "dos/type.h"
 #include "dos/ver.h"
+#include "unix/basename.h"
 #include "unix/cal.h"
+#include "unix/dirname.h"
 #include "unix/head.h"
 #include "unix/hexdump.h"
 #include "unix/pwd.h"
+#include "unix/sort.h"
 #include "unix/tail.h"
+#include "unix/touch.h"
+#include "unix/uniq.h"
+#include "unix/wc.h"
 
 /* clang-format off */
 struct applet commands[] = {
@@ -78,6 +84,12 @@ struct applet commands[] = {
         {help_hexdump, command_hexdump, "hexdump"},
         {help_pwd, command_pwd, "pwd"},
         {help_tail, command_tail, "tail"},
+        {help_wc, command_wc, "wc"},
+        {help_touch, command_touch, "touch"},
+        {help_basename, command_basename, "basename"},
+        {help_dirname, command_dirname, "dirname"},
+        {help_sort, command_sort, "sort"},
+        {help_uniq, command_uniq, "uniq"},
         {help_help, command_help, "help"},
         {NULL, NULL, NULL}
 };
