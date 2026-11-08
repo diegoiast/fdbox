@@ -71,6 +71,7 @@ add_executable(
   src/unix/cal.c
   src/unix/head.c
   src/unix/hexdump.c
+  src/unix/pwd.c
   src/unix/tail.c)
 
 if(WIN32)

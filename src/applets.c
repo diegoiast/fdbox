@@ -7,9 +7,11 @@
 #include <stddef.h>
 
 /* applets includes */
+#include "./help.h"
 #include "dos/beep.h"
 #include "dos/call.h"
 #include "dos/cd.h"
+#include "dos/chcp.h"
 #include "dos/cls.h"
 #include "dos/cmd_dir.h"
 #include "dos/command.h"
@@ -22,25 +24,22 @@
 #include "dos/goto.h"
 #include "dos/history.h"
 #include "dos/if.h"
+#include "dos/keyb.h"
 #include "dos/load.h"
 #include "dos/md.h"
 #include "dos/path.h"
 #include "dos/prompt.h"
-#include "dos/chcp.h"
-#include "dos/keyb.h"
 #include "dos/reboot.h"
 #include "dos/rem.h"
 #include "dos/set.h"
 #include "dos/shift.h"
 #include "dos/type.h"
 #include "dos/ver.h"
-#if 0
 #include "unix/cal.h"
 #include "unix/head.h"
 #include "unix/hexdump.h"
+#include "unix/pwd.h"
 #include "unix/tail.h"
-#endif
-#include "./help.h"
 
 /* clang-format off */
 struct applet commands[] = {
@@ -74,13 +73,11 @@ struct applet commands[] = {
         {help_time, command_time, "time"},
         {help_type, command_type, "type"},
         {help_ver, command_ver, "ver"},
-#if 0
-        { help_type,  command_type, "type" },
-        { help_cal,  command_cal, "cal" },
-        { help_head,  command_head, "head" },
-        { help_hexdump,  command_hexdump, "hexdump" },
-        { help_tail,  command_tail, "tail" },
-#endif
+        {help_cal, command_cal, "cal"},
+        {help_head, command_head, "head"},
+        {help_hexdump, command_hexdump, "hexdump"},
+        {help_pwd, command_pwd, "pwd"},
+        {help_tail, command_tail, "tail"},
         {help_help, command_help, "help"},
         {NULL, NULL, NULL}
 };
