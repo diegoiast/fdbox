@@ -38,9 +38,9 @@ For license - read license.txt
 
 #if defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 #include <stdbool.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 #ifdef __WIN32__
@@ -53,8 +53,8 @@ For license - read license.txt
 
 #if defined(__GONWARE__)
 #include <gonware/syscall.h>
-#include <sys/stat.h>
 #include <strings.h>
+#include <sys/stat.h>
 
 #define P_WAIT 0
 
@@ -162,8 +162,9 @@ static long gdos_bare(const char *name, int argc, char *argv[], char *path, size
                 return -GDOS_ENOENT;
         if (strchr(name, '.')) {
                 snprintf(path, size, "%s", name);
-                return has_ext(name, ".btm") || has_ext(name, ".bat") ? -GDOS_ENOENT
-                                                                       : gdos_start(name, argc, argv);
+                return has_ext(name, ".btm") || has_ext(name, ".bat")
+                           ? -GDOS_ENOENT
+                           : gdos_start(name, argc, argv);
         }
         if (!exts || !*exts)
                 exts = PATHEXT_DEFAULT;
@@ -532,7 +533,9 @@ int command_command(int argc, char *argv[]) {
                 fflush(stdout); /* the prompt has no line end */
                 l = read_line(line, 1024);
                 if (l < 0) {
-                        return EXIT_FAILURE;
+                        /* end of input (EOF, or Ctrl-D/Ctrl-C): leave the
+                         * shell cleanly rather than spin on the prompt */
+                        break;
                 }
 
                 if ((pos = strchr(line, '\n')) != NULL) {
@@ -587,7 +590,9 @@ bool is_interactive() { return isatty(fileno(stdin)); }
 
 int read_line_simple(char line[], int max_size) {
         line[0] = 0;
-        fgets(line, max_size, stdin);
+        if (fgets(line, max_size, stdin) == NULL) {
+                return -1; /* end of input (EOF) or a read error */
+        }
         return strlen(line);
 }
 
